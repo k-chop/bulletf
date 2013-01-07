@@ -1,4 +1,4 @@
-package com.github.whelmaze.bulletfy
+package com.github.whelmaze.bulletf
 package script
 
 /** 
