@@ -1,0 +1,45 @@
+
+action aim(arg1, arg2, arg3) {
+  arg1 + arg2
+}
+
+bullet test(type, speed, angle) { }
+
+effect bomb(x, y, ) { }
+
+enemy zako1(type, speed, angle, rank) { }
+
+aimtest {
+  dir(0, aim)
+  wait(30)
+  spd(0.5)
+}
+
+loadtests {
+  repeat 0 {
+    fire(flux, normal, @rnd(60,90), @rnd(3,5))
+    fire(flux, normal, @rnd(80,110), @rnd(2,4))
+    fire(flux, normal, @rnd(100,120), @rnd(3,5))
+    wait(60)
+  }
+}
+
+flux {
+  dir(0, aim)
+  wait(30)
+  $0 = 0
+  repeat 30 {
+    fire(simple, normal, $0, 3)
+    $0 += 12
+  }
+}
+
+aim {
+  repeat 4 {
+    repeat 5 {
+      fire(simple, normal, @rnd(360), 5.5)
+      wait(4)
+    }
+  wait(30)
+  }
+}

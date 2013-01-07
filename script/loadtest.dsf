@@ -1,0 +1,69 @@
+
+loadtest {
+  fire(roundshot, normal, 0, 0) 
+  repeat 0 {
+    $0 = @aim
+    $0 -= 46
+    fire(qui, normal, $0, @rnd(0.1,0.18))
+    $0 += @rnd(35)
+    fire(qui, normal, $0, @rnd(0.1,0.18))
+    $0 += @rnd(35)
+    wait(5)
+  }
+}
+
+roundshot {
+  repeat 0 {
+    repeat 3 {
+      fire(round, mini, @rnd(0,360), 0.1)
+      wait(15)
+    }
+    wait(80)
+  }
+}
+
+qui {
+  $0 = @angle
+  repeat 8 {
+    $0 += 3
+    dir($0)
+    wait(6)
+  }
+}
+
+qui2 {
+  $0 = @angle
+  dir($0)
+}
+
+
+loadtest1 {
+  repeat 0 {
+    $0 = @aim
+    $0 += 160
+    $0 += @rnd(40)
+    fire(round, normal, $0, 0.1)
+    $0 = 0.1
+    repeat 20 {
+      fire(simple, mini, @aim, $0)
+      $1 = @aim
+      $1 -= 2
+      fire(simple, mini, $1, $0)
+      $2 = @aim
+      $2 += 2
+      fire(simple, mini, $2, $0)
+      $0 += 0.015
+      wait(4)
+    }
+    wait(20)
+  }
+}
+
+round {
+  wait(30)
+  $0 = 0
+  repeat 36 {
+    fire(simple, normal, $0, 0.1)
+    $0 += 10
+  }
+}
