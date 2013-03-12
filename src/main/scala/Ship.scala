@@ -1,6 +1,6 @@
 package com.github.whelmaze.bulletf
 
-class Ship extends Sprite(Resource.shipGraphic, Position(centerX, screenHeight - 50)) {
+class Ship extends Sprite(Resource.shipGraphic, Position(constants.centerX, constants.screenHeight - 50)) {
 
   radius = 2
   

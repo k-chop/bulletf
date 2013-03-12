@@ -15,13 +15,14 @@ object `package` {
   }
 
   //implicit def container2Double(c: Container): Double = c.get()
-  
-  final val screenWidth = 480
-  final val screenHeight = 640
-  final val centerX = screenWidth / 2
-  final val centerY = screenHeight / 2
 
-  
+  object constants {
+    
+    final val screenWidth = 480
+    final val screenHeight = 640
+    final val centerX = screenWidth / 2
+    final val centerY = screenHeight / 2
+  }
   val ri = { i: Int => util.Random.nextInt(i) }
   val rd = { i: Int => util.Random.nextDouble()*i }
 

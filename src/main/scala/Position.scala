@@ -2,7 +2,7 @@ package com.github.whelmaze.bulletf
 
 object Position {
   
-  final def center() = Position(centerX, centerY)  
+  final def center() = Position(constants.centerX, constants.centerY)  
   
 }
 

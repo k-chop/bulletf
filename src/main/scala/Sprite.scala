@@ -19,7 +19,7 @@ class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) 
   
   def draw() = Drawer.draw(texture, pos)
 
-  def inside() = (0-radius <= pos.x  && pos.x <= screenWidth+radius && 0-radius <= pos.y && pos.y <= screenHeight+radius)
+  def inside() = (0-radius <= pos.x  && pos.x <= constants.screenWidth+radius && 0-radius <= pos.y && pos.y <= constants.screenHeight+radius)
   
 }
 

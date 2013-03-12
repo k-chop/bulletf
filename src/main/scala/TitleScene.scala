@@ -1,6 +1,7 @@
 package com.github.whelmaze.bulletf
 
 import org.lwjgl.input.Keyboard
+import org.lwjgl.opengl.GL11
 
 import collection.mutable
 
@@ -23,6 +24,8 @@ class TitleScene extends Scene {
   
   def init() = {
     drawObject += ( new Sprite(Resource.titleGraphic, Position.center()) )
+
+    println(s"OpenGL version: ${GL11.glGetString(GL11.GL_VERSION)}")
 
     println(name + " inited.")
   }

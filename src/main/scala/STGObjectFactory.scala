@@ -9,7 +9,7 @@ object STGObjectFactory {
 
   final def newEmitter(action: Behaivor, kind: Symbol): Bullet = kind match {
     case 'nullpo => {
-      new Bullet(action, Resource.bullet.nullpo, Position(screenWidth / 2.0, screenHeight / 2.0 - 200), 0, 0 )
+      new Bullet(action, Resource.bullet.nullpo, Position(constants.screenWidth / 2.0, constants.screenHeight / 2.0 - 200), 0, 0 )
     }
   }
 

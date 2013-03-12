@@ -19,7 +19,7 @@ class Game(val width: Int, val height: Int) {
   private[this] var lastFrame: Long = 0
   private[this] var fpscount: Int = 0
   private[this] var lastFPS: Long = 0
-  var x: Float = centerX
+  var x: Float = constants.centerX
   var y: Float = 0
   var rotation: Double = 0
   var a: Int = 0

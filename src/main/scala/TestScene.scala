@@ -20,7 +20,7 @@ class TestScene extends Scene {
   private[this] var b: Boolean = false
   
   def name() = "fps test"
-  private[this] val st: Position = Position(centerX, 10)
+  private[this] val st: Position = Position(constants.centerX, 10)
 
   def update(delta: Int): Scene = {
     
