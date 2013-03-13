@@ -1,5 +1,11 @@
 
-loadtest {
+loadtestk {
+  repeat 0 {
+    wait(60)
+  }
+}
+
+loadtesti {
   fire(roundshot, normal, 0, 0) 
   repeat 0 {
     $0 = @aim
@@ -12,13 +18,18 @@ loadtest {
   }
 }
 
+loadtest {
+  fire(roundshot, normal, 0, 0) 
+}
+
+
 roundshot {
   repeat 0 {
     repeat 3 {
       fire(round, mini, @rnd(0,360), 0.1)
-      wait(15)
+      wait(10)
     }
-    wait(80)
+    wait(30)
   }
 }
 
@@ -62,8 +73,8 @@ loadtest1 {
 round {
   wait(30)
   $0 = 0
-  repeat 36 {
+  repeat 72 {
     fire(simple, normal, $0, 0.1)
-    $0 += 10
+    $0 += 5
   }
 }

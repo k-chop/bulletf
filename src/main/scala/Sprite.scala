@@ -8,7 +8,7 @@ class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) 
   var pos = _pos
   var speed = _speed
   var angle = Angle(_angle)
-  protected var flip = 0
+  protected var time = 0
   var radius: Double = 0
   
   def this(resource: Symbol) = this(resource, Position(0, 0), 0, 0)
@@ -17,9 +17,12 @@ class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) 
   
   def update(delta: Int) = {}
   
-  def draw() = Drawer.draw(texture, pos)
+  def draw() {
+    Game.view2d()
+    Drawer.draw(texture, pos)
+  }
 
-  def inside() = (0-radius <= pos.x  && pos.x <= constants.screenWidth+radius && 0-radius <= pos.y && pos.y <= constants.screenHeight+radius)
+  def inside = (0-radius <= pos.x  && pos.x <= constants.screenWidth+radius && 0-radius <= pos.y && pos.y <= constants.screenHeight+radius)
   
 }
 

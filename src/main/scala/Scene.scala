@@ -18,7 +18,6 @@ trait Scene {
   def run()
   
   def draw() = {
-    Game.clearScreen
     drawObject foreach { _.draw }
   }
   

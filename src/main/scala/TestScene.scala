@@ -24,40 +24,39 @@ class TestScene extends Scene {
 
   def update(delta: Int): Scene = {
     
-    drawObject foreach { _.update(delta) }
-    //val bustered = col.check(drawObject.toList)
+    drawObject foreach { obj => if(obj.inside) obj.update(delta) }
+    val bustered: State = Live//col.check(drawObject.toList)
     //if (c % 60 == 0)
-      //drawObject += STGObjectFactory.newBullet(BasicBehaivor, 'mini, st, 0.15, Angle(90))
+    //  drawObject += STGObjectFactory.newBullet(BasicBehaivor, 'mini, st, 0.15, Angle(90))
     drawObject ++= addPool
-    addPool.clear
+    addPool.clear()
 
-    drawObject --= (drawObject filterNot {_.inside})
+    if (c==0)
+      drawObject --= (drawObject filterNot {_.inside})
 
-    // bustered match {
-    //   case Shooted(x) => new GameOverScene
-    //   case Live => this
-    //   case Lost => error("")
-    // }
-    this
+    bustered match {
+       case Shooted(x) => new GameOverScene
+       case Live => this
+       case Lost => sys.error("")
+    }
   }
 
-  def run() = {
+  def run() {
   }
 
-  override def draw() = {
+  override def draw() {
     c += 1
     c %= 120
     b = !b
 //    print(c+" ")
-    //if (c == 0) println("objects: " + drawObject.size)
+    if (c == 0) println("objects: " + drawObject.size)
     
     //  print(c+" ")
-      Game.clearScreen
-      drawObject foreach { _.draw }
-    
+    drawObject foreach { obj => if (obj.inside) obj.draw() }
+
   }
   
-  def init() = {
+  def init() {
 
     drawObject += ship
 
@@ -71,7 +70,7 @@ class TestScene extends Scene {
 
   }
 
-  def dispose() = {
+  def dispose() {
     
     drawObject.clear
     

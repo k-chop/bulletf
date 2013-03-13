@@ -15,14 +15,27 @@ class Bullet(val action: Behaivor, _resource: Symbol, pos: Position, _speed: Dou
   // プログラムカウンタ
   val pc: Array[Int] = Array.fill(MAX_NEST){0}
   // ループカウンタ
-  val lc: Array[Int] = Array.fill(MAX_NEST){-1} 
+  val lc: Array[Int] = Array.fill(MAX_NEST){-1}
   // 変数($0～$9)
   val vars: Array[Double] = Array.fill(MAX_NEST){0.0} // 変数は$0から$9まで
   // 当たり判定の半径
   radius = texture.getImageWidth / 4.0
 
-  override def update(delta: Int) = action.run(delta)(this)
+  override def update(delta: Int) {
+    action.run(delta)(this)
+  }
   
   //override def draw() = Drawer.draw(texture, pos)
-  
+}
+
+class Bullet3d(_action: Behaivor, _resource: Symbol, _pos: Position, _speed: Double, _angle: Double) extends Bullet(_action, _resource, _pos, _speed, _angle) {
+
+  override def draw() {
+    Drawer.draw3d(texture, pos, time)
+  }
+
+  override def update(delta: Int) {
+    time += 1
+    action.run(delta)(this)
+  }
 }
