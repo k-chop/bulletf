@@ -9,9 +9,12 @@ import scala.io.Source
 class ScriptRunner(val pool: ListBuffer[Sprite], val ship: Ship) {
 
   val map = HashMap.empty[Symbol, Behaivor]
+  init()
 
-  map += ('simple -> BasicBehaivor)
-  
+  def init() = {
+    map += ('simple -> BasicBehaivor)
+  }
+
   def build(ref: String) = {
     val src = Source.fromFile( Resource.scriptPath + ref + ".dsf" ).mkString("")
     
@@ -28,6 +31,11 @@ class ScriptRunner(val pool: ListBuffer[Sprite], val ship: Ship) {
     // あとで．
     case Some(x) => x
     case None => throw new Exception//build(ref.name)
+  }
+
+  def clear() = {
+    map.clear()
+    init()
   }
 
   def getAimToShip(bullet: Bullet) = {

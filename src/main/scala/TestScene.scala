@@ -6,6 +6,8 @@ import collection.mutable
 import scala.annotation.tailrec
 
 import org.lwjgl.opengl.GL11
+import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Keyboard._
 
 class TestScene extends Scene {
 //  this: Scene =>
@@ -23,9 +25,10 @@ class TestScene extends Scene {
   private[this] val st: Position = Position(constants.centerX, 10)
 
   def update(delta: Int): Scene = {
-    
+
+    ship.update(delta)
     drawObject foreach { obj => if(obj.inside) obj.update(delta) }
-    val bustered: State = Live//col.check(drawObject.toList)
+    val bustered = col.check(drawObject.toList)
     //if (c % 60 == 0)
     //  drawObject += STGObjectFactory.newBullet(BasicBehaivor, 'mini, st, 0.15, Angle(90))
     drawObject ++= addPool
@@ -33,6 +36,10 @@ class TestScene extends Scene {
 
     if (c==0)
       drawObject --= (drawObject filterNot {_.inside})
+
+    if (Input.key.keydown(KEY_R)) {
+      init()
+    }
 
     bustered match {
        case Shooted(x) => new GameOverScene
@@ -52,17 +59,18 @@ class TestScene extends Scene {
     if (c == 0) println("objects: " + drawObject.size)
     
     //  print(c+" ")
+    ship.draw()
     drawObject foreach { obj => if (obj.inside) obj.draw() }
 
   }
   
   def init() {
 
-    drawObject += ship
-
+    drawObject.clear()
+    runner.clear()
     List('loadtest).foreach{ s => runner.build(s.name) }
     
-    drawObject += STGObjectFactory.newEmitter(runner.get('loadtest), 'nullpo)
+    drawObject += STGObjectFactory.newEmitter(runner.get('main), 'nullpo)
     
     // script load
     
