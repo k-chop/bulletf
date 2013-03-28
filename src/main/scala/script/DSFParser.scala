@@ -14,13 +14,13 @@ object DSFParser extends StandardTokenParsers {
 //  lazy val top: Parser[Seq[(Symbol, Symbol, Array[Op])]] = rep1(definition)
   lazy val top: Parser[Seq[(Symbol, Array[Op])]] = rep1(definition)
   
-  lazy val types: Parser[Symbol] = ("action" | "bullet" | "enemy" | "effect") ^^ { case s => Symbol(s) }
+  lazy val types: Parser[Symbol] = ("action" | "bullet" | "enemy" | "effect" | "emitter") ^^ { case s => Symbol(s) }
   
 //  lazy val definition: Parser[(Symbol, Symbol, Array[Op])] =
   lazy val definition: Parser[(Symbol, Array[Op])] =
 //    types ~ ident ~ "(" ~ repsep(syms, ",") ~ ")" ~ "{" ~ opsec <~ "}" ^^ {
 //    ident ~ "(" ~ repsep(syms, ",") ~ ")" ~ "{" ~ opsec <~ "}" ^^ {
-    ident ~ "{" ~ opseq <~ "}" ^^ {
+    types ~> ident ~ "{" ~ opseq <~ "}" ^^ {
 //      case t ~ s ~ _ ~ args  ~ opsec => (t, Symbol(s), opsec.toArray)
       case s ~ _ ~ ops => (Symbol(s), ops.toArray)
     }

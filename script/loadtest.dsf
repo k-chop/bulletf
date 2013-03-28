@@ -1,5 +1,5 @@
 
-accelshot {
+bullet accelshot {
   $0 = @spd
   $1 = 0.015
   repeat 0 {
@@ -8,7 +8,7 @@ accelshot {
   }
 }
 
-main {
+emitter main {
   $1 = 0
   repeat 0 {
     $0 = $1
