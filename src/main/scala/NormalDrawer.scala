@@ -65,8 +65,8 @@ object Drawer {
     val t = 10f
 
     //glScaled(0.1, 0.1, 1)
-    //GLUtil.drawBox(0.06f, GL_LINE_LOOP)
-    GLUtil.drawVBO()
+    GLUtil.drawBox(0.06f, GL_LINE_LOOP)
+    //GLUtil.drawVBO()
 
     glLoadIdentity()
 
