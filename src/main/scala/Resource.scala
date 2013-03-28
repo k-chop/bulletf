@@ -12,10 +12,5 @@ object Resource {
   final val shipGraphic = 'ship
   final val titleGraphic = 'karititle
 
-  final object bullet {
-    final val normal = 'green1
-    final val mini = 'minicore1
-    final val nullpo = 'nullpo
-  }
-  
+  final val nullImg = buildPath('nullpo)
 }
