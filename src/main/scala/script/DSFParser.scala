@@ -8,7 +8,7 @@ object DSFParser extends StandardTokenParsers {
   import DefinitionFinder._
 
   lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@")
-  lexical.reserved += ("repeat","action","bullet","enemy","effect")
+  lexical.reserved += ("repeat","action","bullet","enemy","effect", "emitter")
 
   // (type, name, ops)
 //  lazy val top: Parser[Seq[(Symbol, Symbol, Array[Op])]] = rep1(definition)
@@ -17,12 +17,12 @@ object DSFParser extends StandardTokenParsers {
   lazy val types: Parser[Symbol] = ("action" | "bullet" | "enemy" | "effect") ^^ { case s => Symbol(s) }
   
 //  lazy val definition: Parser[(Symbol, Symbol, Array[Op])] =
-lazy val definition: Parser[(Symbol, Array[Op])] =
+  lazy val definition: Parser[(Symbol, Array[Op])] =
 //    types ~ ident ~ "(" ~ repsep(syms, ",") ~ ")" ~ "{" ~ opsec <~ "}" ^^ {
 //    ident ~ "(" ~ repsep(syms, ",") ~ ")" ~ "{" ~ opsec <~ "}" ^^ {
-    ident ~ "{" ~ opsec <~ "}" ^^ {
+    ident ~ "{" ~ opseq <~ "}" ^^ {
 //      case t ~ s ~ _ ~ args  ~ opsec => (t, Symbol(s), opsec.toArray)
-      case s ~ _ ~ opsec => (Symbol(s), opsec.toArray)
+      case s ~ _ ~ ops => (Symbol(s), ops.toArray)
     }
 
   lazy val syms: Parser[Symbol] = ident ^^ { case s => Symbol(s) }
@@ -30,16 +30,16 @@ lazy val definition: Parser[(Symbol, Array[Op])] =
   // lazy val action: Parser[(Symbol, Array[Op])] = 
   //   ident ~ "{" ~ opsec <~ "}" ^^ { case s ~ _ ~ opsec => (Symbol(s), opsec.toArray) }
 
-  lazy val opsec: Parser[Seq[Op]] = rep1(op)
+  lazy val opseq: Parser[Seq[Op]] = rep1(op)
 
   lazy val op: Parser[Op] =  bind | func | repeat | update
 
-  lazy val repeat: Parser[Op] = "repeat" ~> numericLit ~ "{" ~ opsec <~ "}" ^^ {
+  lazy val repeat: Parser[Op] = "repeat" ~> numericLit ~ "{" ~ opseq <~ "}" ^^ {
     case time ~ _ ~ opsec => Repeat(time.toInt, opsec.toArray)
   }
 
   lazy val func: Parser[Op] = ident ~ "(" ~ repsep(args, ",") <~ ")" ^^ {
-    case name ~ _ ~ args => findFunction(name, args)
+    case name ~ _ ~ as => findFunction(name, as)
   }
 
   lazy val args: Parser[Container] = value | ident ^^ { s => StrVar(s) }// | calculable
@@ -48,11 +48,11 @@ lazy val definition: Parser[(Symbol, Array[Op])] =
 //    "[" ~> rep1(elem("all", true)) <~ "]" ^^ { case e => CalcParser.calc(e) }
     
   lazy val bind: Parser[Op] = "$" ~> numericLit ~ "=" ~ value ^^ {
-    case idx ~ _ ~ value => SetVar(idx.toInt, value)
+    case idx ~ _ ~ v => SetVar(idx.toInt, v)
   }
 
   lazy val update: Parser[Op] = "$" ~> numericLit ~ ("+" | "-") ~ "=" ~ value ^^ {
-    case idx ~ s ~ d ~ value => UpdateVar(idx.toInt, if (s == "+") value else Negate(value))
+    case idx ~ s ~ d ~ v => UpdateVar(idx.toInt, if (s == "+") v else Negate(v))
   }
   
   lazy val value: Parser[Container] = {
@@ -64,7 +64,7 @@ lazy val definition: Parser[(Symbol, Array[Op])] =
 
   lazy val spvalue: Parser[Container] =
     "@" ~> ident ~ "(" ~ repsep(args, ",") <~ ")" ^^ {
-      case name ~ _ ~ args => findSpecialValue(name, args)
+      case name ~ _ ~ as => findSpecialValue(name, as)
     } |
     "@" ~> ident ^^ {
       case name => findSpecialValue(name, Seq[Container]())
@@ -84,8 +84,17 @@ lazy val definition: Parser[(Symbol, Array[Op])] =
       case Success(behaivors, _) =>
         behaivors foreach { case (n, ops) => println(n+":"+ops.deep.toString) }
         behaivors
-      case Failure(msg, d) => println(msg); println(d.pos.longString); sys.error("")
-      case Error(msg, _) => println(msg); sys.error("")
+      case Failure(msg, d) => {
+        println("parse failure.")
+        println(msg)
+        println(d.pos.longString)
+        Seq(('main, Array(Nop)))
+      }
+      case Error(msg, _) => {
+        println("parse error.")
+        println(msg)
+        Seq(('main, Array(Nop)))
+      }
     }
   }
 
