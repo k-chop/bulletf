@@ -13,7 +13,7 @@ class STGScene extends Scene {
 
   lazy val drawObject = mutable.ListBuffer.empty[Sprite]
   lazy val addPool = mutable.ListBuffer.empty[Sprite]
-  lazy val runner = new ScriptRunner(addPool, ship)
+  lazy val runner = new BehaivorManager(addPool, ship)
 
   private[this] var c: Int = 0
   
@@ -37,17 +37,17 @@ class STGScene extends Scene {
     this
   }
 
-  def run() = {
+  def run() {
   }
 
-  override def draw() = {
+  override def draw() {
     c += 1
     c %= 60
     if (c == 0) println("objects: " + drawObject.size)
-    drawObject foreach { _.draw }
+    drawObject foreach { _.draw() }
   }
   
-  def init() = {
+  def init() {
 
     //drawObject += ship
 
@@ -61,9 +61,9 @@ class STGScene extends Scene {
 
   }
 
-  def dispose() = {
+  def dispose() {
     
-    drawObject.clear
+    drawObject.clear()
     
     println(name + " disposed.")
 

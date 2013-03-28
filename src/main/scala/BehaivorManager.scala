@@ -1,21 +1,19 @@
 package com.github.whelmaze.bulletf
-package script
 
-import scala.collection.mutable.{ HashMap, ListBuffer } 
 import scala.io.Source
+import script.DSFParser
+import scala.collection.mutable
 
-// クラス名おかしくね……ActionRepositoryとかか？
+class BehaivorManager(val pool: mutable.ListBuffer[Sprite], ship: Ship) {
 
-class ScriptRunner(val pool: ListBuffer[Sprite], val ship: Ship) {
-
-  val map = HashMap.empty[Symbol, Behaivor]
+  val map = mutable.HashMap.empty[Symbol, Behaivor]
   init()
 
   def init() = {
     map += ('simple -> BasicBehaivor)
   }
 
-  def build(ref: String) = {
+  def build(ref: String) {
     val src = Source.fromFile( Resource.scriptPath + ref + ".dsf" ).mkString("")
     
     DSFParser.parse(src) foreach { case (name, ops) =>
@@ -38,9 +36,9 @@ class ScriptRunner(val pool: ListBuffer[Sprite], val ship: Ship) {
     init()
   }
 
-  def getAimToShip(bullet: Bullet) = {
+  def getAimToShip(from: Position) = {
     import scala.math._
-    toDegrees( atan2(ship.pos.y - bullet.pos.y, ship.pos.x - bullet.pos.x) )
+    toDegrees( atan2(ship.pos.y - from.y, ship.pos.x - from.x) )
   }
   
 }

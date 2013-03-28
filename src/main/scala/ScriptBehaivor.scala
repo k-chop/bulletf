@@ -5,15 +5,15 @@ import scala.collection.mutable.ListBuffer
 
 import scala.annotation.tailrec
 
-class ScriptBehaivor(val runner: ScriptRunner, val pool: ListBuffer[Sprite] ,val topseq: Array[Op]) extends Behaivor {
+class ScriptBehaivor(val manager: BehaivorManager, val pool: ListBuffer[Sprite] ,val topseq: Array[Op]) extends Behaivor {
   import implicits.angle2double
 
-  def extract(runner: ScriptRunner, bullet: Bullet)(c: Container): Double = c match {
+  def extract(manager: BehaivorManager, bullet: Bullet)(c: Container): Double = c match {
 
     case StateVar(p) => p match {
       case 'x => bullet.pos.x
       case 'y => bullet.pos.y
-      case 'aim => runner.getAimToShip(bullet)
+      case 'aim => manager.getAimToShip(bullet.pos)
       case 'speed => bullet.speed
       case 'angle => bullet.angle
     }
@@ -22,16 +22,18 @@ class ScriptBehaivor(val runner: ScriptRunner, val pool: ListBuffer[Sprite] ,val
     case EVar(getvar) => bullet.vars(getvar.idx)
     case DVar(value) => value
     case RandomVar(begin, end) => scala.util.Random.nextDouble()*(end-begin)+begin
-    case Negate(in) => extract(runner, bullet)(in) * -1
+    case Negate(in) => extract(manager, bullet)(in) * -1
     
   }
   
-  def run(delta: Int)(implicit bullet: Bullet) = {
-    lazy val ex = extract(runner, bullet) _
+  def run(delta: Int)(implicit bullet: Bullet) {
+    lazy val ex = extract(manager, bullet) _
     
     @tailrec
-    def recur(nestLevel: Int, seq: Array[Op]): Unit = {
-      def incPC() = bullet.pc(nestLevel) += 1
+    def recur(nestLevel: Int, seq: Array[Op]) {
+      def incPC() {
+        bullet.pc(nestLevel) += 1
+      }
 
       //println("w:"+bullet.waitCount+",nest:"+nestLevel+",pc:"+bullet.pc(nestLevel))
       
@@ -55,7 +57,7 @@ class ScriptBehaivor(val runner: ScriptRunner, val pool: ListBuffer[Sprite] ,val
             recur(nestLevel, seq)
 
           case Fire(action, kind, dir, speed) =>
-            pool += STGObjectFactory.newBullet(runner.get(action), kind, bullet.pos, ex(speed), Angle( ex(dir) ))
+            pool += STGObjectFactory.newBullet(manager.get(action), kind, bullet.pos, ex(speed), Angle( ex(dir) ))
             //println("fire")
             incPC()
             recur(nestLevel, seq)
@@ -87,7 +89,7 @@ class ScriptBehaivor(val runner: ScriptRunner, val pool: ListBuffer[Sprite] ,val
             case 'absolute =>
               bullet.angle = Angle( ex(dir) )
             case 'aim =>
-              bullet.angle = Angle( runner.getAimToShip(bullet) )
+              bullet.angle = Angle( manager.getAimToShip(bullet.pos) )
             case 'relative =>
               bullet.angle = Angle( ex(dir) )
           }; incPC(); recur(nestLevel, seq)
@@ -128,7 +130,7 @@ class ScriptBehaivor(val runner: ScriptRunner, val pool: ListBuffer[Sprite] ,val
     recur(0, topseq) // 頭からたどる
   }
 
-  def evaluate(seq: Array[Op], op: Op)(implicit bullet: Bullet) = {
+  def evaluate(seq: Array[Op], op: Op)(implicit bullet: Bullet) {
     //def incPC() = bullet.pc += 1
   }
   

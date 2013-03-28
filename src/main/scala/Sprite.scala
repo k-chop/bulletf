@@ -2,7 +2,7 @@ package com.github.whelmaze.bulletf
 
 import java.io.{ FileInputStream, IOException }
 
-class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) extends HasCollision {
+class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) {
   
   protected val texture = TextureFactory.get(_resource)
   var pos = _pos
@@ -15,7 +15,7 @@ class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) 
 
   def this(resource: Symbol, pos: Position) = this(resource, pos, 0, 0)
   
-  def update(delta: Int) = {}
+  def update(delta: Int) {}
   
   def draw() {
     Game.view2d()

@@ -5,7 +5,10 @@ import java.io.{ FileInputStream, IOException }
 
 import scala.collection.mutable.ArrayBuffer
 
-class Bullet(val action: Behaivor, _resource: Symbol, pos: Position, _speed: Double, _angle: Double) extends Sprite(_resource, pos, _speed, _angle) with HasCollision {
+class Bullet(val action: Behaivor, _resource: Symbol, pos: Position, _speed: Double, _angle: Double)
+  extends Sprite(_resource, pos, _speed, _angle)
+  with HasCollision
+{
   import Constants.script._
   
   // 残りウェイトのカウンタ
