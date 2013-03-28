@@ -70,9 +70,14 @@ object DSFParser extends StandardTokenParsers {
       case name => findSpecialValue(name, Seq[Container]())
     }
 
-  lazy val int: Parser[Int] = numericLit ^^ { case i => i.toInt }
+  lazy val int: Parser[Int] =
+    "-" ~> numericLit ^^ { case i => -(i.toInt) } |
+    numericLit ^^ { case i => i.toInt }
 
-  lazy val double: Parser[Double] = numericLit ~ "." ~ numericLit ^^ {
+  lazy val double: Parser[Double] =
+    "-" ~> numericLit ~ "." ~ numericLit ^^ {
+      case bef ~ _ ~ aft => -((bef+"."+aft).toDouble)
+    } | numericLit ~ "." ~ numericLit ^^ {
     case bef ~ _ ~ aft => (bef+"."+aft).toDouble
   }
   
