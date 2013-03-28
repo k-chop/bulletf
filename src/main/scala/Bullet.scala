@@ -5,12 +5,14 @@ import java.io.{ FileInputStream, IOException }
 
 import scala.collection.mutable.ArrayBuffer
 
-class Bullet(val action: Behaivor, _resource: Symbol, pos: Position, _speed: Double, _angle: Double)
-  extends Sprite(_resource, pos, _speed, _angle)
-  with HasCollision
+class Bullet(val action: Behaivor, val resource: Symbol, var pos: Position, var speed: Double, var angle: Angle)
+  extends HasCollision
 {
   import Constants.script._
-  
+
+  val sprite: Sprite = new Sprite(resource)
+
+  var time: Int = 0
   // 残りウェイトのカウンタ
   var waitCount: Int = -1
   // どの階層でウェイト中か
@@ -22,23 +24,16 @@ class Bullet(val action: Behaivor, _resource: Symbol, pos: Position, _speed: Dou
   // 変数($0～$9)
   val vars: Array[Double] = Array.fill(MAX_NEST){0.0} // 変数は$0から$9まで
   // 当たり判定の半径
-  radius = texture.getImageWidth / 4.0
+  val radius = sprite.texture.getImageWidth / 4.0
 
-  override def update(delta: Int) {
+  def update(delta: Int) {
     action.run(delta)(this)
   }
-  
+
+  def draw() {
+    sprite.draw(pos)
+  }
+
+  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
   //override def draw() = Drawer.draw(texture, pos)
-}
-
-class Bullet3d(_action: Behaivor, _resource: Symbol, _pos: Position, _speed: Double, _angle: Double) extends Bullet(_action, _resource, _pos, _speed, _angle) {
-
-  override def draw() {
-    Drawer.draw3d(texture, pos, time)
-  }
-
-  override def update(delta: Int) {
-    time += 1
-    action.run(delta)(this)
-  }
 }

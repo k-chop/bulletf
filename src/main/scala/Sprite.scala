@@ -2,28 +2,15 @@ package com.github.whelmaze.bulletf
 
 import java.io.{ FileInputStream, IOException }
 
-class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) {
+class Sprite(_resource: Symbol) {
   
-  protected val texture = TextureFactory.get(_resource)
-  var pos = _pos
-  var speed = _speed
-  var angle = Angle(_angle)
-  protected var time = 0
-  var radius: Double = 0
-  
-  def this(resource: Symbol) = this(resource, Position(0, 0), 0, 0)
+  val texture = TextureFactory.get(_resource)
 
-  def this(resource: Symbol, pos: Position) = this(resource, pos, 0, 0)
-  
-  def update(delta: Int) {}
-  
-  def draw() {
+  def draw(pos: Position) {
     Game.view2d()
     Drawer.draw(texture, pos)
   }
 
-  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
-  
 }
 
 
