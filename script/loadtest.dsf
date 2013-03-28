@@ -6,46 +6,45 @@ loadtestk {
 }
 
 loadtesti {
-  fire(roundshot, normal, 0, 0) 
+  fire(roundshot, DNT01G, 0, 0) 
   repeat 0 {
     $0 = @aim
     $0 -= 46
-    fire(qui, normal, $0, @rnd(0.1,0.18))
+    fire(qui, DNT01G, $0, @rnd(0.1,0.18))
     $0 += @rnd(35)
-    fire(qui, normal, $0, @rnd(0.1,0.18))
+    fire(qui, DNT01G, $0, @rnd(0.1,0.18))
     $0 += @rnd(35)
     wait(5)
   }
 }
 
-main {
+accelshot {
+  $0 = @spd
+  $1 = 0.015
   repeat 0 {
-    $0 = @aim
-    $0 -= 40
-    $0 += @rnd(0,15)
-    $1 = 0.18
-      fire(simple, eng01b, $0, $1)
-      $0 += 13
-      fire(simple, eng01d, $0, $1)
-      $0 += 13
-      fire(simple, eng02b, $0, $1)
-      $0 += 13
-      fire(simple, eng02r, $0, $1)
-      $0 += 13
-      fire(simple, mini, $0, $1)
-      $0 += 13
-      fire(simple, normal, $0, $1)
-      $0 += 13
-
-    wait(20)
+    spd($1, relative)
+    wait(10)
   }
 }
+
+main {
+  repeat 0 {
+    $0 = 0
+    $0 += @rnd(0,90)
+    repeat 24 {
+      fire(accelshot, ENG01D, $0, 0)
+      $0 += 15
+    } 
+    wait(10)
+  }
+}
+
 
 
 roundshot {
   repeat 0 {
     repeat 3 {
-      fire(round, mini, @rnd(0,360), 0.1)
+      fire(round, BLT01G, @rnd(0,360), 0.1)
       wait(10)
     }
     wait(30)
@@ -72,16 +71,16 @@ loadtest1 {
     $0 = @aim
     $0 += 160
     $0 += @rnd(40)
-    fire(round, normal, $0, 0.1)
+    fire(round, DNT01G, $0, 0.1)
     $0 = 0.1
     repeat 20 {
-      fire(simple, mini, @aim, $0)
+      fire(simple, BLT01G, @aim, $0)
       $1 = @aim
       $1 -= 2
-      fire(simple, mini, $1, $0)
+      fire(simple, BLT01G, $1, $0)
       $2 = @aim
       $2 += 2
-      fire(simple, mini, $2, $0)
+      fire(simple, BLT01G, $2, $0)
       $0 += 0.015
       wait(4)
     }
@@ -93,7 +92,7 @@ round {
   wait(30)
   $0 = 0
   repeat 72 {
-    fire(simple, normal, $0, 0.1)
+    fire(simple, DNT01G, $0, 0.1)
     $0 += 5
   }
 }
