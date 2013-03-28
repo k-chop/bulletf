@@ -3,7 +3,7 @@ package com.github.whelmaze.bulletf
 import java.io.{ FileInputStream, IOException }
 
 import org.lwjgl.{LWJGLException, Sys}
-import org.lwjgl.opengl.{ Display, DisplayMode, GL11 }
+import org.lwjgl.opengl.{GLContext, Display, DisplayMode, GL11}
 import org.lwjgl.util.glu.GLU
 import org.lwjgl.input.Controllers
 
@@ -72,11 +72,15 @@ class Game(_width: Int, _height: Int) {
 
   def start() {
     initGL()
-    SceneController.init(new TitleScene)
+    GLUtil.setup()
+    SceneController.init(new TestScene)
 
     getDelta()
     lastFPS = getTime()
-    
+
+    println("vbo: " + GLContext.getCapabilities.GL_ARB_vertex_buffer_object)
+    println("drawelement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
+
     while (true) {
       val be = getTime
       val delta = getDelta()

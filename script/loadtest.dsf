@@ -18,8 +18,27 @@ loadtesti {
   }
 }
 
-loadtest {
-  fire(roundshot, normal, 0, 0) 
+main {
+  repeat 0 {
+    $0 = @aim
+    $0 -= 40
+    $0 += @rnd(0,15)
+    $1 = 0.18
+      fire(simple, eng01b, $0, $1)
+      $0 += 13
+      fire(simple, eng01d, $0, $1)
+      $0 += 13
+      fire(simple, eng02b, $0, $1)
+      $0 += 13
+      fire(simple, eng02r, $0, $1)
+      $0 += 13
+      fire(simple, mini, $0, $1)
+      $0 += 13
+      fire(simple, normal, $0, $1)
+      $0 += 13
+
+    wait(20)
+  }
 }
 
 

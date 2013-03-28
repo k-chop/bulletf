@@ -22,7 +22,7 @@ class Sprite(_resource: Symbol, _pos: Position, _speed: Double, _angle: Double) 
     Drawer.draw(texture, pos)
   }
 
-  def inside = (0-radius <= pos.x  && pos.x <= constants.screenWidth+radius && 0-radius <= pos.y && pos.y <= constants.screenHeight+radius)
+  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
   
 }
 
