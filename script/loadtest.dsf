@@ -28,13 +28,15 @@ accelshot {
 }
 
 main {
+  $1 = 0
   repeat 0 {
-    $0 = 0
-    $0 += @rnd(0,90)
+    $0 = $1
+    $0 += @rnd(0, 90)
     repeat 24 {
       fire(accelshot, ENG01D, $0, 0)
       $0 += 15
     } 
+    $1 += 5
     wait(10)
   }
 }

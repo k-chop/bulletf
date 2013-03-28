@@ -11,9 +11,8 @@ class STGScene extends Scene {
   lazy val ship = new Ship()
   lazy val col = new CollisionChecker(ship)
 
-  lazy val drawObject = mutable.ListBuffer.empty[Sprite]
-  lazy val addPool = mutable.ListBuffer.empty[Sprite]
-  lazy val runner = new BehaivorManager(addPool, ship)
+  lazy val enemyBullets = mutable.ListBuffer.empty[Emitter]
+  lazy val runner = new BehaviorManager(ship)
 
   private[this] var c: Int = 0
   
@@ -21,13 +20,8 @@ class STGScene extends Scene {
   
   def update(delta: Int): Scene = {
     //val bustered = col.check(drawObject.toList)
-    drawObject foreach { _.update(delta) }
+    enemyBullets foreach { _.update(delta) }
 
-    drawObject ++= addPool
-    addPool.clear
-
-    drawObject --= (drawObject filterNot {_.inside})
-    
     /*bustered match {
       case Shooted(x) => new GameOverScene
       case Live => this
@@ -43,8 +37,8 @@ class STGScene extends Scene {
   override def draw() {
     c += 1
     c %= 60
-    if (c == 0) println("objects: " + drawObject.size)
-    drawObject foreach { _.draw() }
+    if (c == 0) println("objects: " + enemyBullets.size)
+    enemyBullets foreach { _.draw() }
   }
   
   def init() {
@@ -53,7 +47,7 @@ class STGScene extends Scene {
 
     List('loadtest).foreach{ s => runner.build(s.name) }
     
-    drawObject += STGObjectFactory.newEmitter(runner.get('loadtest), 'nullpo)
+    enemyBullets += STGObjectFactory.newEmitter(runner.get('loadtest), 'nullpo)
     
     // script load
     
@@ -63,7 +57,7 @@ class STGScene extends Scene {
 
   def dispose() {
     
-    drawObject.clear()
+    enemyBullets.clear()
     
     println(name + " disposed.")
 

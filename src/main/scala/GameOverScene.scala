@@ -6,8 +6,6 @@ import collection.mutable
 
 class GameOverScene extends Scene {
 
-  lazy val drawObject = mutable.ListBuffer.empty[Sprite]
-  
   def name() = "GameOver"
   
   def update(delta: Int): Scene = {
@@ -19,16 +17,15 @@ class GameOverScene extends Scene {
       this
   }
 
-  def run () = {}
+  def run () {}
   
-  def init() = {
-
+  def init() {
     println(name + " inited.")
   }
 
-  def dispose() = {
-    drawObject.clear
-    
+  def draw() {}
+
+  def dispose() {
     println(name + " disposed.")
   }
   

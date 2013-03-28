@@ -1,14 +1,9 @@
 package com.github.whelmaze.bulletf
 
-import scala.collection.mutable
-
-import org.lwjgl.opengl.GL11
-
 trait Scene {
 
   def name(): String
-  val drawObject: mutable.ListBuffer[Sprite]
-  
+
   init()
   /**
     * delta is milliseconds.
@@ -17,9 +12,7 @@ trait Scene {
   
   def run()
   
-  def draw() = {
-    drawObject foreach { _.draw }
-  }
+  def draw()
   
   def init()
   

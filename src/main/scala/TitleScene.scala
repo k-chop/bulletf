@@ -7,8 +7,8 @@ import collection.mutable
 
 class TitleScene extends Scene {
 
-  lazy val drawObject = mutable.ListBuffer.empty[Sprite]
-  
+  val titleImg = new Sprite(Resource.titleGraphic)
+
   def name() = "Title"
   
   def update(delta: Int): Scene = {
@@ -20,19 +20,21 @@ class TitleScene extends Scene {
       this
   }
 
-  def run () = {}
+  def run () {}
   
-  def init() = {
-    drawObject += ( new Sprite(Resource.titleGraphic, Position.center()) )
+  def init() {
 
     println(s"OpenGL version: ${GL11.glGetString(GL11.GL_VERSION)}")
 
     println(name + " inited.")
   }
 
-  def dispose() = {
-    drawObject.clear
-    Game.clearScreen
+  def draw() {
+    titleImg.draw(Position.center())
+  }
+
+  def dispose() {
+    Game.clearScreen()
     println(name + " disposed.")
   }
   
