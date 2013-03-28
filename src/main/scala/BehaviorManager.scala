@@ -1,31 +1,29 @@
 package com.github.whelmaze.bulletf
-package script
 
-import scala.collection.mutable.{ HashMap, ListBuffer } 
 import scala.io.Source
+import script.DSFParser
+import scala.collection.mutable
 
-// クラス名おかしくね……ActionRepositoryとかか？
+class BehaviorManager(ship: Ship) {
 
-class ScriptRunner(val pool: ListBuffer[Sprite], val ship: Ship) {
-
-  val map = HashMap.empty[Symbol, Behaivor]
+  val map = mutable.HashMap.empty[Symbol, Behavior]
   init()
 
   def init() = {
-    map += ('simple -> BasicBehaivor)
+    map += ('simple -> BasicBehavior)
   }
 
-  def build(ref: String) = {
+  def build(ref: String) {
     val src = Source.fromFile( Resource.scriptPath + ref + ".dsf" ).mkString("")
     
     DSFParser.parse(src) foreach { case (name, ops) =>
-      val action = new ScriptBehaivor(this, pool, ops)
+      val action = new ScriptBehavior(this, ops)
       println("action[" + name.name + "] created.")
       map += ( name -> action )
     }
   }
   
-  def get(ref: Symbol): Behaivor = map.get(ref) match {
+  def get(ref: Symbol): Behavior = map.get(ref) match {
     // 目的のアクションがなかった場合どうする？
     // →buildの時点で依存するアクションはロードしておくべき．
     // あとで．
@@ -38,9 +36,9 @@ class ScriptRunner(val pool: ListBuffer[Sprite], val ship: Ship) {
     init()
   }
 
-  def getAimToShip(bullet: Bullet) = {
+  def getAimToShip(from: Position) = {
     import scala.math._
-    toDegrees( atan2(ship.pos.y - bullet.pos.y, ship.pos.x - bullet.pos.x) )
+    toDegrees( atan2(ship.pos.y - from.y, ship.pos.x - from.x) )
   }
   
 }

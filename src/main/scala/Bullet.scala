@@ -5,37 +5,41 @@ import java.io.{ FileInputStream, IOException }
 
 import scala.collection.mutable.ArrayBuffer
 
-class Bullet(val action: Behaivor, _resource: Symbol, pos: Position, _speed: Double, _angle: Double) extends Sprite(_resource, pos, _speed, _angle) with HasCollision {
+class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var speed: Double, var angle: Angle)
+  extends HasCollision with ScriptedMove
+{
   import Constants.script._
-  
-  // 残りウェイトのカウンタ
-  var waitCount: Int = -1
-  // どの階層でウェイト中か
-  var waitingNest: Int = 0
-  // プログラムカウンタ
-  val pc: Array[Int] = Array.fill(MAX_NEST){0}
-  // ループカウンタ
-  val lc: Array[Int] = Array.fill(MAX_NEST){-1}
-  // 変数($0～$9)
-  val vars: Array[Double] = Array.fill(MAX_NEST){0.0} // 変数は$0から$9まで
+
+  val sprite: Sprite = new Sprite(resource)
+
+  var waitCount = -1
+  var waitingNest = 0
+  val pc = Array.fill(MAX_NEST){0}
+  val lc = Array.fill(MAX_NEST){-1}
+  val vars = Array.fill(MAX_NEST){0.0}
+  var enable = true
+  var time = 0
+
   // 当たり判定の半径
-  radius = texture.getImageWidth / 4.0
+  val radius = sprite.texture.getImageWidth / 4.0
 
-  override def update(delta: Int) {
-    action.run(delta)(this)
+  // 弾は弾を生産できない
+  def produce(action: Behavior, kind: Symbol, pos: Position, speed: Double, angle: Angle) {}
+
+  // スクリプトの実行が終わったら等速直線運動へシフト
+  def onEndScript(delta: Int) {
+    BasicBehavior.run(delta)(this)
   }
-  
+
+  def update(delta: Int) {
+    if (enable) action.run(delta)(this)
+    if (!inside) disable()
+  }
+
+  def draw() {
+    if (enable) sprite.draw(pos)
+  }
+
+  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
   //override def draw() = Drawer.draw(texture, pos)
-}
-
-class Bullet3d(_action: Behaivor, _resource: Symbol, _pos: Position, _speed: Double, _angle: Double) extends Bullet(_action, _resource, _pos, _speed, _angle) {
-
-  override def draw() {
-    Drawer.draw3d(texture, pos, time)
-  }
-
-  override def update(delta: Int) {
-    time += 1
-    action.run(delta)(this)
-  }
 }

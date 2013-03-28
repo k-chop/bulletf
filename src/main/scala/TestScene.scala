@@ -14,9 +14,8 @@ class TestScene extends Scene {
 
   lazy val ship = new Ship()
   lazy val col = new CollisionChecker(ship)
-  lazy val drawObject = mutable.ListBuffer.empty[Sprite]
-  lazy val addPool = mutable.ListBuffer.empty[Sprite]
-  lazy val runner = new ScriptRunner(addPool, ship)
+  lazy val emitters = mutable.ListBuffer.empty[Emitter]
+  lazy val runner = new BehaviorManager(ship)
 
   private[this] var c: Int = 0
   private[this] var b: Boolean = false
@@ -27,25 +26,21 @@ class TestScene extends Scene {
   def update(delta: Int): Scene = {
 
     ship.update(delta)
-    drawObject foreach { obj => if(obj.inside) obj.update(delta) }
-    val bustered = col.check(drawObject.toList)
-    //if (c % 60 == 0)
-    //  drawObject += STGObjectFactory.newBullet(BasicBehaivor, 'mini, st, 0.15, Angle(90))
-    drawObject ++= addPool
-    addPool.clear()
-
-    if (c==0)
-      drawObject --= (drawObject filterNot {_.inside})
+    emitters foreach { _.update(delta) }
+    // 当たり判定どうしよ...
 
     if (Input.key.keydown(KEY_R)) {
       init()
     }
 
+/*
     bustered match {
        case Shooted(x) => new GameOverScene
        case Live => this
        case Lost => sys.error("")
     }
+*/
+    this
   }
 
   def run() {
@@ -56,21 +51,21 @@ class TestScene extends Scene {
     c %= 120
     b = !b
 //    print(c+" ")
-    if (c == 0) println("objects: " + drawObject.size)
+    if (c == 0) println("objects: " + emitters.foldLeft(0)((i,j)=> i + j.size))
     
     //  print(c+" ")
     ship.draw()
-    drawObject foreach { obj => if (obj.inside) obj.draw() }
+    emitters foreach { _.draw() }
 
   }
   
   def init() {
 
-    drawObject.clear()
+    emitters.clear()
     runner.clear()
     List('loadtest).foreach{ s => runner.build(s.name) }
     
-    drawObject += STGObjectFactory.newEmitter(runner.get('main), 'nullpo)
+    emitters += STGObjectFactory.newEmitter(runner.get('main), 'nullpo)
     
     // script load
     
@@ -80,7 +75,7 @@ class TestScene extends Scene {
 
   def dispose() {
     
-    drawObject.clear
+    emitters.clear()
     
     println(name + " disposed.")
 

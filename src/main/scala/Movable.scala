@@ -1,8 +1,7 @@
 package com.github.whelmaze.bulletf
 
-trait HasCollision {
-  
+trait Movable {
   var pos: Position
-  val radius: Double
-  
+  var speed: Double
+  var angle: Angle
 }

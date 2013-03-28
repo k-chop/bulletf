@@ -1,24 +1,5 @@
 
-loadtestk {
-  repeat 0 {
-    wait(60)
-  }
-}
-
-loadtesti {
-  fire(roundshot, DNT01G, 0, 0) 
-  repeat 0 {
-    $0 = @aim
-    $0 -= 46
-    fire(qui, DNT01G, $0, @rnd(0.1,0.18))
-    $0 += @rnd(35)
-    fire(qui, DNT01G, $0, @rnd(0.1,0.18))
-    $0 += @rnd(35)
-    wait(5)
-  }
-}
-
-accelshot {
+bullet accelshot {
   $0 = @spd
   $1 = 0.015
   repeat 0 {
@@ -27,72 +8,16 @@ accelshot {
   }
 }
 
-main {
+emitter main {
+  $1 = 0
   repeat 0 {
-    $0 = 0
-    $0 += @rnd(0,90)
+    $0 = $1
+    $0 += @rnd(0, 90)
     repeat 24 {
       fire(accelshot, ENG01D, $0, 0)
-      $0 += 15
-    } 
+      $0 += 15.0
+    }
+    $1 += 5
     wait(10)
-  }
-}
-
-
-
-roundshot {
-  repeat 0 {
-    repeat 3 {
-      fire(round, BLT01G, @rnd(0,360), 0.1)
-      wait(10)
-    }
-    wait(30)
-  }
-}
-
-qui {
-  $0 = @angle
-  repeat 8 {
-    $0 += 3
-    dir($0)
-    wait(6)
-  }
-}
-
-qui2 {
-  $0 = @angle
-  dir($0)
-}
-
-
-loadtest1 {
-  repeat 0 {
-    $0 = @aim
-    $0 += 160
-    $0 += @rnd(40)
-    fire(round, DNT01G, $0, 0.1)
-    $0 = 0.1
-    repeat 20 {
-      fire(simple, BLT01G, @aim, $0)
-      $1 = @aim
-      $1 -= 2
-      fire(simple, BLT01G, $1, $0)
-      $2 = @aim
-      $2 += 2
-      fire(simple, BLT01G, $2, $0)
-      $0 += 0.015
-      wait(4)
-    }
-    wait(20)
-  }
-}
-
-round {
-  wait(30)
-  $0 = 0
-  repeat 72 {
-    fire(simple, DNT01G, $0, 0.1)
-    $0 += 5
   }
 }

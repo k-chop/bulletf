@@ -1,9 +1,18 @@
 package com.github.whelmaze.bulletf
 
-class Ship extends Sprite(Resource.shipGraphic, Position(constants.centerX, constants.screenHeight - 50)) {
+class Ship extends Sprite(Resource.shipGraphic) with HasCollision {
 
-  radius = 2
+  var pos = Position(constants.centerX, constants.screenHeight - 50)
+
+  val sprite = new Sprite(Resource.shipGraphic)
+  val radius = 2.0
   
-  override def update(delta: Int) = ShipBehaivor.move(this, delta)
+  def update(delta: Int) {
+    ShipBehaivor.move(this, delta)
+  }
+
+  def draw() {
+    sprite.draw(pos)
+  }
   
 }
