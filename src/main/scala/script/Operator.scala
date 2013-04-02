@@ -75,3 +75,9 @@ case class SetSpeed(value: Container, param: Symbol) extends Op
 */
 case class SetDirection(value: Container, param: Symbol) extends Op
 
+/**
+ * 音再生
+ * @param soundId 再生する音のid
+ */
+case class PlaySound(soundId: Symbol) extends Op
+

@@ -60,6 +60,7 @@ class TestScene extends Scene {
   }
   
   def init() {
+    BGM.play(0)
 
     emitters.clear()
     runner.clear()

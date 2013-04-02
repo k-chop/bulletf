@@ -43,7 +43,10 @@ object DefinitionFinder {
       }
     case ("dir", Seq( cont: Container )) =>
       SetDirection(cont, 'absolute)
-    
+
+    case ("se", Seq(StrVar(param))) =>
+      PlaySound(Symbol(param))
+
     case _ => Nop
   }
 

@@ -103,6 +103,10 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
               unit.speed += ex(spd)
           }; incPC(); recur(nestLevel, seq)
 
+          case PlaySound(param) => {
+            SoundEffect.playSymbol(param)
+          }; incPC(); recur(nestLevel, seq)
+
         }
 
       } else if (nestLevel != 0) {
