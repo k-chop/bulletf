@@ -20,4 +20,8 @@ object SoundEffect {
       play(1)
     case _ =>
   }
+
+  def free() {
+    arr.foreach(_.release())
+  }
 }

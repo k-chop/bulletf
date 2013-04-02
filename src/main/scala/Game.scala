@@ -92,8 +92,6 @@ class Game(_width: Int, _height: Int) {
       Game.clearScreen()
       Game.view3d()
 
-      //render(0f, 0f)
-
       Game.view2d()
       if (a%60==0) {
         val ta = System.nanoTime()
@@ -113,7 +111,12 @@ class Game(_width: Int, _height: Int) {
       //Display.sync(fps) // ←dame (on windows7 64bit)
       a += 1; a %= 360
       if (Display.isCloseRequested) {
+        println("free resources")
+        BGM.free()
+        SoundEffect.free()
+
         Display.destroy()
+
         System.exit(0)
       }
     }
@@ -137,57 +140,6 @@ class Game(_width: Int, _height: Int) {
     if (y > Game.height) y = 0
   }
 
-  def render(fx: Float, fy: Float) {
-    import GL11._
-
-    // ay += 0.5f; ax += 0.025f; az += 0.3f
-    // glRotatef(ay, 0.0f, 1.0f, 0.0f)
-    // glRotatef(ax, 1.0f, 0.0f, 0.0f)
-    // glRotatef(az, 0.0f, 0.0f, 1.0f)
-
-    //glOrtho(0.0, width, height, 0, 1, -1)
-
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    glLoadIdentity()
-    GLU.gluPerspective(30.0f, (Game.width / Game.height.toDouble).toFloat, 1.0f, 100.0f)
-    GLU.gluLookAt(fx, fy, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f)
-    //GLU.gluLookAt(0,800,800, 0,0,0, 0,1,0)
-
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-
-    // glBegin(GL_TRIANGLES)
-    //   glColor4f(1.0f, 0.0f, 0.0f, 1.0f)
-    //   glVertex3f(50f , 3f, 0f)
-    //   glColor4f(0.0f, 1.0f, 0.0f, 1.0f)
-    //   glVertex3f(10f , 10f, 0f)
-    //   glColor4f(0.0f, 0.0f, 1.0f, 1.0f)
-    //   glVertex3f(90f , 40f, 0f)
-    // glEnd()
-
-    // glTranslatef(50f,50f,0)
-    // glColor3f(1f, 1f, 1f)
-
-    glTranslated(fx, fy, (a*0.01))
-    glRotatef(a.toFloat*2f, 0f, 0f, 1f)
-
-    val t = 0.01f
-    glBegin(GL_QUADS)
-      glVertex3f(-1f*t, 1f*t, 0f)
-      glVertex3f( 1f*t, 1f*t, 0f)
-      glVertex3f( 1f*t,-1f*t, 0f)
-      glVertex3f(-1f*t,-1f*t, 0f)
-    glEnd()
-
-    //glColor3f(1f,0f,1f)
-    //GLUtil.drawBox(400f, GL_QUADS)
-
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-
-  }
-
   private def initGL() {
     Display.setDisplayMode(new DisplayMode(Game.width,Game.height))
     //Display.setFullscreen(true);
@@ -195,7 +147,7 @@ class Game(_width: Int, _height: Int) {
     Display.create()
 
     Controllers.create()
-    val padcount = Controllers.getControllerCount()
+    val padcount = Controllers.getControllerCount
     println("padcount : " + padcount)
     (0 until padcount).foreach{ i =>
       val co = Controllers.getController(i)
@@ -227,11 +179,11 @@ class Game(_width: Int, _height: Int) {
 
   def updateFPS() {
     if (getTime() - lastFPS > 1000000) {
-      Display.setTitle("FPS: " + fpscount);
-      fpscount = 0;
-      lastFPS += 1000000;
+      Display.setTitle("FPS: " + fpscount)
+      fpscount = 0
+      lastFPS += 1000000
     }
-    fpscount += 1;
+    fpscount += 1
   }
 
 }

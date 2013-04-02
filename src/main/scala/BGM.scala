@@ -11,4 +11,9 @@ object BGM {
   def play(id: Int) {
     arr(id).loop(1f, 0.5f)
   }
+
+  def free() {
+    arr.foreach(_.release())
+  }
+
 }
