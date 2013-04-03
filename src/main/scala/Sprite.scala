@@ -8,11 +8,11 @@ object Sprite {
 
 class Sprite(_resource: Symbol) {
 
-  val texture = TextureFactory.get(_resource)
+  val (texture, rect) = TextureFactory.get(_resource)
 
   def draw(pos: Position) {
     Game.view2d()
-    Drawer.draw(texture, pos)
+    Drawer.draw(texture, rect, pos, 0)
   }
 
 }

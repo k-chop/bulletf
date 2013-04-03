@@ -7,16 +7,23 @@ import collection.mutable
 
 
 object TextureFactory {
-  private val cache = mutable.WeakHashMap.empty[Symbol, Texture]
+  private val cache = mutable.WeakHashMap.empty[Symbol, (Texture, Rect)]
+  private val texCache = mutable.WeakHashMap.empty[String, Texture]
 
-  def get(key: Symbol): Texture = {
+  def get(key: Symbol): (Texture, Rect) = {
     cache.get(key) match {
-      case Some(texture) => texture
+      case Some(textureInfo) => textureInfo
       case None =>
-        val uriStr = fileMapped(key)
-        val texture = TextureLoader.getTexture("PNG", new FileInputStream( uriStr ))
-        cache.update(key, texture)
-        texture
+        val (uriStr, rect) = fileMapped(key)
+        val resTex = texCache.get(uriStr) match {
+          case Some(tex) => tex
+          case None =>
+            val texture = TextureLoader.getTexture("PNG", new FileInputStream( uriStr ))
+            texCache.update(uriStr, texture)
+            texture
+        }
+        cache.update(key, (resTex, rect))
+        (resTex, rect)
     }
   }
 
@@ -28,9 +35,23 @@ object TextureFactory {
    * @param id テクスチャの識別子
    * @return ファイルのURI
    */
-  private[this] def fileMapped(id: Symbol) = {
-    val uri = Resource.buildPath(id)
-    if (exists(uri)) uri else Resource.nullImg
+  private[this] def fileMapped(id: Symbol): (String, Rect) = {
+    val a = 'sprite
+    val uri = Resource.buildPath(a)
+    //val res = if (exists(uri)) uri else Resource.nullImg
+    println("---------------"+id+"---"+uri)
+    val rect = id match { // 超ベタ書き
+      case 'ENG01B => Rect(2,2,32,32)
+      case 'ENG01D => Rect(36,2,32,32)
+      case 'ENG02B => Rect(70,2,32,32)
+      case 'ENG02R => Rect(2,36,32,32)
+      case 'invader01 => Rect(36,36,64,64)
+      case 'ship => Rect(2,102,32,32)
+
+
+      case _ => Rect(0,0,1,1)
+    }
+    (uri, rect)
   }
 
   // ファイルの存在確認。なんかもっとスマートな方法はないものか...

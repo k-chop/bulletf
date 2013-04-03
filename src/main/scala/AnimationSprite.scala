@@ -6,7 +6,7 @@ object AnimationSprite {
 
 class AnimationSprite(_resource: Symbol) {
 
-  val texture = TextureFactory.get(_resource)
+  val (texture, rect) = TextureFactory.get(_resource)
 
   def draw(pos: Position) {
     Game.view2d()
