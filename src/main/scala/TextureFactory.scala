@@ -8,7 +8,7 @@ import collection.mutable
 
 object TextureFactory {
   private val cache = mutable.WeakHashMap.empty[Symbol, (Texture, Rect)]
-  private val texCache = mutable.WeakHashMap.empty[String, Texture]
+  private val texCache = mutable.HashMap.empty[String, Texture]
 
   def get(key: Symbol): (Texture, Rect) = {
     cache.get(key) match {
@@ -18,6 +18,7 @@ object TextureFactory {
         val resTex = texCache.get(uriStr) match {
           case Some(tex) => tex
           case None =>
+            println("create texture: " + uriStr + ", key: " + key)
             val texture = TextureLoader.getTexture("PNG", new FileInputStream( uriStr ))
             texCache.update(uriStr, texture)
             texture
@@ -39,7 +40,6 @@ object TextureFactory {
     val a = 'sprite
     val uri = Resource.buildPath(a)
     //val res = if (exists(uri)) uri else Resource.nullImg
-    println("---------------"+id+"---"+uri)
     val rect = id match { // 超ベタ書き
       case 'ENG01B => Rect(2,2,32,32)
       case 'ENG01D => Rect(36,2,32,32)
@@ -47,8 +47,7 @@ object TextureFactory {
       case 'ENG02R => Rect(2,36,32,32)
       case 'invader01 => Rect(36,36,64,64)
       case 'ship => Rect(2,102,32,32)
-
-
+      case 'DEFAULT => Rect(2,2,32,32)
       case _ => Rect(0,0,1,1)
     }
     (uri, rect)
