@@ -14,7 +14,92 @@ bullet delayaim {
   dir(@aim)
 }
 
+enemy t01 {
+  dir(90)
+  spd(0.25)
+  wait(15)
+  $0 = 3
+  repeat 30 {
+    dir($0, relative)
+    wait(1)
+  }
+  wait(10)
+  fire(simple, ENG01B)
+  wait(3)
+  repeat 7 {
+    se(test2)
+    fire(simple, ENG01D)
+    wait(3)
+  }
+  wait(10)
+  repeat 30 {
+    dir($0, relative)
+    wait(1)
+  }
+  wait(60)
+}
+
+enemy invader {
+  $0 = 90
+  dir($0)
+  $1 = 0.21
+  spd($1)
+  wait(30)
+  repeat 24 {
+    $1 -= @rnd(0.01, 0.02)
+    spd($1)
+    wait(1)
+  }
+  repeat 3 {
+    se(test2)
+    $2 = @rnd(0.23, 0.26)
+    fire(simple, ENG01B, @aim, $2)
+    wait(4)
+  }
+  repeat 18 {
+    $1 -= @rnd(0.01, 0.02)
+    spd($1)
+    wait(1)
+  }
+  wait(60)
+}
+
+emitter invaderline {
+  $0 = 40
+  repeat 20 {
+    appear(invader, invader01, $0, 15)
+    $0 += 20
+    $1 = 10
+    $1 += @rnd(0, 8)
+    wait(1)
+  }
+}
+
+emitter invader5line {
+  repeat 5 {
+    emit(invaderline)
+    wait(60)
+  }  
+}
+
 emitter main {
+  $0 = @x
+  $0 += 100
+  repeat 30 {
+    $1 = $0
+    $0 += @rnd(0, 100)
+    appear(t01, invader01, $0, 15)
+    $0 = $1
+    wait(20)
+  }
+  wait(60)
+  emit(invader5line)
+
+}
+
+emitter a {
+
+
 
   $1 = 0
   repeat 30 {
