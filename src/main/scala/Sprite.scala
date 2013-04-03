@@ -11,8 +11,11 @@ class Sprite(_resource: Symbol) {
   val (texture, rect) = TextureFactory.get(_resource)
 
   def draw(pos: Position) {
-    Game.view2d()
     Drawer.draw(texture, rect, pos, 0)
+  }
+
+  def draw(pos: Position, angle: Double) {
+    Drawer.draw(texture, rect, pos, angle)
   }
 
 }

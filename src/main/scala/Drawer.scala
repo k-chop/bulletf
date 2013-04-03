@@ -27,7 +27,7 @@ object Drawer {
     Game.view2d()
     GL11.glEnable(GL11.GL_TEXTURE_2D)
     if (nowRenderTexId != texture.getTextureID) {
-      println("flip: "+texture.getTextureRef)
+      //println("flip: "+texture.getTextureRef)
       texture.bind() // or GL11.glBind(texture.getTextureID())
       nowRenderTexId = texture.getTextureID
     }

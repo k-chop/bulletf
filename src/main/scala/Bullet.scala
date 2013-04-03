@@ -34,7 +34,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   }
 
   def draw() {
-    if (enable) sprite.draw(pos)
+    if (enable) sprite.draw(pos, angle.dir-90)
   }
 
   def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
