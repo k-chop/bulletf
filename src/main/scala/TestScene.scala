@@ -60,13 +60,13 @@ class TestScene extends Scene {
   }
   
   def init() {
-    BGM.play(0)
+    //BGM.play(0)
 
     emitters.clear()
     runner.clear()
     List('loadtest).foreach{ s => runner.build(s.name) }
     
-    emitters += STGObjectFactory.newEmitter(runner.get('main), 'nullpo)
+    emitters += STGObjectFactory.initialEmitter(runner.get('main))
     
     // script load
     

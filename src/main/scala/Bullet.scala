@@ -5,8 +5,8 @@ import java.io.{ FileInputStream, IOException }
 
 import scala.collection.mutable.ArrayBuffer
 
-class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var speed: Double, var angle: Angle)
-  extends HasCollision with ScriptedMove
+class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
+  extends BulletLike with HasCollision
 {
   import Constants.script._
 
@@ -22,9 +22,6 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
 
   // 当たり判定の半径
   val radius = sprite.texture.getImageWidth / 4.0
-
-  // 弾は弾を生産できない
-  def produce(action: Behavior, kind: Symbol, pos: Position, speed: Double, angle: Angle) {}
 
   // スクリプトの実行が終わったら等速直線運動へシフト
   def onEndScript(delta: Int) {

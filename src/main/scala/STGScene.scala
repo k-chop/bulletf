@@ -47,7 +47,7 @@ class STGScene extends Scene {
 
     List('loadtest).foreach{ s => runner.build(s.name) }
     
-    enemyBullets += STGObjectFactory.newEmitter(runner.get('loadtest), 'nullpo)
+    enemyBullets += STGObjectFactory.initialEmitter(runner.get('loadtest))
     
     // script load
     

@@ -24,6 +24,13 @@ case class Repeat(time: Int, subseq: Array[Op]) extends Op {
 */
 case class Wait(time: Int) extends Op
 
+/**
+ * VWait (Variable Wait)
+ * こちらは実行時に解釈が入るので遅くなる可能性
+ * 定数以外で指定したい場合はこっち使えばおｋ
+ */
+case class VWait(time: Container) extends Op
+
 /** 
 * Nop
 * パースに失敗した残骸．
@@ -38,10 +45,22 @@ case object Nop extends Op
 */
 case class Fire(action: Symbol, kind: Symbol, dir: Container, speed: Container) extends Op
 
-/** 
+/**
+ * GenEnemy
+ * Enemyを生成する．
+ */
+case class GenEnemy(action: Symbol, kind: Symbol, x: Container, y: Container) extends Op
+
+/**
+ * Emit
+ * Emitterを生成する．
+ */
+case class Emit(action: Symbol, x: Container, y: Container) extends Op
+
+/**
 * SetVar
 * Double型の変数をセットする．$0 - $9までが使用可能で，アクションごとに共有される．
-* 
+*
 */
 case class SetVar(idx: Int, value: Container) extends Op
 

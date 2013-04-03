@@ -82,10 +82,11 @@ class Game(_width: Int, _height: Int) {
     println("drawelement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
 
     while (true) {
-      val be = getTime
+      val be = getTime()
       val delta = getDelta()
       //up(delta)
       SceneController.update(delta/1000)
+      SoundEffect.update(delta/1000)
       
       updateFPS()
 

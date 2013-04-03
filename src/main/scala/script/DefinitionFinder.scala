@@ -3,6 +3,10 @@ package script
 
 object DefinitionFinder {
 
+  implicit class SymToStr(val str: String) extends AnyVal {
+    def sym: Symbol = Symbol(str)
+  }
+
   final val spdparams = Set("absolute", "relative")
   final val dirparams = Set("absolute", "aim", "relative")
   final val stateparams = Set("x", "y", "aim", "speed", "angle")
@@ -13,39 +17,67 @@ object DefinitionFinder {
     case ("rnd", Seq( DVar(fst)) ) =>
       RandomVar(0, fst)
     case (n, Seq()) if stateparams(n) =>
-      StateVar( Symbol(n) )
+      StateVar( n.sym )
     case _ => DVar(0.0)
   }
 
   def findFunction(name: String, args: Seq[Container]): Op = (name, args) match {
-    case ("fire", Seq( StrVar(action), StrVar(kind), c: Container, d: Container )) =>
-      Fire(Symbol(action), Symbol(kind), c, d)
-    
-    case ("wait", Seq( DVar(value) )) =>
-      Wait(value.toInt)
-    
-    case ("spd", Seq( cont: Container, StrVar(param) )) =>
-      if ( spdparams(param) ) {
-        SetSpeed(cont, Symbol(param) )
-      } else {
-        println("%s is undefined param with `spd`, fixed to absolute." format param)
-        SetSpeed(cont, 'absolute)
-      }
-    case ("spd", Seq( cont: Container )) =>
-      SetSpeed(cont, 'absolute)
-    
-    case ("dir", Seq( cont: Container, StrVar(param) )) =>
-      if ( dirparams(param) ) {
-        SetDirection(cont, Symbol(param) )
-      } else {
-        println("%s is undefined param with `spd`, fixed to absolute." format param)
-        SetDirection(cont, 'absolute )
-      }
-    case ("dir", Seq( cont: Container )) =>
-      SetDirection(cont, 'absolute)
+    case ("fire", args: Seq[_]) => args match {
+      case Seq( StrVar(action), StrVar(kind), dirCon: Container, speedCon: Container ) =>
+        Fire(action.sym, kind.sym, dirCon, speedCon)
+      case Seq( StrVar(action), StrVar(kind) ) =>
+        Fire(action.sym, kind.sym, StateVar('aim), StateVar('speed))
+      case Seq( StrVar(action) ) =>
+        Fire(action.sym, 'DEFAULT, StateVar('aim), StateVar('speed))
+      case Nil =>
+        Fire('simple, 'DEFAULT, StateVar('aim), StateVar('speed))
+      case _ => Nop
+    }
 
-    case ("se", Seq(StrVar(param))) =>
-      PlaySound(Symbol(param))
+    case ("appear", args: Seq[_]) => args match {
+      case Seq( StrVar(action), StrVar(kind), xCon: Container, yCon: Container ) =>
+        GenEnemy(action.sym, kind.sym, xCon, yCon)
+      case Seq( StrVar(action), StrVar(kind) ) =>
+        GenEnemy(action.sym, kind.sym, StateVar('x), StateVar('y))
+      case _ => Nop
+    }
+
+    case ("emit", args: Seq[_]) => args match {
+      case Seq( StrVar(action), xCon, yCon) =>
+        Emit(action.sym, xCon, yCon)
+      case Seq( StrVar(action) ) => // 指定がない場合親の位置を受け継ぐ
+        Emit(action.sym, StateVar('x), StateVar('y))
+      case _ => Nop
+    }
+
+    case ("wait", Seq( DVar(time) )) =>
+      Wait(time.toInt)
+
+    case ("vwait", Seq( timeCon: Container )) =>
+      VWait(timeCon)
+    
+    case ("spd", Seq( valueCon: Container, StrVar(param) )) =>
+      if ( spdparams(param) ) {
+        SetSpeed(valueCon, param.sym )
+      } else {
+        println("%s is undefined param with `spd`, fixed to absolute." format param)
+        SetSpeed(valueCon, 'absolute)
+      }
+    case ("spd", Seq( valueCon: Container )) =>
+      SetSpeed(valueCon, 'absolute)
+    
+    case ("dir", Seq( valueCon: Container, StrVar(param) )) =>
+      if ( dirparams(param) ) {
+        SetDirection(valueCon, param.sym )
+      } else {
+        println("%s is undefined param with `spd`, fixed to absolute." format param)
+        SetDirection(valueCon, 'absolute )
+      }
+    case ("dir", Seq( valueCon: Container )) =>
+      SetDirection(valueCon, 'absolute)
+
+    case ("se", Seq(StrVar(soundId))) =>
+      PlaySound(soundId.sym)
 
     case _ => Nop
   }

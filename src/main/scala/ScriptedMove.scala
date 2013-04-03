@@ -22,9 +22,6 @@ trait ScriptedMove extends Movable {
     enable = false
   }
 
-  // スクリプトのfireを実行した時に呼び出される。
-  def produce(action: Behavior, kind: Symbol, pos: Position, speed: Double, angle: Angle)
-
   // スクリプトの実行が終わった時に呼び出される。
   def onEndScript(delta: Int)
 }

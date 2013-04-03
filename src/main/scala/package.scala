@@ -11,7 +11,9 @@ object `package` {
 
     implicit def angle2double(a: Angle): Double = a.dir
     implicit def double2Container(d: Double): DVar = DVar(d)
-
+    implicit class autoWrapAngle(val dir: Double) extends AnyVal {
+      def toAngle: Angle = Angle(dir)
+    }
   }
 
   //implicit def container2Double(c: Container): Double = c.get()

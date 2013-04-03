@@ -1,25 +1,29 @@
 package com.github.whelmaze.bulletf
 
-import collection.mutable
 import com.github.whelmaze.bulletf.Constants.script._
+import collection.mutable
 
-class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike with CanProduceAll
+class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
+  extends BulletLike with OwnerLike with CanProduceAll with HasCollision
 {
+
+  val sprite = new Sprite(resource)
+  val radius: Double = sprite.texture.getImageWidth / 4.0
 
   var waitCount: Int = -1
   var waitingNest: Int = 0
   val pc: Array[Int] = Array.fill(MAX_NEST){0}
   val lc: Array[Int] = Array.fill(MAX_NEST){-1}
   val vars: Array[Double] = Array.fill(MAX_NEST){0.0}
-  var enable = true
-  var time = 0
+  var enable: Boolean = true
+  var time: Int = 0
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
-  // スクリプトの実行が終わっていたら、持ち弾が0になるまで待ってから死ぬ
+  // スクリプトの実行が終わった時に呼び出される。
   def onEndScript(delta: Int) {
     if (ownObjects.isEmpty) disable()
+    BasicBehavior.run(delta)(this)
   }
 
   def update(delta: Int) {
@@ -31,16 +35,9 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
   }
 
   def draw() {
+    sprite.draw(pos)
     if (enable) ownObjects.foreach(_.draw())
   }
 
   def size = ownObjects.size
-
-  def clear() {
-    // 消滅の際エフェクト出したりする場合もあるから、foreachでdisableにした方が良いかも？
-    // 得点アイテムへの変化とかもすんだろ
-    ownObjects.clear()
-  }
-
-
 }

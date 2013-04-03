@@ -5,17 +5,23 @@ import com.github.whelmaze.bulletf.script._
 import scala.collection.mutable.ListBuffer
 
 object STGObjectFactory {
-  import implicits.angle2double
 
-  final def newEmitter(action: Behavior, kind: Symbol): Emitter = {
-    new Emitter(action, Position(constants.screenWidth / 2.0, constants.screenHeight / 2.0 - 200), 0, Angle(0) )
+  def initialEmitter(action: Behavior): Emitter = {
+    new Emitter(action, Position(constants.screenWidth / 2.0, constants.screenHeight / 2.0 - 200), Angle.zero, 0)
   }
 
-  final def newBullet(action: Behavior, kind: Symbol, pos: Position, speed: Double, angle: Angle): Bullet = {
-    new Bullet(action, kind, pos, speed, angle)
+  def newEmitter(action: Behavior, pos: Position, angle: Angle, speed: Double): Emitter = {
+    new Emitter(action, pos, angle, speed)
   }
 
-  
+  def newBullet(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double): Bullet = {
+    new Bullet(action, kind, pos, angle, speed)
+  }
+
+  def newEnemy(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double): Enemy = {
+    new Enemy(action, kind, pos, angle, speed)
+  }
+
 }
 
 
