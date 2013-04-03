@@ -20,9 +20,10 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
-  // スクリプトの実行が終わった時に呼び出される。
+  // スクリプトの実行が終わっていてまだ弾が残っているなら等速直線運動
+  // 弾も消え、自身も画面外に行ったら死亡
   def onEndScript(delta: Int) {
-    if (ownObjects.isEmpty) disable()
+    if (ownObjects.isEmpty && inside) disable()
     BasicBehavior.run(delta)(this)
   }
 
@@ -40,4 +41,6 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   }
 
   def size = ownObjects.size
+
+  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
 }
