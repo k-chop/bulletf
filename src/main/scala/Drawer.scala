@@ -5,8 +5,46 @@ import org.newdawn.slick.opengl.{ Texture, TextureLoader }
 import org.lwjgl.opengl.{ Display, DisplayMode, GL11 }
 import org.lwjgl.util.glu.GLU
 import com.github.whelmaze.bulletf.constants._
+import org.lwjgl.opengl.GL11._
+
+case class Rect(x: Int, y:Int, w: Int, h: Int)
 
 object Drawer {
+  private[this] var nowRenderTexId = -1
+
+  def draw(texture: Texture, pos: Position, rotate: Double) {
+
+    val halfx = texture.getImageWidth / 2.0
+    val halfy = texture.getImageHeight / 2.0
+
+    Game.view2d()
+    GL11.glEnable(GL11.GL_TEXTURE_2D)
+    if (nowRenderTexId != texture.getTextureID) {
+      texture.bind() // or GL11.glBind(texture.getTextureID())
+      nowRenderTexId = texture.getTextureID
+    }
+
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+    GL11.glTranslated(pos.x, pos.y, 0.0)
+    GL11.glRotated(rotate, 0.0, 0.0, 1.0)
+
+    GL11.glBegin(GL11.GL_QUADS)
+    GL11.glTexCoord2d(0,0)
+    GL11.glVertex2d(-halfx, -halfy)
+    GL11.glTexCoord2d(1,0)
+    GL11.glVertex2d(texture.getTextureWidth - halfx, -halfy)
+    GL11.glTexCoord2d(1,1)
+    GL11.glVertex2d(texture.getTextureWidth - halfx, texture.getTextureHeight - halfy)
+    GL11.glTexCoord2d(0,1)
+    GL11.glVertex2d(-halfx, texture.getTextureHeight - halfy)
+    GL11.glEnd()
+
+    GL11.glDisable(GL11.GL_TEXTURE_2D)
+    //GL11.glLoadIdentity()
+    GL11.glLoadIdentity()
+  }
 
   def draw(texture: Texture, pos: Position) {
 
@@ -16,8 +54,10 @@ object Drawer {
     Game.view2d()
 
     GL11.glEnable(GL11.GL_TEXTURE_2D)
-    texture.bind() // or GL11.glBind(texture.getTextureID())
-
+    if (nowRenderTexId != texture.getTextureID) {
+      texture.bind() // or GL11.glBind(texture.getTextureID())
+      nowRenderTexId = texture.getTextureID
+    }
     GL11.glBegin(GL11.GL_QUADS)
     GL11.glTexCoord2d(0,0)
     GL11.glVertex2d(pos.x - halfx, pos.y - halfy)

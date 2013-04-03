@@ -1,12 +1,10 @@
 package com.github.whelmaze.bulletf
 
-import java.io.{ FileInputStream, IOException }
-
-object Sprite {
+object AnimationSprite {
   def get(resource: Symbol): Sprite = new Sprite(resource)
 }
 
-class Sprite(_resource: Symbol) {
+class AnimationSprite(_resource: Symbol) {
 
   val texture = TextureFactory.get(_resource)
 
@@ -16,8 +14,3 @@ class Sprite(_resource: Symbol) {
   }
 
 }
-
-
-
-
-
