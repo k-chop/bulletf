@@ -15,8 +15,11 @@ import collection.mutable
  */
 class SpriteAnimationInfo(val rect: Rect, val length: Int, pattern: Array[(Int, Int)], loop: Boolean) {
 
+  private[this] val rects: Array[Rect] = Array.tabulate(length){ i =>
+    rect.copy(x = rect.x + (rect.w * i))
+  }
   private[this] val lastFrame: Int = pattern(length-1)._1
-  private[this] lazy val lastRect: Rect = rect.copy(x = rect.x + (rect.w * pattern(length-1)._1))
+  private[this] lazy val lastRect: Rect = rects(length-1)
 
   def next(_time: Int): Rect = {
     val time = if (loop) _time % lastFrame else _time
@@ -31,7 +34,7 @@ class SpriteAnimationInfo(val rect: Rect, val length: Int, pattern: Array[(Int, 
       val at = math.max(idx - 1, 0) // lengthに到達する前に必ず1つは見つかるはず
 
       val idxp = pattern(at)._2
-      val res = rect.copy(x = rect.x + (rect.w * idxp))
+      val res = rects(idxp)
 
       res
     }
