@@ -5,22 +5,36 @@ import java.io.{File, FileInputStream}
 
 import collection.mutable
 
+/**
+ * アニメーションするSpriteの定義
+ * キャッシュさせるんだから可変な内部状態持たせるな
+ * @param rect 最初の1つのRect
+ * @param length スプライトのパターンの長さ
+ * @param pattern どうアニメーションするかの定義、(frame, index)の配列
+ * @param loop 最後まで再生したあとループするかどうか
+ */
+class SpriteAnimationInfo(val rect: Rect, val length: Int, pattern: Array[(Int, Int)], loop: Boolean) {
 
-class SpriteAnimationInfo(pattern: Array[(Int, Rect)], loop: Boolean) {
+  private[this] val lastFrame: Int = pattern(length-1)._1
+  private[this] lazy val lastRect: Rect = rect.copy(x = rect.x + (rect.w * pattern(length-1)._1))
 
-  private[this] var pt: Int = 0
+  def next(_time: Int): Rect = {
+    val time = if (loop) _time % lastFrame else _time
+    //println(s"normalize time ${_time} to $time")
+    if (lastFrame <= time) { // lengthを越している(loopでない)
+      lastRect
+    } else {
+      var idx = 0
+      // 次のidxからtimeを超えない最大のframeを探索
+      // 毎回頭から探すのはどうかと…
+      while(pattern(idx)._1 < time && idx < length) idx += 1
+      val at = math.max(idx - 1, 0) // lengthに到達する前に必ず1つは見つかるはず
 
-  def rect = pattern(0)._2
+      val idxp = pattern(at)._2
+      val res = rect.copy(x = rect.x + (rect.w * idxp))
 
-  def nextFrame: Int = pattern(pt)._1
-
-  def nextStep(): Rect = {
-    val res = pattern(pt)._2
-    pt += 1
-    if (pt >= pattern.length) {
-      if (loop) pt = 0 else pt -= 1
+      res
     }
-    res
   }
 }
 
@@ -71,7 +85,7 @@ object TextureFactory {
     val a = 'sprite
     val uri = Resource.buildPath(a)
     val animInfo = id match {
-      case _ => new SpriteAnimationInfo(Array((0, Rect(2,2,32,32)), (5, Rect(36,2,32,32)), (9, Rect(2,2,32,32))), loop = true)
+      case _ => new SpriteAnimationInfo(Rect(2,68,17,17), 8, Array((0,0),(2,1),(4,2),(6,3),(8,4),(10,5),(12,6),(14,7),(15,7)), loop = true)
     }
     (uri, animInfo)
   }
@@ -92,9 +106,9 @@ object TextureFactory {
       case 'ENG01B => Rect(2,2,32,32)
       case 'ENG01D => Rect(36,2,32,32)
       case 'ENG02B => Rect(70,2,32,32)
-      case 'ENG02R => Rect(2,36,32,32)
-      case 'invader01 => Rect(36,36,64,64)
-      case 'ship => Rect(2,102,32,32)
+      case 'ENG02R => Rect(104,2,32,32)
+      case 'invader01 => Rect(138,2,64,64)
+      case 'ship => Rect(204,2,32,32)
       case 'DEFAULT => Rect(2,2,32,32)
       case _ => Rect(0,0,1,1)
     }

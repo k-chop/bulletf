@@ -7,15 +7,10 @@ class AnimationSprite(resourceId: Symbol) extends Sprite {
   val rect: Rect = animInfo.rect
   private[this] var time: Int = 0
 
-  def draw(pos: Position) {
-    if (animInfo.nextFrame == time) {
-      Drawer.draw(texture, animInfo.nextStep(), pos, 0)
-    } else {
-      time += 1
-    }
-  }
+  def draw(pos: Position) = draw(pos, 0)
 
   def draw(pos: Position, angle: Double) {
-
+    Drawer.draw(texture, animInfo.next(time), pos, angle)
+    time += 1
   }
 }
