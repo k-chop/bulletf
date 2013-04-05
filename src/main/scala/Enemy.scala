@@ -7,8 +7,8 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   extends BulletLike with OwnerLike with CanProduceAll with HasCollision
 {
 
-  val sprite = new Sprite(resource)
-  val radius: Double = sprite.texture.getImageWidth / 4.0
+  val sprite = Sprite.get(resource)
+  val radius: Double = sprite.rect.x / 4.0
 
   var waitCount: Int = -1
   var waitingNest: Int = 0

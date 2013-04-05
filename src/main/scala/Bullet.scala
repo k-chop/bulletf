@@ -10,7 +10,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
 {
   import Constants.script._
 
-  val sprite: Sprite = new Sprite(resource)
+  val sprite: Sprite = Sprite.get(resource)
 
   var waitCount = -1
   var waitingNest = 0
@@ -21,7 +21,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   var time = 0
 
   // 当たり判定の半径
-  val radius = sprite.texture.getImageWidth / 4.0
+  val radius = sprite.rect.x / 4.0
 
   // スクリプトの実行が終わったら等速直線運動へシフト
   def onEndScript(delta: Int) {

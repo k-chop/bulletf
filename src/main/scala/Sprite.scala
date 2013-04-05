@@ -1,14 +1,34 @@
 package com.github.whelmaze.bulletf
 
-import java.io.{ FileInputStream, IOException }
+import scala.collection.mutable
+import org.newdawn.slick.opengl.Texture
 
 object Sprite {
-  def get(resource: Symbol): Sprite = new Sprite(resource)
+
+  private[this] val cache = mutable.HashMap.empty[Symbol, Sprite]
+
+  def get(resource: Symbol): Sprite = cache.get(resource) match {
+    case Some(cachedSprite) => cachedSprite
+    case None =>
+      val newSprite = new SpriteImpl(resource)
+      cache.update(resource, newSprite)
+      newSprite
+  }
+
+  def count = cache.size
+
 }
 
-class Sprite(_resource: Symbol) {
+trait Sprite {
+  val rect: Rect
 
-  val (texture, rect) = TextureFactory.get(_resource)
+  def draw(pos: Position)
+  def draw(pos: Position, angle: Double)
+}
+
+class SpriteImpl(resourceId: Symbol) extends Sprite {
+
+  val (texture, rect) = TextureFactory.get(resourceId)
 
   def draw(pos: Position) {
     Drawer.draw(texture, rect, pos, 0)

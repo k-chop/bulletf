@@ -1,16 +1,21 @@
 package com.github.whelmaze.bulletf
 
-object AnimationSprite {
-  def get(resource: Symbol): Sprite = new Sprite(resource)
-}
+class AnimationSprite(resourceId: Symbol) extends Sprite {
 
-class AnimationSprite(_resource: Symbol) {
+  val (texture, animInfo) = TextureFactory.getAnimate(resourceId)
 
-  val (texture, rect) = TextureFactory.get(_resource)
+  val rect: Rect = animInfo.rect
+  private[this] var time: Int = 0
 
   def draw(pos: Position) {
-    Game.view2d()
-    Drawer.draw(texture, pos)
+    if (animInfo.nextFrame == time) {
+      Drawer.draw(texture, animInfo.nextStep(), pos, 0)
+    } else {
+      time += 1
+    }
   }
 
+  def draw(pos: Position, angle: Double) {
+
+  }
 }

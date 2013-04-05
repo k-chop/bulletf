@@ -6,10 +6,36 @@ import java.io.{File, FileInputStream}
 import collection.mutable
 
 
+class SpriteAnimationInfo(pattern: Array[(Int, Rect)], loop: Boolean) {
+
+  private[this] var pt: Int = 0
+
+  def rect = pattern(0)._2
+
+  def nextFrame: Int = pattern(pt)._1
+
+  def nextStep(): Rect = {
+    val res = pattern(pt)._2
+    pt += 1
+    if (pt >= pattern.length) {
+      if (loop) pt = 0 else pt -= 1
+    }
+    res
+  }
+}
+
 object TextureFactory {
   private val cache = mutable.WeakHashMap.empty[Symbol, (Texture, Rect)]
+  private val aniCache = mutable.WeakHashMap.empty[Symbol, (Texture, SpriteAnimationInfo)]
   // Textureの生成はゲロ重いのでWeakだとすぐに破棄されてアカン
   private val texCache = mutable.HashMap.empty[String, Texture]
+
+  def genNewTexture(uriStr: String, key: Symbol): Texture = {
+    println("create texture: " + uriStr + ", key: " + key)
+    val texture = TextureLoader.getTexture("PNG", new FileInputStream( uriStr ))
+    texCache.update(uriStr, texture)
+    texture
+  }
 
   def get(key: Symbol): (Texture, Rect) = {
     cache.get(key) match {
@@ -18,15 +44,36 @@ object TextureFactory {
         val (uriStr, rect) = fileMapped(key)
         val resTex = texCache.get(uriStr) match {
           case Some(tex) => tex
-          case None =>
-            println("create texture: " + uriStr + ", key: " + key)
-            val texture = TextureLoader.getTexture("PNG", new FileInputStream( uriStr ))
-            texCache.update(uriStr, texture)
-            texture
+          case None => genNewTexture(uriStr, key)
         }
-        cache.update(key, (resTex, rect))
-        (resTex, rect)
+        val res = (resTex, rect)
+        cache.update(key, res)
+        res
     }
+  }
+
+  def getAnimate(key: Symbol): (Texture, SpriteAnimationInfo) = {
+    aniCache.get(key) match {
+      case Some(textureInfo) => textureInfo
+      case None =>
+        val (uriStr, animInfo) = fileMappedAnimate(key)
+        val resTex = texCache.get(uriStr) match {
+          case Some(tex) => tex
+          case None => genNewTexture(uriStr, key)
+        }
+        val res =(resTex, animInfo)
+        aniCache.update(key, res)
+        res
+    }
+  }
+
+  private[this] def fileMappedAnimate(id: Symbol): (String, SpriteAnimationInfo) = {
+    val a = 'sprite
+    val uri = Resource.buildPath(a)
+    val animInfo = id match {
+      case _ => new SpriteAnimationInfo(Array((0, Rect(2,2,32,32)), (5, Rect(36,2,32,32)), (9, Rect(2,2,32,32))), loop = true)
+    }
+    (uri, animInfo)
   }
 
   /**
@@ -41,7 +88,7 @@ object TextureFactory {
     val a = 'sprite
     val uri = Resource.buildPath(a)
     //val res = if (exists(uri)) uri else Resource.nullImg
-    val rect = id match { // 超ベタ書き
+    val rect = id match { // 超ベタ書き(仮)
       case 'ENG01B => Rect(2,2,32,32)
       case 'ENG01D => Rect(36,2,32,32)
       case 'ENG02B => Rect(70,2,32,32)

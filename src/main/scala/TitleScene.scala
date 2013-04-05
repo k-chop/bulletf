@@ -7,7 +7,7 @@ import collection.mutable
 
 class TitleScene extends Scene {
 
-  val titleImg = new Sprite(Resource.titleGraphic)
+  val titleImg = Sprite.get(Resource.titleGraphic)
 
   def name() = "Title"
   
