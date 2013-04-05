@@ -14,6 +14,7 @@ object BGM {
 
   def free() {
     arr.foreach(_.release())
+    println("Freeing BGM resources complete.")
   }
 
 }

@@ -8,6 +8,7 @@ import collection.mutable
 
 object TextureFactory {
   private val cache = mutable.WeakHashMap.empty[Symbol, (Texture, Rect)]
+  // Textureの生成はゲロ重いのでWeakだとすぐに破棄されてアカン
   private val texCache = mutable.HashMap.empty[String, Texture]
 
   def get(key: Symbol): (Texture, Rect) = {
@@ -55,5 +56,11 @@ object TextureFactory {
 
   // ファイルの存在確認。なんかもっとスマートな方法はないものか...
   private[this] def exists(path: String) = (new File(path)).exists()
+
+  // リソースの開放
+  def free() {
+    texCache.values.foreach(_.release())
+    println("Freeing texture resources complete.")
+  }
 
 }

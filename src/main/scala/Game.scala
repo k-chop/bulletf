@@ -99,6 +99,7 @@ class Game(_width: Int, _height: Int) {
         SceneController.draw()
         val elasp = (System.nanoTime() - ta) / 1000.0 / 1000.0
         println(f"draw takes time: $elasp%e ms")
+        println(s"sprite count: ${Sprite.count}")
       } else {
         SceneController.draw()
       }
@@ -112,9 +113,10 @@ class Game(_width: Int, _height: Int) {
       //Display.sync(fps) // ←dame (on windows7 64bit)
       a += 1; a %= 360
       if (Display.isCloseRequested) {
-        println("free resources")
+        println("free resources...")
         BGM.free()
         SoundEffect.free()
+        TextureFactory.free()
 
         Display.destroy()
 

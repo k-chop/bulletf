@@ -39,5 +39,6 @@ object SoundEffect {
 
   def free() {
     arr.foreach(_.release())
+    println("Freeing sound resources complete.")
   }
 }
