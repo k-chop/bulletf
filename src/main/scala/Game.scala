@@ -85,7 +85,14 @@ class Game(_width: Int, _height: Int) {
       val be = getTime()
       val delta = getDelta()
       //up(delta)
-      SceneController.update(delta/1000)
+      if (a%60==0) {
+        val ta = System.nanoTime()
+        SceneController.update(delta/1000)
+        val elasp = (System.nanoTime() - ta) / 1000.0 / 1000.0
+        println(f"update takes time: $elasp%e ms")
+      } else {
+        SceneController.update(delta/1000)
+      }
       SoundEffect.update(delta/1000)
       
       updateFPS()
