@@ -11,9 +11,10 @@ object BasicBehavior extends Behavior {
 
     val vx = cos(unit.angle * Pi / 180.0f) * unit.speed * delta
     val vy = sin(unit.angle * Pi / 180.0f) * unit.speed * delta
-    unit.pos = unit.pos.add(vx, vy)
+    unit.pos.x += vx
+    unit.pos.y += vy
 
-    unit.angle = unit.angle.normalized
+    unit.angle.normalize()
 
   }
 }

@@ -74,13 +74,13 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
           // 必要なら定義先で改めて定義すればよい。
           case GenEnemy(action, kind, x, y) => unit match {
             case c: CanProduceAll =>
-              c.genEnemy(manager.get(action), kind, Position(ex(x), ex(y)), unit.angle, unit.speed)
+              c.genEnemy(manager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
           case Emit(action, x, y) => unit match {
             case c: CanProduceAll =>
-              c.emit(manager.get(action), Position(ex(x), ex(y)), unit.angle, unit.speed)
+              c.emit(manager.get(action), Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
@@ -109,11 +109,12 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
 
           case SetDirection(dir, param) => param match {
             case 'absolute =>
-              unit.angle = ex(dir).toAngle
+              unit.angle.update(ex(dir))
             case 'aim =>
-              unit.angle = manager.getAimToShip(unit.pos).toAngle
+              unit.angle.update(manager.getAimToShip(unit.pos))
             case 'relative =>
-              unit.angle = unit.angle + ex(dir).toAngle
+              unit.angle += ex(dir)
+
           }; incPC(); recur(nestLevel, seq)
 
           case SetSpeed(spd, param) => param match {

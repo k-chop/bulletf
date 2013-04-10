@@ -1,12 +1,27 @@
 package com.github.whelmaze.bulletf
 
 object Angle {
+  def apply(d: Double) = new Angle(d)
   lazy val zero = Angle(0)
 }
 
-case class Angle(dir: Double) extends AnyVal {
+class Angle(private[this] var _dir: Double) {
+  def dir: Double = _dir
   
-  def update(newDir: Double) = Angle(newDir)
-  def normalized = Angle( if(dir > 360) dir + 360 % 360 else dir )
-  def +(left: Angle) = Angle(dir + left.dir)
+  def update(newDir: Double) {
+    _dir = newDir
+  }
+
+  def normalize(): Angle = {
+    _dir = if(_dir > 360) _dir + 360 % 360 else _dir
+    this
+  }
+
+  def +=(left: Angle) {
+    _dir += left.dir
+  }
+
+  def +=(left: Double) {
+    _dir += left
+  }
 }

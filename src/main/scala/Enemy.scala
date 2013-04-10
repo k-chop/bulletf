@@ -31,7 +31,8 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
     if (enable) {
       action.run(delta)(this)
       ownObjects.foreach(_.update(delta))
-      ownObjects = ownObjects.filter(_.enable)
+      if (time % 120 == 0) // per 2sec
+        ownObjects = ownObjects.filter(_.enable)
     }
   }
 

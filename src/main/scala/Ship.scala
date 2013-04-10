@@ -9,7 +9,7 @@ class Ship extends HasCollision {
   val radius = 2.0
   
   def update(delta: Int) {
-    ShipBehaivor.move(this, delta)
+    ShipBehavior.move(this, delta)
   }
 
   def draw() {
