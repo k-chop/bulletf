@@ -18,6 +18,21 @@ trait Runnable {
 
 trait BulletLike extends ScriptedMove with Runnable with Drawable
 
+trait HasInnerFunc {
+  self: BulletLike =>
+
+  protected class InnerUpdateFunc {
+    private[this] var delta: Int = 0
+    def set(d: Int) { delta = d }
+    val func: BulletLike => Unit = b => b.update(delta)
+  }
+
+  protected val updateFunc: InnerUpdateFunc
+  protected val enableFunc = (b: BulletLike) => b.enable
+  protected val drawFunc = (b: BulletLike) => b.draw()
+
+}
+
 trait OwnerLike {
   var ownObjects: mutable.ListBuffer[BulletLike]
 }

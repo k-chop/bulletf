@@ -1,5 +1,13 @@
 package com.github.whelmaze.bulletf
 
+import com.github.whelmaze.bulletf.Constants.script._
+
+object ScriptedMove {
+  val initialPc: Array[Int] = Array.fill(MAX_NEST){0}
+  val initialLc: Array[Int] = Array.fill(MAX_NEST){-1}
+  val initialVars: Array[Double] = Array.fill(MAX_NEST){0.0}
+}
+
 trait ScriptedMove extends Movable {
 
   // 残りウェイトのカウンタ
@@ -24,4 +32,22 @@ trait ScriptedMove extends Movable {
 
   // スクリプトの実行が終わった時に呼び出される。
   def onEndScript(delta: Int)
+
+  protected def copyPc: Array[Int] = {
+    val dest = Array.ofDim[Int](MAX_NEST)
+    Array.copy(ScriptedMove.initialPc, 0, dest, 0, MAX_NEST)
+    dest
+  }
+
+  protected def copyLc: Array[Int] = {
+    val dest = Array.ofDim[Int](MAX_NEST)
+    Array.copy(ScriptedMove.initialLc, 0, dest, 0, MAX_NEST)
+    dest
+  }
+
+  protected def copyVars: Array[Double] = {
+    val dest = Array.ofDim[Double](MAX_NEST)
+    Array.copy(ScriptedMove.initialVars, 0, dest, 0, MAX_NEST)
+    dest
+  }
 }

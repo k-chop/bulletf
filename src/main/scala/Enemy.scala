@@ -4,7 +4,7 @@ import com.github.whelmaze.bulletf.Constants.script._
 import collection.mutable
 
 class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike with CanProduceAll with HasCollision
+  extends BulletLike with OwnerLike with CanProduceAll with HasCollision with HasInnerFunc
 {
 
   val sprite = Sprite.get(resource)
@@ -20,6 +20,8 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
+  override val updateFunc = new InnerUpdateFunc
+
   // スクリプトの実行が終わっていてまだ弾が残っているなら等速直線運動
   // 弾も消え、自身も画面外に行ったら死亡
   def onEndScript(delta: Int) {
@@ -30,15 +32,16 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   def update(delta: Int) {
     if (enable) {
       action.run(delta)(this)
-      ownObjects.foreach(_.update(delta))
+      updateFunc.set(delta)
+      ownObjects.foreach(updateFunc.func)
       if (time % 120 == 0) // per 2sec
-        ownObjects = ownObjects.filter(_.enable)
+        ownObjects = ownObjects.filter(enableFunc)
     }
   }
 
   def draw() {
     sprite.draw(pos)
-    if (enable) ownObjects.foreach(_.draw())
+    if (enable) ownObjects.foreach(drawFunc)
   }
 
   def size = ownObjects.size

@@ -4,7 +4,7 @@ import collection.mutable
 import com.github.whelmaze.bulletf.Constants.script._
 
 class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike with CanProduceAll
+  extends BulletLike with OwnerLike with CanProduceAll with HasInnerFunc
 {
 
   var waitCount: Int = -1
@@ -17,6 +17,8 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
+  override val updateFunc = new InnerUpdateFunc
+
   // スクリプトの実行が終わっていたら、持ち弾が0になるまで待ってから死ぬ
   def onEndScript(delta: Int) {
     if (ownObjects.isEmpty) disable()
@@ -25,14 +27,15 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
   def update(delta: Int) {
     if (enable) {
       action.run(delta)(this)
-      ownObjects.foreach(_.update(delta))
+      updateFunc.set(delta)
+      ownObjects.foreach(updateFunc.func)
       if (time % 120 == 0) // per 2sec
-        ownObjects = ownObjects.filter(_.enable)
+        ownObjects = ownObjects filter enableFunc
     }
   }
 
   def draw() {
-    if (enable) ownObjects.foreach(_.draw())
+    if (enable) ownObjects foreach drawFunc
   }
 
   def size = ownObjects.size
@@ -42,6 +45,5 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
     // 得点アイテムへの変化とかもすんだろ
     ownObjects.clear()
   }
-
 
 }
