@@ -1,7 +1,6 @@
 package com.github.whelmaze.bulletf
 
 import collection.mutable
-import com.github.whelmaze.bulletf.Constants.script._
 
 class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: Double)
   extends BulletLike with OwnerLike with CanProduceAll with HasInnerFunc
@@ -9,9 +8,9 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
 
   var waitCount: Int = -1
   var waitingNest: Int = 0
-  val pc: Array[Int] = Array.fill(MAX_NEST){0}
-  val lc: Array[Int] = Array.fill(MAX_NEST){-1}
-  val vars: Array[Double] = Array.fill(MAX_NEST){0.0}
+  val pc = copyPc
+  val lc = copyLc
+  val vars = copyVars
   var enable = true
   var time = 0
 

@@ -3,9 +3,9 @@ package com.github.whelmaze.bulletf
 import com.github.whelmaze.bulletf.Constants.script._
 
 object ScriptedMove {
-  val initialPc: Array[Int] = Array.fill(MAX_NEST){0}
-  val initialLc: Array[Int] = Array.fill(MAX_NEST){-1}
-  val initialVars: Array[Double] = Array.fill(MAX_NEST){0.0}
+  lazy val initialPc: Array[Int] = Array.fill(MAX_NEST){0}
+  lazy val initialLc: Array[Int] = Array.fill(MAX_NEST){-1}
+  lazy val initialVars: Array[Double] = Array.fill(MAX_NEST){0.0}
 }
 
 trait ScriptedMove extends Movable {

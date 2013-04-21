@@ -12,9 +12,9 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   var waitCount: Int = -1
   var waitingNest: Int = 0
-  val pc: Array[Int] = Array.fill(MAX_NEST){0}
-  val lc: Array[Int] = Array.fill(MAX_NEST){-1}
-  val vars: Array[Double] = Array.fill(MAX_NEST){0.0}
+  val pc = copyPc
+  val lc = copyLc
+  val vars = copyVars
   var enable: Boolean = true
   var time: Int = 0
 
