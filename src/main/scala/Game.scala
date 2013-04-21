@@ -15,8 +15,6 @@ object Game {
   def width = _width
   def height = _height
 
-  var bulletCount = 0
-
   def clearScreen() {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT)
   }
@@ -102,11 +100,7 @@ class Game(_width: Int, _height: Int) {
       Game.clearScreen()
       Game.view3d()
 
-      if (a%60==0) {
-        Game.bulletCount = 0
-      }
-
-      //Game.view2d()
+      Game.view2d()
       if (a%60==0) {
         val ta = System.nanoTime()
         SceneController.draw()
@@ -116,11 +110,6 @@ class Game(_width: Int, _height: Int) {
       } else {
         SceneController.draw()
       }
-
-      if (a%60==0) {
-        println(s"bullet count: ${Game.bulletCount}")
-      }
-
       Display.update()
 
       // s += 1
