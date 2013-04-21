@@ -9,25 +9,44 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Keyboard._
 
-class TestScene extends Scene {
+class TestScene extends Scene with HasInnerFunc {
 //  this: Scene =>
 
   lazy val ship = new Ship()
   lazy val col = new CollisionChecker(ship)
   lazy val emitters = mutable.ListBuffer.empty[Emitter]
+  lazy val enemies = mutable.ListBuffer.empty[Enemy]
   lazy val runner = new BehaviorManager(ship)
 
   private[this] var c: Int = 0
   private[this] var b: Boolean = false
   
   def name() = "fps test"
-  private[this] val st: Position = Position(constants.centerX, 10)
+
+  protected val updateFunc = new InnerUpdateFunc
 
   def update(delta: Int): Scene = {
 
     ship.update(delta)
-    emitters foreach { _.update(delta) }
-    // 当たり判定どうしよ...
+    updateFunc.set(delta)
+    emitters foreach updateFunc.func
+
+    enemies foreach updateFunc.func
+
+    (enemies.toList) foreach {
+      case e: Enemy =>
+        val cc = new CollisionChecker(e)
+        cc.check(ship.ownObjects.toList) match {
+          case Shooted(_) => e.disable()
+          case _ =>
+        }
+      case _ =>
+    }
+
+    // fetch enemy_pool
+    if (Global.enemy_pool.nonEmpty) {
+      enemies ++= Global.enemy_pool.fetch()
+    }
 
     if (Input.key.keydown(KEY_R)) {
       init()
@@ -50,19 +69,18 @@ class TestScene extends Scene {
     c += 1
     c %= 120
     b = !b
-//    print(c+" ")
-    if (c == 0) println("objects: " + emitters.foldLeft(0)((i,j)=> i + j.size))
+    //if (c == 0) println("objects: " + emitters.foldLeft(0)((i,j)=> i + j.size))
     
-    //  print(c+" ")
     ship.draw()
-    emitters foreach { _.draw() }
-
+    emitters foreach drawFunc
+    enemies foreach drawFunc
   }
   
   def init() {
     //BGM.play(0)
 
     emitters.clear()
+    enemies.clear()
     runner.clear()
     List('loadtest).foreach{ s => runner.build(s.name) }
     

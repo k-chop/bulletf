@@ -19,9 +19,8 @@ trait Runnable {
 trait BulletLike extends ScriptedMove with Runnable with Drawable
 
 trait HasInnerFunc {
-  self: BulletLike =>
 
-  protected class InnerUpdateFunc {
+  protected class InnerUpdateFunc  {
     private[this] var delta: Int = 0
     def set(d: Int) { delta = d }
     val func: BulletLike => Unit = b => b.update(delta)
@@ -47,7 +46,8 @@ trait CanProduceAll {
     ownObjects += STGObjectFactory.newEmitter(action, pos, angle, speed)
   }
   def genEnemy(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
-    ownObjects += STGObjectFactory.newEnemy(action, kind, pos, angle, speed)
+    //ownObjects += STGObjectFactory.newEnemy(action, kind, pos, angle, speed)
+    Global.enemy_pool.set(STGObjectFactory.newEnemy(action, kind, pos, angle, speed))
   }
 
 }
