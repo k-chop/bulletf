@@ -8,7 +8,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 {
 
   val sprite = Sprite.get(resource)
-  val radius: Double = sprite.rect.x / 4.0
+  val radius: Double = sprite.rect.w / 4.0
 
   var waitCount: Int = -1
   var waitingNest: Int = 0
@@ -19,6 +19,11 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   var time: Int = 0
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
+
+  override def disable() {
+    super.disable()
+
+  }
 
   override val updateFunc = new InnerUpdateFunc
 
@@ -40,8 +45,10 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   }
 
   def draw() {
-    sprite.draw(pos)
-    if (enable) ownObjects.foreach(drawFunc)
+    if (enable) {
+      sprite.draw(pos)
+      ownObjects.foreach(drawFunc)
+    }
   }
 
   def size = ownObjects.size

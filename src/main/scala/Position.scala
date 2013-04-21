@@ -7,4 +7,8 @@ object Position {
   
 }
 
-class Position (var x: Double, var y: Double)
+class Position (var x: Double, var y: Double) {
+
+  def cloneBy(dx: Double, dy: Double): Position = new Position(x + dx, y + dy)
+
+}

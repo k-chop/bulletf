@@ -6,5 +6,5 @@ object Live extends State
 
 object Lost extends State
 
-case class Shooted(target: Bullet) extends State
+case class Shooted(target: HasCollision) extends State
 

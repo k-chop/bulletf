@@ -32,7 +32,9 @@ object Input {
 
     private val controller = Controllers.getController(1)
 
-    def poll() = controller.poll
+    def poll() {
+      controller.poll()
+    }
     def apply(i: Int) = controller.isButtonPressed(padmap(i)) 
     def x: Float = controller.getPovX
     def y: Float = controller.getPovY
