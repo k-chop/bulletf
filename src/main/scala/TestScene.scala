@@ -13,7 +13,7 @@ class TestScene extends Scene with HasInnerFunc {
 //  this: Scene =>
 
   lazy val ship = new Ship()
-  lazy val col = new CollisionChecker(ship)
+  lazy val col = new CollisionCheckerShip(ship)
   lazy val emitters = mutable.ListBuffer.empty[Emitter]
   lazy val enemies = mutable.ListBuffer.empty[Enemy]
   lazy val runner = new BehaviorManager(ship)
@@ -30,18 +30,37 @@ class TestScene extends Scene with HasInnerFunc {
     ship.update(delta)
     updateFunc.set(delta)
     emitters foreach updateFunc.func
-
     enemies foreach updateFunc.func
 
-    (enemies.toList) foreach {
-      case e: Enemy =>
-        val cc = new CollisionChecker(e)
-        cc.check(ship.ownObjects.toList) match {
-          case Shooted(_) => e.disable()
-          case _ =>
-        }
-      case _ =>
+    // ↓これ各シーンでやることじゃなくね……
+    // collisioncheckerに丸投げで良いのでは
+
+    // enemy collision check
+    (enemies.toList) foreach { e =>
+      val cc = new CollisionCheckerEnemy(e)
+      cc.check(ship.ownObjects.toList) match {
+        case ShotBy(s: Shot) =>
+          e.damage(s)
+        case _ =>
+      }
     }
+
+    // ship collision check
+    val nexts = if (c % 1 == 0) {
+    col.check(enemies.toList) match {
+      case ShotBy(x) =>
+        println(s"shot by $x")
+        new TitleScene
+      case _ =>
+        col.check(emitters.toList) match {
+          case ShotBy(x) =>
+            println(s"shot by $x")
+            new TitleScene
+          case _ =>
+            this
+        }
+    }
+    } else this
 
     // fetch enemy_pool
     if (Global.enemy_pool.nonEmpty) {
@@ -52,22 +71,15 @@ class TestScene extends Scene with HasInnerFunc {
       init()
     }
 
-/*
-    bustered match {
-       case Shooted(x) => new GameOverScene
-       case Live => this
-       case Lost => sys.error("")
-    }
-*/
-    this
+    c += 1
+
+    nexts
   }
 
   def run() {
   }
 
   override def draw() {
-    c += 1
-    c %= 120
     b = !b
     //if (c == 0) println("objects: " + emitters.foldLeft(0)((i,j)=> i + j.size))
     

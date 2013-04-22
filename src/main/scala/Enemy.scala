@@ -18,6 +18,9 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   var enable: Boolean = true
   var time: Int = 0
 
+  // 体力
+  var health: Int = 10
+
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
   override def disable() {
@@ -48,6 +51,13 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
     if (enable) {
       sprite.draw(pos)
       ownObjects.foreach(drawFunc)
+    }
+  }
+
+  def damage(s: Shot) {
+    health -= s.power
+    if (health < 0) {
+      disable()
     }
   }
 
