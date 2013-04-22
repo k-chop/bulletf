@@ -16,6 +16,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   val lc = copyLc
   val vars = copyVars
   var enable: Boolean = true
+  var live: Boolean = true
   var time: Int = 0
 
   // 体力
@@ -25,7 +26,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   override def disable() {
     super.disable()
-
+    live = false
   }
 
   override val updateFunc = new InnerUpdateFunc
@@ -33,13 +34,16 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   // スクリプトの実行が終わっていてまだ弾が残っているなら等速直線運動
   // 弾も消え、自身も画面外に行ったら死亡
   def onEndScript(delta: Int) {
-    if (ownObjects.isEmpty && inside) disable()
-    BasicBehavior.run(delta)(this)
+    if (ownObjects.isEmpty && !live) disable()
+    if (live) BasicBehavior.run(delta)(this)
   }
 
   def update(delta: Int) {
     if (enable) {
-      action.run(delta)(this)
+      if (!inside) live = false
+      if (live) {
+        action.run(delta)(this)
+      }
       updateFunc.set(delta)
       ownObjects.foreach(updateFunc.func)
       if (time % 120 == 0) // per 2sec
@@ -49,7 +53,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   def draw() {
     if (enable) {
-      sprite.draw(pos)
+      if (live) sprite.draw(pos)
       ownObjects.foreach(drawFunc)
     }
   }

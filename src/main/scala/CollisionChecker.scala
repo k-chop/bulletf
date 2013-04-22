@@ -16,7 +16,7 @@ class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLi
   // 1つ見つけた時点で探索打ち切り隊
   def check(pool: List[BulletLike]): State = {
     pool foreach {
-      case s: Enemy =>
+      case s: Enemy if s.enable =>
         if (!isHit(s)) { // 当たってなければ子もチェック
           check(s.ownObjects.toList) match {
             case s: ShotBy[_] => return s
@@ -25,11 +25,11 @@ class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLi
         } else { // foreachの中でearly returnっていいのかこれ...
           return ShotBy(s)
         }
-      case s: Bullet => // 当たってたらそれ返す, 当たってなかったら華麗にスルー
+      case s: Bullet if s.enable => // 当たってたらそれ返す, 当たってなかったら華麗にスルー
         if (isHit(s)) {
           return ShotBy(s)
         }
-      case s: Emitter => // Emitterに当たり判定はないので子のチェック
+      case s: Emitter if s.enable => // Emitterに当たり判定はないので子のチェック
         check(s.ownObjects.toList) match {
           case s: ShotBy[_] => return s
           case _ =>

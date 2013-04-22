@@ -37,11 +37,15 @@ class TestScene extends Scene with HasInnerFunc {
 
     // enemy collision check
     (enemies.toList) foreach { e =>
-      val cc = new CollisionCheckerEnemy(e)
-      cc.check(ship.ownObjects.toList) match {
-        case ShotBy(s: Shot) =>
-          e.damage(s)
-        case _ =>
+      if (e.live) {
+        val cc = new CollisionCheckerEnemy(e)
+        cc.check(ship.ownObjects.toList) match {
+          case ShotBy(s: Shot) =>
+            println(s"hit: ${s.pos}")
+            e.damage(s)
+            SoundEffect.playSymbol('test2)
+          case _ =>
+        }
       }
     }
 
@@ -49,12 +53,12 @@ class TestScene extends Scene with HasInnerFunc {
     val nexts = if (c % 1 == 0) {
     col.check(enemies.toList) match {
       case ShotBy(x) =>
-        println(s"shot by $x")
+        println(s"shot by ${x.asInstanceOf[HasCollision].pos}")
         new TitleScene
       case _ =>
         col.check(emitters.toList) match {
           case ShotBy(x) =>
-            println(s"shot by $x")
+            println(s"shot by ${x.asInstanceOf[HasCollision].pos}")
             new TitleScene
           case _ =>
             this
