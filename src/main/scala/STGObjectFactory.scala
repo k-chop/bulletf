@@ -22,6 +22,10 @@ object STGObjectFactory {
     new Enemy(action, kind, pos, angle, speed)
   }
 
+  def newShot(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double): Shot = {
+    new Shot(action, kind, pos, angle, speed)
+  }
+
 }
 
 

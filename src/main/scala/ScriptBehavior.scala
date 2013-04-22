@@ -9,7 +9,7 @@ import util.Try
 class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extends Behavior {
   import implicits.autoWrapAngle
 
-  def extract(manager: BehaviorManager, unit: ScriptedMove)(c: Container): Double = c match {
+  def extract(unit: ScriptedMove)(c: Container): Double = c match {
     case StateVar(p) => p match {
       case 'x => unit.pos.x
       case 'y => unit.pos.y
@@ -22,12 +22,33 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
     case EVar(getvar) => unit.vars(getvar.idx)
     case DVar(value) => value
     case RandomVar(begin, end) => scala.util.Random.nextDouble()*(end-begin)+begin
-    case Negate(in) => extract(manager, unit)(in) * -1
+    case Negate(in) => extract(unit)(in) * -1
   }
 
+  // ひっどいクラスだけど高速化の為なので俺は悪くねぇっ！
+  private[ScriptBehavior] class Extractor(private[this] var _unit: ScriptedMove) {
+
+    def set(unit: ScriptedMove) { _unit = unit }
+
+    def unset() { _unit = null }
+
+    def apply(c: Container): Double = {
+      if (_unit != null)
+        extract(_unit)(c)
+      else {
+        System.err.println(s"call Extractor#apply without ScriptedMove_unit\ncontainer info: ${c.toString}\ntopseq info: ${topseq.deep.toString()}")
+        0
+      }
+    }
+  }
+
+  val ex = new Extractor(null)
 
   def run(delta: Int)(implicit unit: ScriptedMove) {
-    @inline val ex = extract(manager, unit) _
+    // runの度にanonfun$3を生成してヤバイ
+    // 普通なら問題にならないけど、毎フレーム呼び出されるものなのでキツイ
+    //val ex = extract(unit) _
+    ex.set(unit)
 
     unit.time += 1
     
@@ -59,14 +80,14 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
             recur(nestLevel, seq)
 
           case VWait(t) => // なんという実装の重複...
-            val time = Try(ex(t).toInt).getOrElse(0)
+            val time = ex(t).toInt
             unit.waitCount = if (time < 1) 1 else time
             unit.waitingNest = nestLevel
             recur(nestLevel, seq)
 
           case Fire(action, kind, dir, speed) => unit match {
             case c: CanProduceAll =>
-              c.fire(manager.get(action), kind, unit.pos, ex(dir).toAngle, ex(speed))
+              c.fire(manager.get(action), kind, Position(unit.pos.x, unit.pos.y), ex(dir).toAngle, ex(speed))
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
@@ -74,13 +95,13 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
           // 必要なら定義先で改めて定義すればよい。
           case GenEnemy(action, kind, x, y) => unit match {
             case c: CanProduceAll =>
-              c.genEnemy(manager.get(action), kind, Position(ex(x), ex(y)), unit.angle, unit.speed)
+              c.genEnemy(manager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
           case Emit(action, x, y) => unit match {
             case c: CanProduceAll =>
-              c.emit(manager.get(action), Position(ex(x), ex(y)), unit.angle, unit.speed)
+              c.emit(manager.get(action), Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
@@ -109,11 +130,12 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
 
           case SetDirection(dir, param) => param match {
             case 'absolute =>
-              unit.angle = ex(dir).toAngle
+              unit.angle.update(ex(dir))
             case 'aim =>
-              unit.angle = manager.getAimToShip(unit.pos).toAngle
+              unit.angle.update(manager.getAimToShip(unit.pos))
             case 'relative =>
-              unit.angle = unit.angle + ex(dir).toAngle
+              unit.angle += ex(dir)
+
           }; incPC(); recur(nestLevel, seq)
 
           case SetSpeed(spd, param) => param match {
@@ -155,6 +177,7 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
     }
     
     recur(0, topseq) // 頭からたどる
+    ex.unset()
   }
 
   def evaluate(seq: Array[Op], op: Op)(implicit bullet: Bullet) {

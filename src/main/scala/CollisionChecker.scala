@@ -2,23 +2,56 @@ package com.github.whelmaze.bulletf
 
 import collection.mutable
 
-class CollisionChecker(val owner: HasCollision) {
+abstract class CollisionChecker[A, B](val target: A) {
 
-  // TODO : 敵の弾なら自機だけ、自機の弾なら敵だけ、を対象にするには……？
-  // 別々に作るのがてっとりばやいのかなあ。
-  
-  def check(pool: List[HasCollision]): State = pool find {
-    case b: Bullet if collision_?(b) => true
-    case _ => false
-  } match {
-    case Some(x: Bullet) => Shooted(x)
-    case None => Live
-    case _ => Lost
+  def check(pool: List[B]): State
+  @inline final def sq(d: Double) = d * d
+
+}
+
+class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLike](target) {
+
+  def isHit(s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
+
+  // 1つ見つけた時点で探索打ち切り隊
+  def check(pool: List[BulletLike]): State = {
+    pool foreach {
+      case s: Enemy =>
+        if (!isHit(s)) { // 当たってなければ子もチェック
+          check(s.ownObjects.toList) match {
+            case s: ShotBy[_] => return s
+            case _ =>
+          }
+        } else { // foreachの中でearly returnっていいのかこれ...
+          return ShotBy(s)
+        }
+      case s: Bullet => // 当たってたらそれ返す, 当たってなかったら華麗にスルー
+        if (isHit(s)) {
+          return ShotBy(s)
+        }
+      case s: Emitter => // Emitterに当たり判定はないので子のチェック
+        check(s.ownObjects.toList) match {
+          case s: ShotBy[_] => return s
+          case _ =>
+        }
+      case _ => // ShotBy以外はスルー
+    }
+    Live // 全部のチェックスルーしたら当たってない
   }
 
-  final def collision_?(target: Bullet): Boolean = {
-    sq(owner.pos.x - target.pos.x) + sq(owner.pos.y - target.pos.y) < sq(target.radius + owner.radius)
+}
+
+class CollisionCheckerEnemy(target: Enemy) extends CollisionChecker[Enemy, Shot](target) {
+
+  def isHit(s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
+
+  def check(pool: List[Shot]): State = {
+    pool foreach {
+      case s: Shot =>
+        if (isHit(s)) return ShotBy(s)
+      case _ =>
+    }
+    Live
   }
 
-  final def sq(d: Double) = d * d
 }

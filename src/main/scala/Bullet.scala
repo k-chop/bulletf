@@ -14,9 +14,10 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
 
   var waitCount = -1
   var waitingNest = 0
-  val pc = Array.fill(MAX_NEST){0}
-  val lc = Array.fill(MAX_NEST){-1}
-  val vars = Array.fill(MAX_NEST){0.0}
+
+  val pc = copyPc
+  val lc = copyLc
+  val vars = copyVars
   var enable = true
   var time = 0
 

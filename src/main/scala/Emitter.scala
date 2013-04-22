@@ -1,21 +1,22 @@
 package com.github.whelmaze.bulletf
 
 import collection.mutable
-import com.github.whelmaze.bulletf.Constants.script._
 
 class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike with CanProduceAll
+  extends BulletLike with OwnerLike with CanProduceAll with HasInnerFunc
 {
 
   var waitCount: Int = -1
   var waitingNest: Int = 0
-  val pc: Array[Int] = Array.fill(MAX_NEST){0}
-  val lc: Array[Int] = Array.fill(MAX_NEST){-1}
-  val vars: Array[Double] = Array.fill(MAX_NEST){0.0}
+  val pc = copyPc
+  val lc = copyLc
+  val vars = copyVars
   var enable = true
   var time = 0
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
+
+  override val updateFunc = new InnerUpdateFunc
 
   // スクリプトの実行が終わっていたら、持ち弾が0になるまで待ってから死ぬ
   def onEndScript(delta: Int) {
@@ -25,13 +26,15 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
   def update(delta: Int) {
     if (enable) {
       action.run(delta)(this)
-      ownObjects.foreach(_.update(delta))
-      ownObjects = ownObjects.filter(_.enable)
+      updateFunc.set(delta)
+      ownObjects.foreach(updateFunc.func)
+      if (time % 120 == 0) // per 2sec
+        ownObjects = ownObjects filter enableFunc
     }
   }
 
   def draw() {
-    if (enable) ownObjects.foreach(_.draw())
+    if (enable) ownObjects foreach drawFunc
   }
 
   def size = ownObjects.size
@@ -41,6 +44,5 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
     // 得点アイテムへの変化とかもすんだろ
     ownObjects.clear()
   }
-
 
 }
