@@ -23,7 +23,6 @@ object Drawer {
     val texW = texture.getImageWidth.toDouble
     val texH = texture.getImageHeight.toDouble
 
-
     Game.view2d()
     GL11.glEnable(GL11.GL_TEXTURE_2D)
     if (nowRenderTexId != texture.getTextureID) {
@@ -36,7 +35,8 @@ object Drawer {
     glLoadIdentity()
 
     GL11.glTranslated(pos.x, pos.y, 0.0)
-    GL11.glRotated(rotate, 0.0, 0.0, 1.0)
+    if (rotate != 0)
+      GL11.glRotated(rotate, 0.0, 0.0, 1.0)
 
     GL11.glBegin(GL11.GL_QUADS)
     GL11.glTexCoord2d(rect.x / texW, rect.y / texH)
