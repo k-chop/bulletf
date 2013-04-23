@@ -113,6 +113,7 @@ object TextureFactory {
       case 'invader01 => Rect(138,2,64,64)
       case 'ship => Rect(204,2,32,32)
       case 'shot => Rect(140,68,32,32)
+      case 'number => Rect(2,102,160,18)
       case 'DEFAULT => Rect(2,2,32,32)
       case _ => Rect(0,0,1,1)
     }

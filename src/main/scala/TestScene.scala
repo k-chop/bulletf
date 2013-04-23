@@ -8,6 +8,7 @@ import scala.annotation.tailrec
 import org.lwjgl.opengl.GL11
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Keyboard._
+import com.github.whelmaze.bulletf.ui.ScoreBoard
 
 class TestScene extends Scene with HasInnerFunc {
 //  this: Scene =>
@@ -17,6 +18,8 @@ class TestScene extends Scene with HasInnerFunc {
   lazy val emitters = mutable.ListBuffer.empty[Emitter]
   lazy val enemies = mutable.ListBuffer.empty[Enemy]
   lazy val runner = new BehaviorManager(ship)
+  lazy val score: ScoreBoard = ui.ScoreBoard.init(0)
+  Global.scoreboard.set(score)
 
   private[this] var c: Int = 0
   private[this] var b: Boolean = false
@@ -43,7 +46,8 @@ class TestScene extends Scene with HasInnerFunc {
           case ShotBy(s: Shot) =>
             //println(s"hit: ${s.pos}")
             e.damage(s)
-            //SoundEffect.playSymbol('test2)
+            Global.scoreboard.add(10)
+            SoundEffect.playSymbol('test2)
           case _ =>
         }
       }
@@ -90,6 +94,7 @@ class TestScene extends Scene with HasInnerFunc {
     ship.draw()
     emitters foreach drawFunc
     enemies foreach drawFunc
+    score.draw()
   }
   
   def init() {

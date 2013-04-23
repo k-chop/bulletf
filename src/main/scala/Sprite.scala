@@ -28,6 +28,7 @@ trait Sprite {
 
   def draw(pos: Position)
   def draw(pos: Position, angle: Double)
+  def draw(custom_rect: Rect, pos: Position, angle: Double)
 }
 
 class SpriteImpl(resourceId: Symbol) extends Sprite {
@@ -40,6 +41,10 @@ class SpriteImpl(resourceId: Symbol) extends Sprite {
 
   def draw(pos: Position, angle: Double) {
     Drawer.draw(texture, rect, pos, angle)
+  }
+
+  def draw(custom_rect: Rect, pos: Position, angle: Double) {
+    Drawer.draw(texture, custom_rect, pos, angle)
   }
 
 }
