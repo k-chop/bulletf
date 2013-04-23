@@ -41,9 +41,9 @@ class TestScene extends Scene with HasInnerFunc {
         val cc = new CollisionCheckerEnemy(e)
         cc.check(ship.ownObjects.toList) match {
           case ShotBy(s: Shot) =>
-            println(s"hit: ${s.pos}")
+            //println(s"hit: ${s.pos}")
             e.damage(s)
-            SoundEffect.playSymbol('test2)
+            //SoundEffect.playSymbol('test2)
           case _ =>
         }
       }

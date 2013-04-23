@@ -61,8 +61,12 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   def damage(s: Shot) {
     health -= s.power
     if (health < 0) {
-      disable()
+      die()
     }
+  }
+
+  def die() {
+    live = false
   }
 
   def size = ownObjects.size

@@ -17,7 +17,8 @@ class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLi
   def check(pool: List[BulletLike]): State = {
     pool foreach {
       case s: Enemy if s.enable =>
-        if (!isHit(s)) { // 当たってなければ子もチェック
+        val ehit = if (s.live) isHit(s) else false
+        if (!ehit) { // 当たってなければ子もチェック
           check(s.ownObjects.toList) match {
             case s: ShotBy[_] => return s
             case _ =>
