@@ -15,7 +15,7 @@ case class Rect(x: Int, y:Int, w: Int, h: Int)
 object Drawer {
   private[this] var nowRenderTexId = -1
 
-  def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double) {
+  def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double) {
 
     val halfWidth = rect.w / 2.0
     val halfHeight = rect.h / 2.0
@@ -35,16 +35,21 @@ object Drawer {
     glLoadIdentity()
 
     GL11.glTranslated(pos.x, pos.y, 0.0)
-    if (rotate != 0)
+
+    if (rotate != 0) {
       GL11.glRotated(rotate, 0.0, 0.0, 1.0)
+    }
+    if ((scale - 1.0) > 0.001) {
+      GL11.glScaled(scale, scale, 1)
+    }
 
     GL11.glBegin(GL11.GL_QUADS)
     GL11.glTexCoord2d(rect.x / texW, rect.y / texH)
     GL11.glVertex2d(-halfWidth, -halfHeight)
     GL11.glTexCoord2d((rect.x + rect.w) / texW, rect.y / texH)
-    GL11.glVertex2d(rect.w - halfWidth, -halfHeight)
+    GL11.glVertex2d(halfWidth, -halfHeight)
     GL11.glTexCoord2d((rect.x + rect.w) / texW, (rect.y + rect.h) / texH)
-    GL11.glVertex2d(rect.w - halfWidth, rect.h - halfHeight)
+    GL11.glVertex2d(halfWidth, rect.h - halfHeight)
     GL11.glTexCoord2d(rect.x / texW, (rect.y + rect.h) / texH)
     GL11.glVertex2d(-halfWidth, rect.h - halfHeight)
     GL11.glEnd()
@@ -53,8 +58,12 @@ object Drawer {
     GL11.glLoadIdentity()
   }
 
+  def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double) {
+    draw(texture, rect, pos, rotate, 1.0)
+  }
+
   def draw(texture: Texture, pos: Position) {
-    draw(texture, Rect(0, 0, texture.getImageWidth, texture.getImageHeight), pos, 0)
+    draw(texture, Rect(0, 0, texture.getImageWidth, texture.getImageHeight), pos, 0, 1.0)
   }
 
   def draw3d(texture: Texture, pos: Position, time: Int) {
