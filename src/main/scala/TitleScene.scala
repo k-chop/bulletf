@@ -30,7 +30,7 @@ class TitleScene extends Scene {
   }
 
   def draw() {
-    titleImg.draw(Position.center())
+    titleImg.draw(Position.center)
   }
 
   def dispose() {

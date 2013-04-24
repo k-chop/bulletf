@@ -15,6 +15,10 @@ class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLi
 
   // 1つ見つけた時点で探索打ち切り隊
   def check(pool: List[BulletLike]): State = {
+
+    // 無敵時間が1以上ならそもそも判定取らない
+    if (0 < target.invincibleTime) return Live
+
     pool foreach {
       case s: Enemy if s.enable =>
         val ehit = if (s.live) isHit(s) else false
@@ -48,7 +52,7 @@ class CollisionCheckerEnemy(target: Enemy) extends CollisionChecker[Enemy, Shot]
 
   def check(pool: List[Shot]): State = {
     pool foreach {
-      case s: Shot =>
+      case s: Shot if s.enable =>
         if (isHit(s)) return ShotBy(s)
       case _ =>
     }

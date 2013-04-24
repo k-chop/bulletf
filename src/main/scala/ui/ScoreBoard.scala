@@ -48,8 +48,9 @@ class ScoreBoardImpl(private[this] var score: Int) extends ClearableScoreBoard {
 
   }
 
+  private[this] val tp = Position(0,0)
+
   def draw() {
-    val tp = Position(0,0)
     def drawIn(i: Int, x: Int, y: Int, digit: Int) {
       if (i == 0 && digit != 0) {
         return

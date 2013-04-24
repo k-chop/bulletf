@@ -1,5 +1,15 @@
 package com.github.whelmaze.bulletf
 
+object Shot {
+
+  // 体当たり時の攻撃判定用。再利用するのでdestroyされない
+  lazy val hurlShip = new Shot(BasicBehavior, 'null, Position.outside, Angle.zero, 0) {
+    override val power = 20
+    override def destroy() {}
+  }
+
+}
+
 class Shot(val action: Behavior, val resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
   extends BulletLike with HasCollision
 {
@@ -17,8 +27,8 @@ class Shot(val action: Behavior, val resource: Symbol, var pos: Position, var an
 
   val power = 2
 
-  override def disable() {
-
+  def destroy() {
+    disable()
   }
 
   // 当たり判定の半径

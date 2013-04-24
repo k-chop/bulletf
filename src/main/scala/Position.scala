@@ -3,7 +3,8 @@ package com.github.whelmaze.bulletf
 object Position {
 
   def apply(x: Double, y: Double) = new Position(x, y)
-  final def center() = Position(constants.centerX, constants.centerY)  
+  final def center = Position(constants.centerX, constants.centerY)
+  final def outside = Position(-200, -200)
   
 }
 

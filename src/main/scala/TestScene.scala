@@ -14,6 +14,7 @@ class TestScene extends Scene with HasInnerFunc {
   lazy val enemies = mutable.ListBuffer.empty[Enemy]
   lazy val runner = new BehaviorManager(ship)
   lazy val score: ClearableScoreBoard = ui.ScoreBoard.init(0)
+  lazy val lives: LifeBoard = new ui.LifeBoard(ship)
   Global.scoreboard.set(score)
 
   private[this] var c: Int = 0
@@ -41,6 +42,7 @@ class TestScene extends Scene with HasInnerFunc {
           case ShotBy(s: Shot) =>
             //println(s"hit: ${s.pos}")
             e.damage(s)
+            s.destroy()
             Global.scoreboard.add(10)
             SoundEffect.playSymbol('test2)
           case _ =>
@@ -49,20 +51,29 @@ class TestScene extends Scene with HasInnerFunc {
     }
 
     // ship collision check
-    val nexts = if (c % 1 == 0) {
-    col.check(enemies.toList) match {
+    val damaged = col.check(enemies.toList) match {
       case ShotBy(x) =>
         println(s"shot by ${x.asInstanceOf[HasCollision].pos}")
-        new TitleScene
+        ship.damage(x)
+        true
       case _ =>
         col.check(emitters.toList) match {
           case ShotBy(x) =>
             println(s"shot by ${x.asInstanceOf[HasCollision].pos}")
-            new TitleScene
-          case _ =>
-            this
+            ship.damage(x)
+            true
+          case _ => false
         }
     }
+
+    // 自機がダメージ食らった場合
+    val nextScene = if (damaged) {
+      if (ship.life <= 0) { //ライフが0以下(死亡)
+        new GameOverScene
+      } else { // 残機まだある場合は初期位置に戻す
+        ship.pos = Ship.initialPosition
+        this
+      }
     } else this
 
     // fetch enemy_pool
@@ -76,7 +87,7 @@ class TestScene extends Scene with HasInnerFunc {
 
     c += 1
 
-    nexts
+    nextScene
   }
 
   def run() {
@@ -90,6 +101,7 @@ class TestScene extends Scene with HasInnerFunc {
     emitters foreach drawFunc
     enemies foreach drawFunc
     score.draw()
+    lives.draw()
   }
   
   def init() {
