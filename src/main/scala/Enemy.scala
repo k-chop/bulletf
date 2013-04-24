@@ -53,7 +53,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   def draw() {
     if (enable) {
-      if (live) sprite.draw(pos)
+      if (live) sprite.draw(pos, 0, 1.0, 1.0)
       ownObjects.foreach(drawFunc)
     }
   }

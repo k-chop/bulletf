@@ -5,11 +5,11 @@ import collection.mutable
 abstract class CollisionChecker[A, B](val target: A) {
 
   def check(pool: List[B]): State
-  @inline final def sq(d: Double) = d * d
 
 }
 
 class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLike](target) {
+  import MathUtil.sq
 
   def isHit(s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
 
@@ -47,6 +47,7 @@ class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLi
 }
 
 class CollisionCheckerEnemy(target: Enemy) extends CollisionChecker[Enemy, Shot](target) {
+  import MathUtil.sq
 
   def isHit(s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
 

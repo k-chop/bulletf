@@ -26,8 +26,17 @@ object Sprite {
 trait Sprite {
   val rect: Rect
 
-  def draw(pos: Position)
-  def draw(pos: Position, angle: Double)
+  def draw(pos: Position) {
+    draw(pos, 0)
+  }
+  def draw(pos: Position, angle: Double) {
+    draw(pos, angle, 1.0)
+  }
+  def draw(pos: Position, angle: Double, scale: Double) {
+    draw(pos, angle, scale, 1.0)
+  }
+  def draw(pos: Position, angle: Double, scale: Double, alpha: Double)
+
   def draw(custom_rect: Rect, pos: Position, angle: Double)
 }
 
@@ -35,12 +44,8 @@ class SpriteImpl(resourceId: Symbol) extends Sprite {
 
   val (texture, rect) = TextureFactory.get(resourceId)
 
-  def draw(pos: Position) {
-    Drawer.draw(texture, rect, pos, 0)
-  }
-
-  def draw(pos: Position, angle: Double) {
-    Drawer.draw(texture, rect, pos, angle)
+  def draw(pos: Position, angle: Double, scale: Double, alpha: Double) {
+    Drawer.draw(texture, rect, pos, angle, scale, alpha)
   }
 
   def draw(custom_rect: Rect, pos: Position, angle: Double) {

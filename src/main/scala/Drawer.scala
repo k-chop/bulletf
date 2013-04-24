@@ -17,7 +17,8 @@ case class Rect(x: Int, y:Int, w: Int, h: Int) {
 object Drawer {
   private[this] var nowRenderTexId = -1
 
-  def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double) {
+  def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double, alpha: Double) {
+    import MathUtil.sq
 
     val halfWidth = rect.w / 2.0
     val halfHeight = rect.h / 2.0
@@ -41,8 +42,13 @@ object Drawer {
     if (rotate != 0) {
       GL11.glRotated(rotate, 0.0, 0.0, 1.0)
     }
-    if ((scale - 1.0) > 0.001) {
+    if (sq(scale-1.0) > 0.001) {
       GL11.glScaled(scale, scale, 1)
+    }
+    if (sq(alpha-1.0) > 0.001) {
+      GL11.glColor4d(1.0, 1.0, 1.0, alpha)
+    } else { // ここ重くね？
+      GL11.glColor4d(1.0, 1.0, 1.0, 1.0)
     }
 
     GL11.glBegin(GL11.GL_QUADS)
@@ -60,12 +66,14 @@ object Drawer {
     GL11.glLoadIdentity()
   }
 
+
+
   def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double) {
-    draw(texture, rect, pos, rotate, 1.0)
+    draw(texture, rect, pos, rotate, 1.0, 1.0)
   }
 
   def draw(texture: Texture, pos: Position) {
-    draw(texture, Rect(0, 0, texture.getImageWidth, texture.getImageHeight), pos, 0, 1.0)
+    draw(texture, Rect(0, 0, texture.getImageWidth, texture.getImageHeight), pos, 0, 1.0, 1.0)
   }
 
   def draw3d(texture: Texture, pos: Position, time: Int) {
