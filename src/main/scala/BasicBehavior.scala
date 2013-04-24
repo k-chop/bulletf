@@ -3,7 +3,7 @@ package com.github.whelmaze.bulletf
 
 object BasicBehavior extends Behavior {
 
-  final def run(delta: Int)(implicit unit: ScriptedMove) {
+  final def run(delta: Int)(implicit unit: ScriptControlled) {
     import scala.math._
     import implicits.angle2double
 

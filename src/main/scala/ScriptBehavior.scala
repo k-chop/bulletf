@@ -9,7 +9,7 @@ import util.Try
 class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extends Behavior {
   import implicits.autoWrapAngle
 
-  def extract(unit: ScriptedMove)(c: Container): Double = c match {
+  def extract(unit: ScriptControlled)(c: Container): Double = c match {
     case StateVar(p) => p match {
       case 'x => unit.pos.x
       case 'y => unit.pos.y
@@ -26,9 +26,9 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
   }
 
   // ひっどいクラスだけど高速化の為なので俺は悪くねぇっ！
-  private[ScriptBehavior] class Extractor(private[this] var _unit: ScriptedMove) {
+  private[ScriptBehavior] class Extractor(private[this] var _unit: ScriptControlled) {
 
-    def set(unit: ScriptedMove) { _unit = unit }
+    def set(unit: ScriptControlled) { _unit = unit }
 
     def unset() { _unit = null }
 
@@ -44,7 +44,7 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
 
   val ex = new Extractor(null)
 
-  def run(delta: Int)(implicit unit: ScriptedMove) {
+  def run(delta: Int)(implicit unit: ScriptControlled) {
     // runの度にanonfun$3を生成してヤバイ
     // 普通なら問題にならないけど、毎フレーム呼び出されるものなのでキツイ
     //val ex = extract(unit) _

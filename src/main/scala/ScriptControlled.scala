@@ -2,13 +2,13 @@ package com.github.whelmaze.bulletf
 
 import com.github.whelmaze.bulletf.Constants.script._
 
-object ScriptedMove {
+object ScriptControlled {
   lazy val initialPc: Array[Int] = Array.fill(MAX_NEST){0}
   lazy val initialLc: Array[Int] = Array.fill(MAX_NEST){-1}
   lazy val initialVars: Array[Double] = Array.fill(MAX_NEST){0.0}
 }
 
-trait ScriptedMove extends Movable {
+trait ScriptControlled extends Movable {
 
   // 残りウェイトのカウンタ
   var waitCount: Int
@@ -35,19 +35,19 @@ trait ScriptedMove extends Movable {
 
   protected def copyPc: Array[Int] = {
     val dest = Array.ofDim[Int](MAX_NEST)
-    Array.copy(ScriptedMove.initialPc, 0, dest, 0, MAX_NEST)
+    Array.copy(ScriptControlled.initialPc, 0, dest, 0, MAX_NEST)
     dest
   }
 
   protected def copyLc: Array[Int] = {
     val dest = Array.ofDim[Int](MAX_NEST)
-    Array.copy(ScriptedMove.initialLc, 0, dest, 0, MAX_NEST)
+    Array.copy(ScriptControlled.initialLc, 0, dest, 0, MAX_NEST)
     dest
   }
 
   protected def copyVars: Array[Double] = {
     val dest = Array.ofDim[Double](MAX_NEST)
-    Array.copy(ScriptedMove.initialVars, 0, dest, 0, MAX_NEST)
+    Array.copy(ScriptControlled.initialVars, 0, dest, 0, MAX_NEST)
     dest
   }
 }

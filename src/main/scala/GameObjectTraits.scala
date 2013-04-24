@@ -16,7 +16,7 @@ trait Runnable {
   def update(delta: Int)
 }
 
-trait BulletLike extends ScriptedMove with Runnable with Drawable
+trait BulletLike extends ScriptControlled with Runnable with Drawable
 
 trait HasInnerFunc {
 
