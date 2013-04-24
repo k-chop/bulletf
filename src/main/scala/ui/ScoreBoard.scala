@@ -5,6 +5,10 @@ object ScoreBoard {
   def init(i: Int) = new ScoreBoardImpl(i)
 }
 
+trait ClearableScoreBoard extends ScoreBoard {
+  def clear()
+}
+
 trait ScoreBoard extends Runnable with Drawable {
   def get: Int
   def add(i: Int)
@@ -17,7 +21,7 @@ object NullScoreBoard extends ScoreBoard {
   def draw() {}
 }
 
-class ScoreBoardImpl(private[this] var score: Int) extends ScoreBoard {
+class ScoreBoardImpl(private[this] var score: Int) extends ClearableScoreBoard {
   val basex = 10
   val basey = 28
   val basew = 160

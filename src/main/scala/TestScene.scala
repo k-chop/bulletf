@@ -1,14 +1,9 @@
 package com.github.whelmaze.bulletf
 
-import com.github.whelmaze.bulletf.script._
-
 import collection.mutable
-import scala.annotation.tailrec
 
-import org.lwjgl.opengl.GL11
-import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Keyboard._
-import com.github.whelmaze.bulletf.ui.ScoreBoard
+import com.github.whelmaze.bulletf.ui._
 
 class TestScene extends Scene with HasInnerFunc {
 //  this: Scene =>
@@ -18,7 +13,7 @@ class TestScene extends Scene with HasInnerFunc {
   lazy val emitters = mutable.ListBuffer.empty[Emitter]
   lazy val enemies = mutable.ListBuffer.empty[Enemy]
   lazy val runner = new BehaviorManager(ship)
-  lazy val score: ScoreBoard = ui.ScoreBoard.init(0)
+  lazy val score: ClearableScoreBoard = ui.ScoreBoard.init(0)
   Global.scoreboard.set(score)
 
   private[this] var c: Int = 0
@@ -103,6 +98,8 @@ class TestScene extends Scene with HasInnerFunc {
     emitters.clear()
     enemies.clear()
     runner.clear()
+    score.clear()
+
     List('loadtest).foreach{ s => runner.build(s.name) }
     
     emitters += STGObjectFactory.initialEmitter(runner.get('main))
