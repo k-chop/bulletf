@@ -10,15 +10,15 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   val sprite = Sprite.get(resource)
   val radius: Double = sprite.rect.w / 4.0
 
-  var waitCount: Int = -1
+/*  var waitCount: Int = -1
   var waitingNest: Int = 0
   val pc = copyPc
   val lc = copyLc
   val vars = copyVars
   var enable: Boolean = true
-  var live: Boolean = true
-  var time: Int = 0
+  var time: Int = 0*/
 
+  var live: Boolean = true
   // 体力
   var health: Int = 10
 

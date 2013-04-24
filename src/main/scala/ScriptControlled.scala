@@ -11,19 +11,19 @@ object ScriptControlled {
 trait ScriptControlled extends Movable {
 
   // 残りウェイトのカウンタ
-  var waitCount: Int
+  var waitCount: Int = -1
   // どの階層でウェイト中か
-  var waitingNest: Int
+  var waitingNest: Int = 0
   // プログラムカウンタ
-  val pc: Array[Int]
+  val pc: Array[Int] = copyPc
   // ループカウンタ
-  val lc: Array[Int]
+  val lc: Array[Int] = copyLc
   // 変数($0～$9)
-  val vars: Array[Double]
+  val vars: Array[Double] = copyVars
   // 死亡確認
-  var enable: Boolean
+  var enable: Boolean = true
   // 生成されてからの時間(frame)
-  var time: Int
+  var time: Int = 0
 
   // enable = falseのエイリアス
   def disable() {

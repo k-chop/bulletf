@@ -16,16 +16,16 @@ class Shot(val action: Behavior, val resource: Symbol, var pos: Position, var an
 
   val sprite: Sprite = Sprite.get(resource)
 
-  var waitCount = -1
+/*  var waitCount = -1
   var waitingNest = 0
 
   val pc = copyPc
   val lc = copyLc
   val vars = copyVars
   var enable = true
-  var time = 0
+  var time = 0*/
 
-  val power = 2
+  val power = 5
 
   def destroy() {
     disable()

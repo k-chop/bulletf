@@ -12,14 +12,14 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
 
   val sprite: Sprite = Sprite.get(resource)
 
-  var waitCount = -1
+/*  var waitCount = -1
   var waitingNest = 0
 
   val pc = copyPc
   val lc = copyLc
   val vars = copyVars
   var enable = true
-  var time = 0
+  var time = 0*/
 
   // 当たり判定の半径
   val radius = sprite.rect.x / 4.0
