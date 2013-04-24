@@ -49,6 +49,9 @@ trait CanProduceAll {
     //ownObjects += STGObjectFactory.newEnemy(action, kind, pos, angle, speed)
     Global.enemy_pool.set(STGObjectFactory.newEnemy(action, kind, pos, angle, speed))
   }
+  def effect(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
+    Global.effect_pool.set(STGObjectFactory.newEffect(action, kind, pos, angle, speed))
+  }
 
 }
 

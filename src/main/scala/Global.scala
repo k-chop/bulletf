@@ -2,11 +2,31 @@ package com.github.whelmaze.bulletf
 
 import scala.collection.mutable
 import com.github.whelmaze.bulletf.ui._
+import scala.collection.mutable.ListBuffer
 
 /**
  *  evil global
  */
 object Global {
+
+  private[Global] trait GlobalPool[T] {
+    protected[this] var self: mutable.ListBuffer[T]
+    def set(t: T) {
+      self += t
+    }
+    def set(t: T*) {
+      self ++= t
+    }
+    def clear() {
+      self.clear()
+    }
+    def fetch(): List[T] = {
+      val ret = self.toList
+      clear()
+      ret
+    }
+    def nonEmpty: Boolean = self.nonEmpty
+  }
 
   object scoreboard {
     private[this] var self: ScoreBoard = NullScoreBoard
@@ -27,30 +47,29 @@ object Global {
 
   }
 
-  object enemy_pool {
+  object effect_pool extends GlobalPool[Effect] {
+    protected[this] var self = mutable.ListBuffer.empty[Effect]
+  }
 
-    private[this] var self = mutable.ListBuffer.empty[Enemy]
+  object enemy_pool extends GlobalPool[Enemy] {
+    protected[this] var self = mutable.ListBuffer.empty[Enemy]
+  }
 
-    def set(e: Enemy) {
-      self += e
+  object aimToShip {
+    private[this] var ship: Option[Ship] = None
+    def set(s: Ship) {
+      ship = Option(s)
     }
-
-    def set(e: Enemy*) {
-      self ++= e
+    def apply(from: Position): Double = {
+      import scala.math._
+      if (ship.isDefined) {
+        val t = ship.get
+        toDegrees( atan2(t.pos.y - from.y, t.pos.x - from.x) )
+      } else 0
     }
-
-    def clear() {
-      self.clear()
+    def reset() {
+      ship = None
     }
-
-    def fetch(): List[Enemy] = {
-      val ret = self.toList
-      clear()
-      ret
-    }
-
-    def nonEmpty: Boolean = self.nonEmpty
-
   }
 
 }

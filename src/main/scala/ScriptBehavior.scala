@@ -6,14 +6,14 @@ import scala.collection.mutable.ListBuffer
 import scala.annotation.tailrec
 import util.Try
 
-class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extends Behavior {
+class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
   import implicits.autoWrapAngle
 
   def extract(unit: ScriptControlled)(c: Container): Double = c match {
     case StateVar(p) => p match {
       case 'x => unit.pos.x
       case 'y => unit.pos.y
-      case 'aim => manager.getAimToShip(unit.pos)
+      case 'aim => Global.aimToShip(unit.pos)
       case 'speed => unit.speed
       case 'angle => unit.angle.dir
     }
@@ -87,7 +87,7 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
 
           case Fire(action, kind, dir, speed) => unit match {
             case c: CanProduceAll =>
-              c.fire(manager.get(action), kind, Position(unit.pos.x, unit.pos.y), ex(dir).toAngle, ex(speed))
+              c.fire(BehaviorManager.get(action), kind, Position(unit.pos.x, unit.pos.y), ex(dir).toAngle, ex(speed))
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
@@ -95,13 +95,19 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
           // 必要なら定義先で改めて定義すればよい。
           case GenEnemy(action, kind, x, y) => unit match {
             case c: CanProduceAll =>
-              c.genEnemy(manager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
+              c.genEnemy(BehaviorManager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
           case Emit(action, x, y) => unit match {
             case c: CanProduceAll =>
-              c.emit(manager.get(action), Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
+              c.emit(BehaviorManager.get(action), Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
+            case _ =>
+          }; incPC(); recur(nestLevel, seq)
+
+          case GenEffect(action, kind, x, y) => unit match {
+            case c: CanProduceAll =>
+              c.effect(BehaviorManager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
 
@@ -132,7 +138,7 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
             case 'absolute =>
               unit.angle.update(ex(dir))
             case 'aim =>
-              unit.angle.update(manager.getAimToShip(unit.pos))
+              unit.angle.update(Global.aimToShip(unit.pos))
             case 'relative =>
               unit.angle += ex(dir)
 
@@ -147,6 +153,21 @@ class ScriptBehavior(val manager: BehaviorManager, val topseq: Array[Op]) extend
 
           case PlaySound(param) => {
             SoundEffect.playSymbol(param)
+          }; incPC(); recur(nestLevel, seq)
+
+          // SetScale, SetAlphaはEffectのみに作用するのでここに置くのはちょっと違う気もする
+          case SetScale(scaleCon) => {
+            unit match {
+              case e: Effect => e.scale = ex(scaleCon)
+              case _ =>
+            }
+          }; incPC(); recur(nestLevel, seq)
+
+          case SetAlpha(alphaCon) => {
+            unit match {
+              case e: Effect => e.alpha = ex(alphaCon)
+              case _ =>
+            }
           }; incPC(); recur(nestLevel, seq)
 
         }

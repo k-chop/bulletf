@@ -12,10 +12,11 @@ class TestScene extends Scene with HasInnerFunc {
   lazy val col = new CollisionCheckerShip(ship)
   lazy val emitters = mutable.ListBuffer.empty[Emitter]
   lazy val enemies = mutable.ListBuffer.empty[Enemy]
-  lazy val runner = new BehaviorManager(ship)
+  lazy val effects = mutable.ListBuffer.empty[Effect]
   lazy val score: ClearableScoreBoard = ui.ScoreBoard.init(0)
   lazy val lives: LifeBoard = new ui.LifeBoard(ship)
   Global.scoreboard.set(score)
+  Global.aimToShip.set(ship)
 
   private[this] var c: Int = 0
   private[this] var b: Boolean = false
@@ -30,6 +31,7 @@ class TestScene extends Scene with HasInnerFunc {
     updateFunc.set(delta)
     emitters foreach updateFunc.func
     enemies foreach updateFunc.func
+    effects foreach updateFunc.func
 
     // ↓これ各シーンでやることじゃなくね……
     // collisioncheckerに丸投げで良いのでは
@@ -76,9 +78,14 @@ class TestScene extends Scene with HasInnerFunc {
       }
     } else this
 
-    // fetch enemy_pool
+    // fetch from enemy_pool
     if (Global.enemy_pool.nonEmpty) {
       enemies ++= Global.enemy_pool.fetch()
+    }
+
+    // fetch from effect_pool
+    if (Global.effect_pool.nonEmpty) {
+      effects ++= Global.effect_pool.fetch()
     }
 
     if (Input.key.keydown(KEY_R)) {
@@ -100,6 +107,7 @@ class TestScene extends Scene with HasInnerFunc {
     ship.draw()
     emitters foreach drawFunc
     enemies foreach drawFunc
+    effects foreach drawFunc
     score.draw()
     lives.draw()
   }
@@ -109,12 +117,13 @@ class TestScene extends Scene with HasInnerFunc {
 
     emitters.clear()
     enemies.clear()
-    runner.clear()
+    BehaviorManager.clear()
     score.clear()
+    effects.clear()
 
-    List('loadtest).foreach{ s => runner.build(s.name) }
+    List('loadtest, 'effects).foreach{ s => BehaviorManager.build(s.name) }
     
-    emitters += STGObjectFactory.initialEmitter(runner.get('main))
+    emitters += STGObjectFactory.initialEmitter(BehaviorManager.get('main))
     
     // script load
     

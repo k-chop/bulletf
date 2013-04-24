@@ -4,7 +4,7 @@ import scala.io.Source
 import script.DSFParser
 import scala.collection.mutable
 
-class BehaviorManager(ship: Ship) {
+object BehaviorManager {
 
   val map = mutable.HashMap.empty[Symbol, Behavior]
   init()
@@ -17,7 +17,7 @@ class BehaviorManager(ship: Ship) {
     val src = Source.fromFile( Resource.scriptPath + ref + ".dsf" ).mkString("")
     
     DSFParser.parse(src) foreach { case (name, ops) =>
-      val action = new ScriptBehavior(this, ops)
+      val action = new ScriptBehavior(ops)
       println("action[" + name.name + "] created.")
       map += ( name -> action )
     }
@@ -34,11 +34,6 @@ class BehaviorManager(ship: Ship) {
   def clear() = {
     map.clear()
     init()
-  }
-
-  def getAimToShip(from: Position) = {
-    import scala.math._
-    toDegrees( atan2(ship.pos.y - from.y, ship.pos.x - from.x) )
   }
   
 }

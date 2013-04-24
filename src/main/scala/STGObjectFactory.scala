@@ -26,6 +26,10 @@ object STGObjectFactory {
     new Shot(action, kind, pos, angle, speed)
   }
 
+  def newEffect(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double): Effect = {
+    new Effect(action, kind, pos, angle, speed)
+  }
+
 }
 
 

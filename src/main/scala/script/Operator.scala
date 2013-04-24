@@ -58,6 +58,12 @@ case class GenEnemy(action: Symbol, kind: Symbol, x: Container, y: Container) ex
 case class Emit(action: Symbol, x: Container, y: Container) extends Op
 
 /**
+ * Effect
+ * Effectを生成する．
+ */
+case class GenEffect(action: Symbol, kind: Symbol, x: Container, y: Container) extends Op
+
+/**
 * SetVar
 * Double型の変数をセットする．$0 - $9までが使用可能で，アクションごとに共有される．
 *
@@ -100,3 +106,14 @@ case class SetDirection(value: Container, param: Symbol) extends Op
  */
 case class PlaySound(soundId: Symbol) extends Op
 
+/**
+ * 大きさ変更
+ * @param value 変更する大きさ(1.0が通常)
+ */
+case class SetScale(value: Container) extends Op
+
+/**
+ * alpha値変更
+ * @param value 変更するalpha値
+ */
+case class SetAlpha(value: Container) extends Op

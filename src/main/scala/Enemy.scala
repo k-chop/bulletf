@@ -67,6 +67,8 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   def die() {
     live = false
+    // 死んだ時もスクリプトで制御し隊
+    effect(BehaviorManager.get('death), 'invader01, pos.cloneBy(0,0), Angle.zero, 0)
   }
 
   def size = ownObjects.size

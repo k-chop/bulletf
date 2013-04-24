@@ -50,6 +50,14 @@ object DefinitionFinder {
       case _ => Nop
     }
 
+    case ("fx", arg: Seq[_]) => args match {
+      case Seq( StrVar(action), StrVar(kind), xCon, yCon) =>
+        GenEffect(action.sym, kind.sym, xCon, yCon)
+      case Seq( StrVar(action), StrVar(kind) ) =>
+        GenEffect(action.sym, kind.sym, StateVar('x), StateVar('y))
+      case _ => Nop
+    }
+
     case ("wait", Seq( DVar(time) )) =>
       Wait(time.toInt)
 
@@ -78,6 +86,12 @@ object DefinitionFinder {
 
     case ("se", Seq(StrVar(soundId))) =>
       PlaySound(soundId.sym)
+
+    case ("scale", Seq(valueCon: Container)) =>
+      SetScale(valueCon)
+
+    case ("alpha", Seq(valueCon: Container)) =>
+      SetAlpha(valueCon)
 
     case _ => Nop
   }
