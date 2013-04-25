@@ -1,5 +1,6 @@
 
 bullet accelshot {
+  se(shot03, 0.2)
   $0 = @spd
   $1 = 0.015
   repeat 0 {
@@ -88,30 +89,240 @@ emitter invader5line {
   }  
 }
 
+// 今のところこれが起点。
 emitter main {
 
   wait(5)
 
   $0 = @x
-  $0 += 100
-  repeat 1 {
-    $1 = $0
-    $0 += @rnd(0, 100)
-    appear(t01, invader01, $0, 15)
-    $0 = $1
+  $0 += 80
+  repeat 3 {
+    appear(first, invader01, $0, 15)
+    $0 += 30
     wait(20)
   }
+
+  wait(30)
+
+  $0 = @x
+  $0 -= 80
+  repeat 3 {
+    appear(first, invader01, $0, 15)
+    $0 -= 30
+    wait(20)
+  }
+
+  wait(30)
+
+  appear(second, invader01, @x, 15)
+
   wait(60)
-  emit(invader5line)
+
+  $0 = @x
+  $0 += 100
+  appear(third, invader01, $0, 15)
+  $0 -= 200
+  appear(third, invader01, $0, 15)
+
+  wait(70)
+
+  $0 = @x
+  $0 += 150
+  appear(third, invader01, $0, 15)
+  $0 -= 300
+  appear(third, invader01, $0, 15)
+
+  wait(60)
+
+  $0 = @x
+  $0 += 80
+  repeat 4 {
+    appear(first, invader01, $0, 15)
+    $0 += 30
+    wait(10)
+  }
+
+  $0 = @x
+  $0 -= 80
+  repeat 4 {
+    appear(first, invader01, $0, 15)
+    $0 -= 30
+    wait(10)
+  }
+
+  appear(forth, invader01, @x, 15)
 
 }
 
-emitter round {
-  $0 = @dir
-  $1 = 15
-  se(test)
+enemy forth {
+  dir(90)
+  spd(0.21)
+  wait(25)
+  $0 = 0.21
+  repeat 21 {
+    spd($0)
+    $0 -= 0.01
+    wait(1)
+  }
+  spd(0)
+  wait(10)
+
+  $0 = @aim
+  repeat 12 {
+    dir($0)
+    se(shot04)
+    $0 += @rnd(5,10)
+    spd(0.3)
+    emit(round12)
+    spd(0)
+    wait(6)
+  }
+  repeat 6 {
+    dir($0)
+    se(shot04)
+    $0 += @rnd(3,6)
+    spd(0.3)
+    emit(round12)
+    spd(0)
+    wait(8)    
+  }
+  repeat 64 {
+    dir($0)
+    se(shot04)
+    $0 += @rnd(30,80)
+    spd(0.3)
+    emit(round12)
+    spd(0)
+    wait(3)
+  }
+
+  repeat 3 {
+    fx(muzzle, ENG01B)
+    se(exp02)
+    fire(accelshot, ENG02R, @aim, 0.42)
+    wait(18)
+  }
+
+  dir(90)
+  wait(120)
+
+  repeat 11 {
+    spd($0)
+    $0 -= 0.03
+    wait(4)
+  }
+  
+}
+
+enemy third {
+  dir(90)
+  spd(0.21)
+  wait(25)
+  $0 = 0.21
+  repeat 21 {
+    spd($0)
+    $0 -= 0.01
+    wait(1)
+  }
+  spd(0)
+  wait(10)
+
+  $0 = @aim
+  $0 += 3
+  fx(muzzle, ENG01B)
+  se(shot02)
+  fire(accelshot, ENG01B, $0, 0.2)
+  $0 -= 6
+  fire(accelshot, ENG01B, $0, 0.2)
+  $0 += 3
+  wait(5)
+  fx(muzzle, ENG01D)
+  se(exp03)
+  fire(accelshot, ENG01D, $0, 0.23)
+  wait(30)
+  $0 = 0
+  repeat 11 {
+    spd($0)
+    $0 += 0.03
+    wait(4)
+  }
+}
+
+enemy second {
+  dir(90)
+  spd(0.21)
+  wait(35)
+  $0 = 0.21
+  repeat 21 {
+    spd($0)
+    $0 -= 0.01
+    wait(1)
+  }
+  spd(0)
+  wait(10)
+  $0 = @aim
+  $0 -= 10
+  $1 = @dir
+  repeat 4 {
+    fx(muzzle, ENG01B)
+    se(shot03, 0.2)
+    dir($0)
+    spd(0.21)
+    emit(round)
+    spd(0)
+    $0 += 10
+    wait(25)
+  }
+  $0 = 0
+  dir($1)
+  repeat 10 {
+    spd($0)
+    $0 -= 0.02
+  }
+  wait(30)
+}
+
+enemy first {
+  $0 = 90
+  dir($0)
+  $1 = 0.21
+  spd($1)
+  wait(30)
   repeat 24 {
-    fire(simple, ENG01B, $0, 0.4)
+    $1 -= @rnd(0.01, 0.02)
+    spd($1)
+    wait(1)
+  }
+  repeat 1 {
+    fx(muzzle, ENG01B)
+    fire(exsimple, ENG01B, @aim, 0.3)
+    wait(4)
+  }
+  wait(20)
+  repeat 18 {
+    $1 -= @rnd(0.01, 0.02)
+    spd($1)
+    wait(4)
+  }
+  wait(60)
+}
+
+
+emitter round12 {
+  $0 = @angle
+  $1 = 30
+  repeat 12 {
+    fire(simple, ENG01B, $0, @speed)
+    $0 += 30
+  }
+}
+
+
+emitter round {
+  $0 = @angle
+  $1 = 15
+  repeat 24 {
+    fire(simple, ENG01B, $0, @speed)
     $0 += 15
   }
 }
