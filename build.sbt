@@ -8,6 +8,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 scalacOptions += "-feature"
 
-javaOptions in run += "-verbose:gc"
+javaOptions in run ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
 
 seq(lwjglSettings: _*)
