@@ -1,0 +1,53 @@
+
+effect muzzle { // うるさいだまれ
+  $0 = 0.8
+  $1 = 0.8
+  repeat 4 {
+    alpha($0)
+    scale($1)
+    $0 -= 0.2
+    $1 += 0.2
+    wait(4)
+  }
+  alpha(0)
+}
+
+effect player_death {
+  se(exp01)
+  wait(4)
+  se(exp01)
+  wait(4)
+  se(exp05)
+  $0 = 1.0
+  $1 = 1.0
+  repeat 10 {
+    alpha($0)
+    scale($1)
+    $0 -= 0.1
+    $1 += 0.2
+    wait(1)
+  } 
+  alpha(0)
+}
+
+effect death {
+  se(exp03, 0.2)
+  $0 = 1.0
+  $1 = 1.0
+  repeat 4 {
+    alpha($0)
+    scale($1)
+    $0 -= 0.1
+    $1 -= 0.1
+    wait(1)
+  }
+  wait(1)
+  repeat 6 {
+    $0 -= 0.1
+    $1 += 0.4
+    alpha($0)
+    scale($1)
+    wait(1)
+  }
+  alpha(0)
+}
