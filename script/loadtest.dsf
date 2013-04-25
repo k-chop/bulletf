@@ -8,6 +8,10 @@ bullet accelshot {
   }
 }
 
+bullet exsimple {
+  se(shot03, 0.2)  
+}
+
 bullet delayaim {
   wait(60)
   spd(0.3, absolute)
@@ -24,11 +28,12 @@ enemy t01 {
     wait(1)
   }
   wait(10)
+  se(shot03, 1.0, 0.2)
   fire(simple, ENG01B)
   wait(3)
   repeat 7 {
-    se(test2)
-    fire(simple, ENG01D)
+    fx(muzzle, ENG01B)
+    fire(exsimple, ENG01D)
     wait(3)
   }
   wait(10)
@@ -50,9 +55,10 @@ enemy invader {
     spd($1)
     wait(1)
   }
-  repeat 3 {
-    se(test2)
-    $2 = @rnd(0.23, 0.26)
+  repeat 6 {
+    $2 = @rnd(0.03, 0.06)
+    fx(muzzle, ENG01B)
+    se(shot03, 0.2)
     fire(simple, ENG01B, @aim, $2)
     wait(4)
   }
