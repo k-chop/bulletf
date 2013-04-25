@@ -83,8 +83,12 @@ object DSFParser extends StandardTokenParsers {
   
   lazy val variable: Parser[Container] =
     "$" ~> numericLit ^^ { case i => EVar(GetVar(i.toInt)) }
-  
-  def parse(source: String): Seq[(Symbol, Array[Op])] = {
+
+  def parse(_source: String): Seq[(Symbol, Array[Op])] = {
+    val commentReg = """//.*""".r
+    val source = commentReg.replaceAllIn(_source, "") // 一行コメントを行末まで削除
+
+    println(source)
     top(new lexical.Scanner(source)) match {
       case Success(behaivors, _) =>
         behaivors foreach { case (n, ops) => println(n+":"+ops.deep.toString) }

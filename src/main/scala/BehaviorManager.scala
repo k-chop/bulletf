@@ -14,7 +14,7 @@ object BehaviorManager {
   }
 
   def build(ref: String) {
-    val src = Source.fromFile( Resource.scriptPath + ref + ".dsf" ).mkString("")
+    val src = Source.fromFile( Resource.scriptPath + ref + ".dsf" ).getLines().mkString("\n")
     
     DSFParser.parse(src) foreach { case (name, ops) =>
       val action = new ScriptBehavior(ops)
