@@ -28,7 +28,7 @@ object BehaviorManager {
     // →buildの時点で依存するアクションはロードしておくべき．
     // あとで．
     case Some(x) => x
-    case None => throw new Exception//build(ref.name)
+    case None => sys.error(s"BehaviorManager: no action [$ref]")
   }
 
   def clear() = {
