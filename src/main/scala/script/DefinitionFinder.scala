@@ -84,8 +84,15 @@ object DefinitionFinder {
     case ("dir", Seq( valueCon: Container )) =>
       SetDirection(valueCon, 'absolute)
 
-    case ("se", Seq(StrVar(soundId))) =>
-      PlaySound(soundId.sym)
+    case ("se", args: Seq[_]) => args match {
+      case Seq(StrVar(soundId)) =>
+        PlaySound(soundId.sym, DVar(1.0), DVar(0.5))
+      case Seq(StrVar(soundId), volCon: Container) =>
+        PlaySound(soundId.sym, DVar(1.0), volCon)
+      case Seq(StrVar(soundId), pitchCon: Container, volCon: Container) =>
+        PlaySound(soundId.sym, pitchCon, volCon)
+      case _ => Nop
+    }
 
     case ("scale", Seq(valueCon: Container)) =>
       SetScale(valueCon)

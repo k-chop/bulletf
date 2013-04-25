@@ -46,7 +46,7 @@ class TestScene extends Scene with HasInnerFunc {
             e.damage(s)
             s.destroy()
             Global.scoreboard.add(10)
-            SoundSystem.playSymbol('test2)
+            SoundSystem.playSymbol('test2, vol = 0.04f)
           case _ =>
         }
       }

@@ -20,16 +20,24 @@ object SoundSystem {
     }
   }
 
-  def play(id: Int) {
+  def play(id: Int, pitch: Float = 1.0f, vol: Float = 0.5f) {
     require(id < arr.length)
     if (cooltime(id) < 1) {
-      arr(id).play(1.0f, 0.5f)
+      arr(id).play(pitch, vol)
       cooltime(id) = cooltimeDef(id)
     }
   }
 
+  def play(id: Int) {
+    play(id, 1.0f, 0.5f)
+  }
+
+  def playSymbol(s: Symbol, pitch: Float = 1.0f, vol: Float = 0.5f) {
+    if (symmap.isDefinedAt(s)) play(symmap(s), pitch, vol)
+  }
+
   def playSymbol(s: Symbol) {
-    if (symmap.isDefinedAt(s)) play(symmap(s))
+    playSymbol(s, 1.0f, 0.5f)
   }
 
   def init() {

@@ -17,7 +17,7 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
   // 初期位置
   var pos = Ship.initialPosition
   // 当たり判定の半径
-  val radius = 2.0
+  val radius = 4.0
   // インスタンス生成から経っている時間(フレーム)
   var time: Int = 0
   // 無敵時間
@@ -40,6 +40,11 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
     if (0 < pt) {
       remLives -= pt
       invincibleTime = 120 // 無敵時間2秒
+      Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('player_death), 'ship, pos.cloneBy(0,0), Angle.zero, 0))
+      Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('muzzle), 'ENG01D, pos.cloneBy(-6,-8), Angle.zero, 0))
+      Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('muzzle), 'ENG01D, pos.cloneBy(+12,-4), Angle.zero, 0))
+      Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('muzzle), 'ENG01D, pos.cloneBy(-2,+7), Angle.zero, 0))
+      Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('muzzle), 'ENG01D, pos.cloneBy(+4,+11), Angle.zero, 0))
     }
   }
 
