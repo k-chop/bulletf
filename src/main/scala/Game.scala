@@ -74,6 +74,7 @@ class Game(_width: Int, _height: Int) {
     initGL()
     GLUtil.setup()
     SceneController.init(new TestScene)
+    SoundSystem.init()
 
     getDelta()
     lastFPS = getTime()
@@ -93,7 +94,7 @@ class Game(_width: Int, _height: Int) {
       } else {
         SceneController.update(delta/1000)
       }
-      SoundEffect.update(delta/1000)
+      SoundSystem.update(delta/1000)
       
       updateFPS()
 
@@ -122,7 +123,7 @@ class Game(_width: Int, _height: Int) {
       if (Display.isCloseRequested) {
         println("free resources...")
         BGM.free()
-        SoundEffect.free()
+        SoundSystem.free()
         TextureFactory.free()
 
         Display.destroy()

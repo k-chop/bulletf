@@ -152,7 +152,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
           }; incPC(); recur(nestLevel, seq)
 
           case PlaySound(param) => {
-            SoundEffect.playSymbol(param)
+            SoundSystem.playSymbol(param)
           }; incPC(); recur(nestLevel, seq)
 
           // SetScale, SetAlphaはEffectのみに作用するのでここに置くのはちょっと違う気もする

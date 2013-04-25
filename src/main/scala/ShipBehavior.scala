@@ -30,6 +30,7 @@ object ShipBehavior {
 
     if (ship.time % 3 == 0) {
       if (Input(SHOT) && !Input(LAZER)) {
+        SoundSystem.playSymbol('shot01a)
         ship.ownObjects +=
           STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(-6, -5), Angle(-90), 1.2)
         ship.ownObjects +=
