@@ -88,11 +88,11 @@ object DSFParser extends StandardTokenParsers {
     val commentReg = """//.*""".r
     val source = commentReg.replaceAllIn(_source, "") // 一行コメントを行末まで削除
 
-    println(source)
+    //println(source)
     top(new lexical.Scanner(source)) match {
-      case Success(behaivors, _) =>
-        behaivors foreach { case (n, ops) => println(n+":"+ops.deep.toString) }
-        behaivors
+      case Success(behaviors, _) =>
+        behaviors foreach { case (n, ops) => println(n+":"+ops.deep.toString) }
+        behaviors
       case Failure(msg, d) => {
         println("parse failure.")
         println(msg)
