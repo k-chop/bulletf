@@ -13,8 +13,10 @@ javaOptions in run ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
 seq(lwjglSettings: _*)
 
 compile in Compile <<= compile in Compile mapR {
-  case Inc(inc: Incomplete) => throw inc
+  case Inc(inc: Incomplete) =>
+    Sound.play("sound/cut01.wav")
+    throw inc
   case Value(v) =>
-    BulletfBuild.playsound("sound/pickup01.wav")
+    Sound.play("sound/pickup01.wav")
     v
 }

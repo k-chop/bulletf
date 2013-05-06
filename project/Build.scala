@@ -10,11 +10,11 @@ import scala.concurrent.ops._
 // http://www.ibm.com/developerworks/jp/java/library/j-5things12/#N101D9
 // http://stackoverflow.com/questions/16057378/executing-a-task-dependency-for-test-failure-in-sbt
 
-object BulletfBuild extends Build {
+object Sound {
 
-  def playsound(file: String) {
+  def play(file: String) {
     spawn {
-      val clip = AudioSystem.getClip()
+      val clip = AudioSystem.getClip
       clip.addLineListener(new LineListener(){
         def update(e: LineEvent) {
           if (e.getType == LineEvent.Type.STOP) {
@@ -34,6 +34,9 @@ object BulletfBuild extends Build {
       stream.close()
     }
   }
+}
+
+object BulletfBuild extends Build {
 
   lazy val root = Project(
     id = "bulletf",
