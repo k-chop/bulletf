@@ -28,7 +28,7 @@ class Effect(var action: Behavior, resource: Symbol, var pos: Position, var angl
   }
 
   def draw() {
-    if (enable) sprite.draw(pos, angle.dir, scale, alpha)
+    if (enable) sprite.draw(pos, angle.dir, scale, alpha, time)
   }
 
 }

@@ -7,18 +7,20 @@ import collection.mutable
 
 /**
  * アニメーションするSpriteの定義
- * キャッシュさせるんだから可変な内部状態持たせるな
+ * キャッシュさせるんだから可変な内部状態持たせたらイカン
  * @param rect 最初の1つのRect
  * @param length スプライトのパターンの長さ
- * @param pattern どうアニメーションするかの定義、(frame, index)の配列
+ * @param pattern どうアニメーションするかの定義、(frame, index)の配列, indexをframe時間表示する。
  * @param loop 最後まで再生したあとループするかどうか
  */
 class SpriteAnimationInfo(val rect: Rect, val length: Int, pattern: Array[(Int, Int)], loop: Boolean) {
 
+  // 今の所、同サイズで横一列に並んだ画像しか対応してない
   private[this] val rects: Array[Rect] = Array.tabulate(length){ i =>
     rect.copy(x = rect.x + (rect.w * i))
   }
-  private[this] val lastFrame: Int = pattern(length-1)._1
+
+  private[this] val lastFrame: Int = pattern.foldLeft(0){ case (sum,t) => sum + t._1}
   private[this] lazy val lastRect: Rect = rects(length-1)
 
   def next(_time: Int): Rect = {
@@ -27,16 +29,17 @@ class SpriteAnimationInfo(val rect: Rect, val length: Int, pattern: Array[(Int, 
     if (lastFrame <= time) { // lengthを越している(loopでない)
       lastRect
     } else {
-      var idx = 0
-      // 次のidxからtimeを超えない最大のframeを探索
-      // 毎回頭から探すのはどうかと…
-      while(pattern(idx)._1 < time && idx < length) idx += 1
-      val at = math.max(idx - 1, 0) // lengthに到達する前に必ず1つは見つかるはず
+
+      @scala.annotation.tailrec
+      def findIdx(idx: Int, chkTime: Int): Int = {
+        if (time < chkTime) idx
+        else findIdx(idx+1, chkTime + pattern(idx)._1)
+      }
+
+      val at = findIdx(0, pattern(0)._1)
 
       val idxp = pattern(at)._2
-      val res = rects(idxp)
-
-      res
+      rects(idxp)
     }
   }
 }
@@ -88,7 +91,7 @@ object TextureFactory {
     val a = 'sprite
     val uri = Resource.buildPath(a)
     val animInfo = id match {
-      case _ => new SpriteAnimationInfo(Rect(2,68,17,17), 8, Array((0,0),(2,1),(4,2),(6,3),(8,4),(10,5),(12,6),(14,7),(15,7)), loop = true)
+      case _ => new SpriteAnimationInfo(Rect(2,68,17,17), 8, Array.tabulate(8){ i => (2,i) }, loop = true)
     }
     (uri, animInfo)
   }

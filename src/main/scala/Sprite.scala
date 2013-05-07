@@ -35,7 +35,11 @@ trait Sprite {
   def draw(pos: Position, angle: Double, scale: Double) {
     draw(pos, angle, scale, 1.0)
   }
-  def draw(pos: Position, angle: Double, scale: Double, alpha: Double)
+  def draw(pos: Position, angle: Double, scale: Double, alpha: Double) {
+    draw(pos, angle, scale, alpha, 0)
+  }
+
+  def draw(pos: Position, angle: Double, scale: Double, alpha: Double, time: Int)
 
   def draw(custom_rect: Rect, pos: Position, angle: Double)
 }
@@ -44,7 +48,8 @@ class SpriteImpl(resourceId: Symbol) extends Sprite {
 
   val (texture, rect) = TextureFactory.get(resourceId)
 
-  def draw(pos: Position, angle: Double, scale: Double, alpha: Double) {
+  // 普通のSpriteはtime無視
+  def draw(pos: Position, angle: Double, scale: Double, alpha: Double, time: Int) {
     Drawer.draw(texture, rect, pos, angle, scale, alpha)
   }
 
