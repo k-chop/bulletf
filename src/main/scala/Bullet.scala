@@ -22,7 +22,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   var time = 0*/
 
   // 当たり判定の半径
-  val radius = sprite.rect.x / 4.0
+  val radius = 2.0
 
   // スクリプトの実行が終わったら等速直線運動へシフト
   def onEndScript(delta: Int) {
@@ -35,7 +35,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   }
 
   def draw() {
-    if (enable) sprite.draw(pos, angle.dir-90, 1.0, 1.0, time)
+    if (enable) sprite.draw(pos, /*(time % 360)*8*/angle.dir-90, 1.0, 1.0, time)
   }
 
   def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
