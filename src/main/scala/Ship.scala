@@ -38,7 +38,7 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
       case _ => 0
     }
     if (0 < pt) {
-      remLives -= pt
+      //remLives -= pt
       invincibleTime = 120 // 無敵時間2秒
       Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('player_death), 'ship, pos.cloneBy(0,0), Angle.zero, 0))
       Global.effect_pool.set(STGObjectFactory.newEffect(BehaviorManager.get('muzzle), 'ENG01D, pos.cloneBy(-6,-8), Angle.zero, 0))
