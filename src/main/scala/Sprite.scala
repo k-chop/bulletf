@@ -10,7 +10,7 @@ object Sprite {
   def get(resource: Symbol): Sprite = cache.get(resource) match {
     case Some(cachedSprite) => cachedSprite
     case None =>
-      val newSprite: Sprite = (if (resource.name.substring(0, 2) == "a_") {
+      val newSprite: Sprite = (if (resource.name.toLowerCase.substring(0, 2) == "a_") {
         new AnimationSprite(resource)
       } else {
         new SpriteImpl(resource)

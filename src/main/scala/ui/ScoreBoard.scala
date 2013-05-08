@@ -26,7 +26,7 @@ class ScoreBoardImpl(private[this] var score: Int) extends ClearableScoreBoard {
   val basey = 28
   val basew = 160
 
-  val sprite = Sprite.get('number)
+  val sprite = Sprite.get('numbers)
   lazy val rects = {
     val w = 16; val h = 18
     val a = Array.tabulate(10)(i => sprite.rect.cloneBy(i*16, 0, w, h))

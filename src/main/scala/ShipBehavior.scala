@@ -32,23 +32,23 @@ object ShipBehavior {
       if (Input(SHOT) && !Input(LAZER)) {
         SoundSystem.playSymbol('shot01a, vol = 0.1f)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(-6, -5), Angle(-90), 1.2)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-6, -5), Angle(-90), 1.2)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(+6, -5), Angle(-90), 1.2)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+6, -5), Angle(-90), 1.2)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(-10, -3), Angle(-100), 1.2)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-10, -3), Angle(-100), 1.2)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(+10, -3), Angle(-80), 1.2)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+10, -3), Angle(-80), 1.2)
       } else if (Input(SHOT) && Input(LAZER)) {
         SoundSystem.playSymbol('shot01a, vol = 0.1f)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(-15, 3), Angle(-90), 1.25)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-15, 3), Angle(-90), 1.25)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(-6, -3), Angle(-90), 1.25)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-6, -3), Angle(-90), 1.25)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(+6, -3), Angle(-90), 1.25)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+6, -3), Angle(-90), 1.25)
         ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot, ship.pos.cloneBy(+15, 3), Angle(-90), 1.25)
+          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+15, 3), Angle(-90), 1.25)
       }
     }
   }

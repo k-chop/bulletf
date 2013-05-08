@@ -9,8 +9,33 @@ import collection.mutable
 object TextureFactory {
   private val cache = mutable.WeakHashMap.empty[Symbol, (Texture, Rect)]
   private val aniCache = mutable.WeakHashMap.empty[Symbol, (Texture, SpriteAnimationInfo)]
-  // Textureの生成はゲロ重いのでWeakだとすぐに破棄されてアカン
+  // Textureの生成はゲロ重いので指定したタイミング以外で破棄されないように
   private val texCache = mutable.HashMap.empty[String, Texture]
+
+    //XMLのロードが超重いので先に済ませてしまう
+  private val id2rect: Map[String, Rect] = {
+    import java.io.File
+
+    val xml = scala.xml.XML.load(new File(Resource.imgpath + "sprite.xml").toURI.toURL)
+    val acc = mutable.HashMap.empty[String, Rect]
+
+    (xml \\ "TextureAtlas" \\ "sprite") foreach { node =>
+      for {
+        s <- node
+        x <- s.attribute("x")
+        y <- s.attribute("y")
+        h <- s.attribute("h")
+        w <- s.attribute("w")
+        n <- s.attribute("n")
+      } { // sprite.xmlは自動生成でいじらないし整数以外が混入することなんてないよね！！！
+        val id = n.text.toLowerCase
+        val rect = Rect(x.text.toInt, y.text.toInt, w.text.toInt, h.text.toInt)
+        acc += (id -> rect)
+        println(s"make mapping: $id -> $rect")
+      }
+    }
+    acc.toMap
+  }
 
   def genNewTexture(uriStr: String, key: Symbol): Texture = {
     println("create texture: " + uriStr + ", key: " + key)
@@ -50,42 +75,43 @@ object TextureFactory {
   }
 
   private[this] def fileMappedAnimate(id: Symbol): (String, SpriteAnimationInfo) = {
+
     val a = 'sprite
     val uri = Resource.buildPath(a)
-    val animInfo = id match {
-      case _ => new SpriteAnimationInfo(Rect(2,68,17,17), 8, Array.tabulate(8){ i => (2,i) }, loop = true)
+
+    val animInfo = id2rect.get(id.name.toLowerCase + ".png") map { r =>
+      // 現状アニメーションする1つのコマは縦横が同じサイズのものと仮定
+      val newRect = r.copy(w = r.h)
+      // idに対応するアニメーション定義ファイルを読み込む
+      // けど仕様決まってないのであとで
+      // 今は2フレームごとに次に進む & ループすると決め打ち
+      val len = r.w / r.h
+      val timeTable = Array.tabulate(len){ i => (2,i) }
+      new SpriteAnimationInfo(newRect, len, timeTable, loop = true)
+    } getOrElse {
+      // 見つからない場合は適当なの用意して渡す
+      (new SpriteAnimationInfo(Rect(0,0,1,1), 1, Array((10,0)), loop = false))
     }
+
     (uri, animInfo)
   }
 
   /**
-   * スクリプトで用いる識別子から、実際のファイル/切り取り範囲などへのマッピング。
-   * 現状扱えるのが単一ファイルのみなのでそのままファイル名のSymbolを返しているが、
-   * 大きなテクスチャから切り抜く形に実装を変更する際に返り値の型も変わる。たぶん。
-   * ファイルが存在しなかったら空テクスチャを返す。
-   * @param id テクスチャの識別子
-   * @return ファイルのURI
+   * スクリプトで用いる識別子から、実際のファイル/切り取り範囲などへのマッピングを取得する。
+   * 指定したidに対応する定義が存在しなかったら1x1の空テクスチャを返す。
+   * @param id 識別子
+   * @return ファイルのURIと切り取り範囲のTuple
    */
   private[this] def fileMapped(id: Symbol): (String, Rect) = {
+
     val a = 'sprite
     val uri = Resource.buildPath(a)
-    //val res = if (exists(uri)) uri else Resource.nullImg
-    val rect = id match { // 超ベタ書き(仮)
-      case 'ENG01B => Rect(2,2,32,32)
-      case 'ENG01D => Rect(36,2,32,32)
-      case 'ENG02B => Rect(70,2,32,32)
-      case 'ENG02R => Rect(104,2,32,32)
-      case 'invader01 => Rect(138,2,64,64)
-      case 'ship => Rect(204,2,32,32)
-      case 'shot => Rect(140,68,32,32)
-      case 'number => Rect(2,102,160,18)
-      case 'DEFAULT => Rect(2,2,32,32)
-      case _ => Rect(0,0,1,1)
-    }
+
+    val rect = id2rect.get(id.name.toLowerCase + ".png").getOrElse(Rect(0,0,1,1))
+
     (uri, rect)
   }
 
-  // ファイルの存在確認。なんかもっとスマートな方法はないものか...
   private[this] def exists(path: String) = (new File(path)).exists()
 
   // リソースの開放
