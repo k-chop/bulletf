@@ -27,6 +27,16 @@ class TestScene extends Scene with HasInnerFunc {
 
   def update(delta: Int): Scene = {
 
+    // fetch from enemy_pool
+    if (Global.enemy_pool.nonEmpty) {
+      enemies ++= Global.enemy_pool.fetch()
+    }
+
+    // fetch from effect_pool
+    if (Global.effect_pool.nonEmpty) {
+      effects ++= Global.effect_pool.fetch()
+    }
+
     ship.update(delta)
     updateFunc.set(delta)
     emitters foreach updateFunc.func
@@ -77,16 +87,6 @@ class TestScene extends Scene with HasInnerFunc {
         this
       }
     } else this
-
-    // fetch from enemy_pool
-    if (Global.enemy_pool.nonEmpty) {
-      enemies ++= Global.enemy_pool.fetch()
-    }
-
-    // fetch from effect_pool
-    if (Global.effect_pool.nonEmpty) {
-      effects ++= Global.effect_pool.fetch()
-    }
 
     if (Input.key.keydown(KEY_R)) {
       init()
