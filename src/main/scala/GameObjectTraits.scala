@@ -36,7 +36,17 @@ trait OwnerLike {
   var ownObjects: mutable.ListBuffer[BulletLike]
 }
 
-trait CanProduceAll {
+trait CanProduceToGlobal {
+  def genEnemy(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
+    //ownObjects += STGObjectFactory.newEnemy(action, kind, pos, angle, speed)
+    Global.enemy_pool.set(STGObjectFactory.newEnemy(action, kind, pos, angle, speed))
+  }
+  def effect(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
+    Global.effect_pool.set(STGObjectFactory.newEffect(action, kind, pos, angle, speed))
+  }
+}
+
+trait CanProduceAll extends CanProduceToGlobal {
   self: OwnerLike =>
 
   def fire(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
@@ -44,13 +54,6 @@ trait CanProduceAll {
   }
   def emit(action: Behavior, pos: Position, angle: Angle, speed: Double) {
     ownObjects += STGObjectFactory.newEmitter(action, pos, angle, speed)
-  }
-  def genEnemy(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
-    //ownObjects += STGObjectFactory.newEnemy(action, kind, pos, angle, speed)
-    Global.enemy_pool.set(STGObjectFactory.newEnemy(action, kind, pos, angle, speed))
-  }
-  def effect(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
-    Global.effect_pool.set(STGObjectFactory.newEffect(action, kind, pos, angle, speed))
   }
 
 }

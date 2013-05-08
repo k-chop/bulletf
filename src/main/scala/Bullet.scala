@@ -6,7 +6,7 @@ import java.io.{ FileInputStream, IOException }
 import scala.collection.mutable.ArrayBuffer
 
 class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with HasCollision
+  extends BulletLike with HasCollision with CanProduceToGlobal
 {
   import Constants.script._
 

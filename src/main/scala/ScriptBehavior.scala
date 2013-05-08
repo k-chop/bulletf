@@ -94,7 +94,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
           // genEnemy, emitは基本的に親(発射元)の速度,角度を受け継ぐ。
           // 必要なら定義先で改めて定義すればよい。
           case GenEnemy(action, kind, x, y) => unit match {
-            case c: CanProduceAll =>
+            case c: CanProduceToGlobal =>
               c.genEnemy(BehaviorManager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
@@ -106,7 +106,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
           }; incPC(); recur(nestLevel, seq)
 
           case GenEffect(action, kind, x, y) => unit match {
-            case c: CanProduceAll =>
+            case c: CanProduceToGlobal =>
               c.effect(BehaviorManager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)

@@ -1,6 +1,8 @@
 package com.github.whelmaze.bulletf
 
-class Effect(var action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double) extends BulletLike {
+class Effect(var action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
+  extends BulletLike with CanProduceToGlobal
+{
 
   var sprite: Sprite = Sprite.get(resource)
 
