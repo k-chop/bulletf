@@ -15,6 +15,7 @@ class TestScene extends Scene with HasInnerFunc {
   lazy val effects = mutable.ListBuffer.empty[Effect]
   lazy val score: ClearableScoreBoard = ui.ScoreBoard.init(0)
   lazy val lives: LifeBoard = new ui.LifeBoard(ship)
+  lazy val background: BackGround = new BackGroundBasicStars
   Global.scoreboard.set(score)
   Global.aimToShip.set(ship)
 
@@ -37,7 +38,9 @@ class TestScene extends Scene with HasInnerFunc {
       effects ++= Global.effect_pool.fetch()
     }
 
+    background.update(delta)
     ship.update(delta)
+
     updateFunc.set(delta)
     emitters foreach updateFunc.func
     enemies foreach updateFunc.func
@@ -103,7 +106,8 @@ class TestScene extends Scene with HasInnerFunc {
   override def draw() {
     b = !b
     //if (c == 0) println("objects: " + emitters.foldLeft(0)((i,j)=> i + j.size))
-    
+
+    background.draw()
     ship.draw()
     emitters foreach drawFunc
     enemies foreach drawFunc
