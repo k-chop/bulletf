@@ -23,12 +23,12 @@ trait HasInnerFunc {
   protected class InnerUpdateFunc  {
     private[this] var delta: Int = 0
     def set(d: Int) { delta = d }
-    val func: BulletLike => Unit = b => b.update(delta)
+    val func: Runnable => Unit = b => b.update(delta)
   }
 
   protected val updateFunc: InnerUpdateFunc
   protected val enableFunc = (b: BulletLike) => b.enable
-  protected val drawFunc = (b: BulletLike) => b.draw()
+  protected val drawFunc = (b: Drawable) => b.draw()
 
 }
 
