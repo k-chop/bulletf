@@ -7,13 +7,6 @@ import org.lwjgl.util.glu.GLU
 import com.github.whelmaze.bulletf.constants._
 import org.lwjgl.opengl.GL11._
 
-object Rect {
-  lazy val whole = Rect(0,0,1,1)
-}
-case class Rect(x: Int, y:Int, w: Int, h: Int) {
-  def cloneBy(ax: Int, ay: Int, aw: Int, ah: Int) = copy(x+ax, y+ay, aw, ah)
-}
-
 object Drawer {
   private[this] var nowRenderTexId = -1
 
