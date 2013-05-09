@@ -8,28 +8,45 @@ object DSFParser extends StandardTokenParsers {
   import DefinitionFinder._
 
   lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@")
-  lexical.reserved += ("repeat","action","bullet","enemy","effect", "emitter")
+  lexical.reserved += ("repeat","action","bullet","enemy","effect", "emitter","data","init","run","die")
 
   // (type, name, ops)
 //  lazy val top: Parser[Seq[(Symbol, Symbol, Array[Op])]] = rep1(definition)
   lazy val top: Parser[Seq[(Symbol, Array[Op])]] = rep1(definition)
   
-  lazy val types: Parser[Symbol] = ("action" | "bullet" | "enemy" | "effect" | "emitter") ^^ { case s => Symbol(s) }
-  
-//  lazy val definition: Parser[(Symbol, Symbol, Array[Op])] =
-  lazy val definition: Parser[(Symbol, Array[Op])] =
-//    types ~ ident ~ "(" ~ repsep(syms, ",") ~ ")" ~ "{" ~ opsec <~ "}" ^^ {
-//    ident ~ "(" ~ repsep(syms, ",") ~ ")" ~ "{" ~ opsec <~ "}" ^^ {
-    types ~> ident ~ "{" ~ opseq <~ "}" ^^ {
-//      case t ~ s ~ _ ~ args  ~ opsec => (t, Symbol(s), opsec.toArray)
-      case s ~ _ ~ ops => (Symbol(s), ops.toArray)
+  lazy val types: Parser[Symbol] =
+    ("action" | "bullet" | "enemy" | "effect" | "emitter") ^^ {
+      case s => Symbol(s)
     }
+  
+  lazy val definition: Parser[(Symbol, Array[Op])] = {
+/*    types ~> ident ~ "{" ~ blocks <~ "}" ^^ { // 新定義
+      case s ~ _ ~ bl => (Symbol(s), bl.find(_._1 == 'run).map(_._2).getOrElse(Seq.empty[Op]).toArray)
+    } | types ~> ident ~ "{" ~ opseq <~ "}" ^^ { // 旧定義
+      case s ~ _ ~ ops => (Symbol(s), ops.toArray)
+    }*/
+    newdef | olddef
+  }
+
+  lazy val newdef: Parser[(Symbol, Array[Op])] = types ~> ident ~ "{" ~ blocks <~ "}" ^^ {
+    case s ~ _ ~ bls => (Symbol(s), bls.find(_._1 == 'run).map(_._2).getOrElse(Seq(Nop)).toArray)
+  }
+
+  lazy val olddef: Parser[(Symbol, Array[Op])] = types ~> ident ~ "{" ~ opseq <~ "}" ^^ {
+    case s ~ _ ~ ops => (Symbol(s), ops.toArray)
+  }
+
+  lazy val blocks: Parser[Seq[(Symbol, Seq[Op])]] = rep1(block)
+
+  lazy val block: Parser[(Symbol, Seq[Op])] =
+    blockName ~ "{" ~ opseq <~ "}" ^^ {
+      case bn ~ _ ~ ops => (bn, ops)
+    }
+
+  lazy val blockName = ("data" | "init" | "run" | "die") ^^ { case s => Symbol(s) }
 
   lazy val syms: Parser[Symbol] = ident ^^ { case s => Symbol(s) }
   
-  // lazy val action: Parser[(Symbol, Array[Op])] = 
-  //   ident ~ "{" ~ opsec <~ "}" ^^ { case s ~ _ ~ opsec => (Symbol(s), opsec.toArray) }
-
   lazy val opseq: Parser[Seq[Op]] = rep1(op)
 
   lazy val op: Parser[Op] =  bind | func | repeat | update
