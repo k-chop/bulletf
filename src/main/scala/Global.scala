@@ -55,6 +55,14 @@ object Global {
     protected[this] var self = mutable.ListBuffer.empty[Enemy]
   }
 
+  object needInit_pool extends GlobalPool[CanInit] with HasInnerFunc {
+    protected[this] var self = mutable.ListBuffer.empty[CanInit]
+    def allInit() {
+      self.foreach(initFunc)
+      self.clear()
+    }
+  }
+
   object aimToShip {
     private[this] var ship: Option[Ship] = None
     def set(s: Ship) {

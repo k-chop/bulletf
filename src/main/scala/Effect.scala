@@ -18,6 +18,10 @@ class Effect(var action: Behavior, resource: Symbol, var pos: Position, var angl
     this.speed = speed
   }
 
+  override def init() {
+    action.init(this)
+  }
+
   def update(delta: Int) {
     if (enable) {
       time += 1

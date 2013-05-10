@@ -31,6 +31,10 @@ class Shot(val action: Behavior, val resource: Symbol, var pos: Position, var an
     disable()
   }
 
+  override def init() {
+    action.init(this)
+  }
+
   // 当たり判定の半径
   val radius = sprite.rect.w / 4.0
 

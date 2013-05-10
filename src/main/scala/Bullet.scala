@@ -24,6 +24,10 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   // 当たり判定の半径
   val radius = 2.0
 
+  override def init() {
+    action.init(this)
+  }
+
   // スクリプトの実行が終わったら等速直線運動へシフト
   def onEndScript(delta: Int) {
     BasicBehavior.run(delta)(this)

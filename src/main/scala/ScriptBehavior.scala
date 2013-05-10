@@ -93,7 +93,6 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
           // 必要なら定義先で改めて定義すればよい。
           case GenEnemy(action, kind, x, y) => unit match {
             case c: CanProduceToGlobal =>
-              println("genenemy")
               c.genEnemy(BehaviorManager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
@@ -192,7 +191,7 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
         }
       } else { // もう全部終わってるならScriptedMove側に移譲(ただしinitブロック中では単に終了)
         if (!onInit) unit.onEndScript(delta)
-        else println(s"initblock end $unit")
+        //else println(s"initblock end $unit")
       }
     }
 

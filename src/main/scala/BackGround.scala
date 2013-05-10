@@ -51,7 +51,4 @@ class BackGroundBasicStars extends BackGround with HasInnerFunc {
     stars.foreach(drawFunc)
   }
 
-  // ------------------------------
-  override val updateFunc = new InnerUpdateFunc
-
 }

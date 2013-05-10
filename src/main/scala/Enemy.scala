@@ -25,7 +25,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
   // initブロックの実行
-  def init() {
+  override def init() {
     action.init(this)
   }
 
@@ -33,8 +33,6 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
     super.disable()
     live = false
   }
-
-  override val updateFunc = new InnerUpdateFunc
 
   // スクリプトの実行が終わっていてまだ弾が残っているなら等速直線運動
   // 弾も消え、自身も画面外に行ったら死亡
@@ -45,6 +43,10 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   def update(delta: Int) {
     if (enable) {
+      if (nextAddPool.nonEmpty) {
+        ownObjects ++= nextAddPool // この時点でinitが済んでる
+        nextAddPool.clear()
+      }
       if (!inside) live = false
       if (live) {
         time += 1

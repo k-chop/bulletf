@@ -16,15 +16,21 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
-  override val updateFunc = new InnerUpdateFunc
+  override def init() {
+    action.init(this)
+  }
 
   // スクリプトの実行が終わっていたら、持ち弾が0になるまで待ってから死ぬ
   def onEndScript(delta: Int) {
-    if (ownObjects.isEmpty) disable()
+    if (ownObjects.isEmpty && nextAddPool.isEmpty) disable()
   }
 
   def update(delta: Int) {
     if (enable) {
+      if (nextAddPool.nonEmpty) {
+        ownObjects ++= nextAddPool
+        nextAddPool.clear()
+      }
       time += 1
       action.run(delta)(this)
       updateFunc.set(delta)

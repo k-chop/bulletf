@@ -16,6 +16,10 @@ trait Runnable {
   def update(delta: Int)
 }
 
+trait CanInit {
+  def init()
+}
+
 trait BulletLike extends ScriptControlled with Runnable with Drawable
 
 trait HasInnerFunc {
@@ -26,10 +30,10 @@ trait HasInnerFunc {
     val func: Runnable => Unit = b => b.update(delta)
   }
 
-  protected val updateFunc: InnerUpdateFunc
+  protected lazy val updateFunc: InnerUpdateFunc = new InnerUpdateFunc
   protected val enableFunc = (b: BulletLike) => b.enable
   protected val drawFunc = (b: Drawable) => b.draw()
-  protected val initFunc = (b: Enemy) => b.init()
+  protected val initFunc = (b: CanInit) => b.init()
 
 }
 
@@ -50,11 +54,13 @@ trait CanProduceToGlobal {
 trait CanProduceAll extends CanProduceToGlobal {
   self: OwnerLike =>
 
+  protected[this] lazy val nextAddPool = mutable.ListBuffer.empty[BulletLike]
+
   def fire(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
-    ownObjects += STGObjectFactory.newBullet(action, kind, pos, angle, speed)
+    nextAddPool += STGObjectFactory.newBullet(action, kind, pos, angle, speed)
   }
   def emit(action: Behavior, pos: Position, angle: Angle, speed: Double) {
-    ownObjects += STGObjectFactory.newEmitter(action, pos, angle, speed)
+    nextAddPool += STGObjectFactory.newEmitter(action, pos, angle, speed)
   }
 
 }

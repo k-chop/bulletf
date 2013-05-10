@@ -70,11 +70,6 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
   // でも現状普通にownObjectに外からアクセスできてしまうので意味が無い
   def shots: List[Shot] = ownObjects.toList
 
-  // -------------------------------------------
-
-  // Functionの生成を避ける為の
-  protected val updateFunc = new InnerUpdateFunc
-
 }
 
 

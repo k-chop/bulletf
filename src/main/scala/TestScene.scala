@@ -24,21 +24,23 @@ class TestScene extends Scene with HasInnerFunc {
   
   def name() = "fps test"
 
-  protected val updateFunc = new InnerUpdateFunc
-
   def update(delta: Int): Scene = {
 
     // fetch from enemy_pool
     if (Global.enemy_pool.nonEmpty) {
-      val newEnemies = Global.enemy_pool.fetch()
-      newEnemies foreach initFunc
-      enemies ++= newEnemies
+      enemies ++= Global.enemy_pool.fetch()
     }
 
     // fetch from effect_pool
     if (Global.effect_pool.nonEmpty) {
       effects ++= Global.effect_pool.fetch()
     }
+
+    // need init objects
+    if (Global.needInit_pool.nonEmpty) {
+      Global.needInit_pool.allInit()
+    }
+
 
     background.update(delta)
     ship.update(delta)
@@ -128,8 +130,9 @@ class TestScene extends Scene with HasInnerFunc {
     effects.clear()
     Global.enemy_pool.clear()
     Global.effect_pool.clear()
+    Global.needInit_pool.clear()
 
-    List('newdef, 'effects).foreach{ s => BehaviorManager.build(s.name) }
+    List('loadtest, 'effects).foreach{ s => BehaviorManager.build(s.name) }
     
     emitters += STGObjectFactory.initialEmitter(BehaviorManager.get('main))
     
