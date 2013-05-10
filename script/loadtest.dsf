@@ -1,384 +1,470 @@
+bullet tailshot {
+  run {
+    repeat 0 {
+      fx(tail, ENG01B)
+      wait(4)
+    }
+  }
+}
 
 bullet accelshot {
-  se(shot03, 0.2)
-  $0 = @spd
-  $1 = 0.015
-  repeat 0 {
-    spd($1, relative)
-    wait(10)
+  init {
+    $0 = @spd
+    $1 = 0.015
+  }
+  run {
+    se(shot03, 0.2)
+    repeat 0 {
+      spd($1, relative)
+      wait(10)
+    }
   }
 }
 
 bullet exsimple {
-  se(shot03, 0.2)  
+  run {
+    se(shot03, 0.2)
+  }
 }
 
 bullet delayaim {
-  wait(60)
-  spd(0.3, absolute)
-  dir(@aim)
+  run {
+    wait(60)
+    spd(0.3, absolute)
+    dir(@aim)
+  }
 }
 
 enemy t01 {
-  dir(90)
-  spd(0.25)
-  wait(15)
-  $0 = 3
-  repeat 30 {
-    dir($0, relative)
-    wait(1)
+  init {
+    dir(90)
+    spd(0.25)
   }
-  wait(10)
-  se(shot03, 1.0, 0.2)
-  fire(simple, ENG01B)
-  wait(3)
-  repeat 7 {
-    fx(muzzle, ENG01B)
-    fire(exsimple, ENG01D)
+  run {
+    wait(15)
+    $0 = 3
+    repeat 30 {
+      dir($0, relative)
+      wait(1)
+    }
+    wait(10)
+    se(shot03, 1.0, 0.2)
+    fire(simple, ENG01B)
     wait(3)
+    repeat 7 {
+      fx(muzzle, ENG01B)
+      fire(exsimple, ENG01D)
+      wait(3)
+    }
+    wait(10)
+    repeat 30 {
+      dir($0, relative)
+      wait(1)
+    }
+    wait(60)
   }
-  wait(10)
-  repeat 30 {
-    dir($0, relative)
-    wait(1)
-  }
-  wait(60)
 }
 
 enemy invader {
-  $0 = 90
-  dir($0)
-  $1 = 0.21
-  spd($1)
-  wait(30)
-  repeat 24 {
-    $1 -= @rnd(0.01, 0.02)
+  init {
+    $0 = 90
+    dir($0)
+    $1 = 0.21
     spd($1)
-    wait(1)
   }
-  repeat 6 {
-    $2 = @rnd(0.03, 0.06)
-    fx(muzzle, ENG01B)
-    se(shot03, 0.2)
-    fire(simple, ENG01B, @aim, $2)
-    wait(4)
+  run {
+    wait(30)
+    repeat 24 {
+      $1 -= @rnd(0.01, 0.02)
+      spd($1)
+      wait(1)
+    }
+    repeat 6 {
+      $2 = @rnd(0.03, 0.06)
+      fx(muzzle, ENG01B)
+      se(shot03, 0.2)
+      fire(simple, ENG01B, @aim, $2)
+      wait(4)
+    }
+    repeat 18 {
+      $1 -= @rnd(0.01, 0.02)
+      spd($1)
+      wait(1)
+    }
+    wait(60)
   }
-  repeat 18 {
-    $1 -= @rnd(0.01, 0.02)
-    spd($1)
-    wait(1)
-  }
-  wait(60)
 }
 
 emitter invaderline {
-  $0 = 40
-  repeat 20 {
-    appear(invader, invader01, $0, 15)
-    $0 += 20
-    $1 = 10
-    $1 += @rnd(0, 8)
-    wait(1)
+  init {
+    $0 = 40
+  }
+  run {
+    repeat 20 {
+      appear(invader, invader01, $0, 15)
+      $0 += 20
+      $1 = 10
+      $1 += @rnd(0, 8)
+      wait(1)
+    }
   }
 }
 
 emitter invader5line {
-  repeat 5 {
-    emit(invaderline)
-    wait(60)
-  }  
+  run {
+    repeat 5 {
+      emit(invaderline)
+      wait(60)
+    }
+  }
 }
 
 // 今のところこれが起点。
 emitter main {
+  run {
+    wait(5)
 
-  wait(5)
+    repeat 7 {
+      appear(first, invader01, @x, 15)
+      wait(20)
+    }
 
-  $0 = @x
-  $0 += 80
-  repeat 3 {
-    appear(first, invader01, $0, 15)
-    $0 += 30
-    wait(20)
+    wait(30)
+
+    $0 = @x
+    $0 -= 80
+    repeat 3 {
+      appear(first, invader01, $0, 15)
+      $0 -= 30
+      wait(20)
+    }
+
+    wait(30)
+
+    appear(second, invader01, @x, 15)
+
+    wait(60)
+
+    $0 = @x
+    $0 += 100
+    appear(third, invader01, $0, 15)
+    $0 -= 200
+    appear(third, invader01, $0, 15)
+
+    wait(70)
+
+    $0 = @x
+    $0 += 150
+    appear(third, invader01, $0, 15)
+    $0 -= 300
+    appear(third, invader01, $0, 15)
+
+    wait(60)
+
+    $0 = @x
+    $0 += 80
+    repeat 4 {
+      appear(first, invader01, $0, 15)
+      $0 += 30
+      wait(10)
+    }
+
+    $0 = @x
+    $0 -= 80
+    repeat 4 {
+      appear(first, invader01, $0, 15)
+      $0 -= 30
+      wait(10)
+    }
+
+    appear(forth, invader01, @x, 15)
+
   }
-
-  wait(30)
-
-  $0 = @x
-  $0 -= 80
-  repeat 3 {
-    appear(first, invader01, $0, 15)
-    $0 -= 30
-    wait(20)
-  }
-
-  wait(30)
-
-  appear(second, invader01, @x, 15)
-
-  wait(60)
-
-  $0 = @x
-  $0 += 100
-  appear(third, invader01, $0, 15)
-  $0 -= 200
-  appear(third, invader01, $0, 15)
-
-  wait(70)
-
-  $0 = @x
-  $0 += 150
-  appear(third, invader01, $0, 15)
-  $0 -= 300
-  appear(third, invader01, $0, 15)
-
-  wait(60)
-
-  $0 = @x
-  $0 += 80
-  repeat 4 {
-    appear(first, invader01, $0, 15)
-    $0 += 30
-    wait(10)
-  }
-
-  $0 = @x
-  $0 -= 80
-  repeat 4 {
-    appear(first, invader01, $0, 15)
-    $0 -= 30
-    wait(10)
-  }
-
-  appear(forth, invader01, @x, 15)
 
 }
 
 enemy forth {
-  dir(90)
-  spd(0.21)
-  wait(25)
-  $0 = 0.21
-  repeat 21 {
-    spd($0)
-    $0 -= 0.01
-    wait(1)
+  init {
+    dir(90)
+    spd(0.21)
   }
-  spd(0)
-  wait(10)
 
-  $0 = @aim
-  repeat 12 {
-    dir($0)
-    se(shot04)
-    $0 += @rnd(5,10)
-    spd(0.3)
-    emit(round12)
+  run {
+    wait(25)
+    $0 = 0.21
+    repeat 21 {
+      spd($0)
+      $0 -= 0.01
+      wait(1)
+    }
     spd(0)
-    wait(6)
-  }
-  repeat 6 {
-    dir($0)
-    se(shot04)
-    $0 += @rnd(3,6)
-    spd(0.3)
-    emit(round12)
-    spd(0)
-    wait(8)    
-  }
-  repeat 64 {
-    dir($0)
-    se(shot04)
-    $0 += @rnd(30,80)
-    spd(0.3)
-    emit(round12)
-    spd(0)
-    wait(3)
-  }
+    wait(10)
 
-  repeat 3 {
-    fx(muzzle, ENG01B)
-    se(exp02)
-    fire(accelshot, ENG02R, @aim, 0.42)
-    wait(18)
-  }
+    $0 = @aim
+    repeat 12 {
+      dir($0)
+      se(shot04)
+      $0 += @rnd(5,10)
+      spd(0.3)
+      emit(round12)
+      spd(0)
+      wait(6)
+    }
+    repeat 8 {
+      dir($0)
+      se(shot04)
+      $0 += @rnd(3,6)
+      spd(0.3)
+      emit(round12)
+      spd(0)
+      wait(8)    
+    }
+    repeat 64 {
+      dir($0)
+      se(shot04)
+      $0 += @rnd(30,80)
+      spd(0.3)
+      emit(round12)
+      spd(0)
+      wait(3)
+    }
 
-  dir(90)
-  wait(120)
+    wait(7)
 
-  repeat 11 {
-    spd($0)
-    $0 -= 0.03
-    wait(4)
+    repeat 3 {
+      fx(muzzle, ENG01B)
+      se(exp02)
+      $0 = @aim
+      $0 -= 35
+      fire(accelshot, A_ENG08R, $0, 0.42)
+      $0 += 35
+      fire(accelshot, A_ENG08R, $0, 0.42)
+      $0 += 35
+      fire(accelshot, A_ENG08R, $0, 0.42)
+      wait(18)
+    }
+
+    dir(90)
+    wait(120)
+
+    $0 = 0
+
+    repeat 11 {
+      spd($0)
+      $0 -= 0.03
+      wait(4)
+    }
   }
   
 }
 
 enemy third {
-  dir(90)
-  spd(0.21)
-  wait(25)
-  $0 = 0.21
-  repeat 21 {
-    spd($0)
-    $0 -= 0.01
-    wait(1)
+  init {
+    dir(90)
+    spd(0.21)
   }
-  spd(0)
-  wait(10)
 
-  $0 = @aim
-  $0 += 3
-  fx(muzzle, ENG01B)
-  se(shot02)
-  fire(accelshot, ENG01B, $0, 0.2)
-  $0 -= 6
-  fire(accelshot, ENG01B, $0, 0.2)
-  $0 += 3
-  wait(5)
-  fx(muzzle, ENG01D)
-  se(exp03)
-  fire(accelshot, ENG01D, $0, 0.23)
-  wait(30)
-  $0 = 0
-  repeat 11 {
-    spd($0)
-    $0 += 0.03
-    wait(4)
+  run {
+    wait(25)
+    $0 = 0.21
+    repeat 21 {
+      spd($0)
+      $0 -= 0.01
+      wait(1)
+    }
+    spd(0)
+    wait(10)
+
+    $0 = @aim
+    $0 += 3
+    fx(muzzle, ENG01B)
+    se(shot02)
+    fire(accelshot, ENG01B, $0, 0.2)
+    $0 -= 6
+    fire(accelshot, ENG01B, $0, 0.2)
+    $0 += 3
+    wait(5)
+    fx(muzzle, ENG01D)
+    se(exp03)
+    fire(accelshot, ENG01D, $0, 0.23)
+    wait(30)
+    $0 = 0
+    repeat 11 {
+      spd($0)
+      $0 += 0.03
+      wait(4)
+    }
   }
 }
 
 enemy second {
-  dir(90)
-  spd(0.21)
-  wait(35)
-  $0 = 0.21
-  repeat 21 {
-    spd($0)
-    $0 -= 0.01
-    wait(1)
-  }
-  spd(0)
-  wait(10)
-  $0 = @aim
-  $0 -= 10
-  $1 = @dir
-  repeat 4 {
-    fx(muzzle, ENG01B)
-    se(shot03, 0.2)
-    dir($0)
+  init {
+    dir(90)
     spd(0.21)
-    emit(round)
+  }
+
+  run {
+    wait(35)
+    $0 = 0.21
+    repeat 21 {
+      spd($0)
+      $0 -= 0.01
+      wait(1)
+    }
     spd(0)
-    $0 += 10
-    wait(25)
+    wait(10)
+    $0 = @aim
+    $0 -= 10
+    $1 = @dir
+    repeat 4 {
+      fx(muzzle, ENG01B)
+      se(shot03, 0.2)
+      dir($0)
+      spd(0.21)
+      emit(round)
+      spd(0)
+      $0 += 10
+      wait(25)
+    }
+    $0 = 0
+    dir($1)
+    repeat 10 {
+      spd($0)
+      $0 -= 0.02
+    }
+    wait(30)
   }
-  $0 = 0
-  dir($1)
-  repeat 10 {
-    spd($0)
-    $0 -= 0.02
-  }
-  wait(30)
 }
 
 enemy first {
-  $0 = 90
-  dir($0)
-  $1 = 0.21
-  spd($1)
-  wait(30)
-  repeat 24 {
-    $1 -= @rnd(0.01, 0.02)
+  init {
+    $0 = 90
+    dir($0)
+    $1 = 0.21
     spd($1)
-    wait(1)
   }
-  repeat 1 {
-    fx(muzzle, ENG01B)
-    fire(exsimple, ENG01B, @aim, 0.3)
-    wait(4)
+  
+  run {
+    wait(30)
+    repeat 24 {
+      $1 -= @rnd(0.01, 0.02)
+      spd($1)
+      wait(1)
+    }
+    repeat 1 {
+      fx(muzzle, ENG01B)
+      se(shot05)
+      emit(way4)
+      //fire(exsimple, ENG01B, @aim, 0.05)
+      wait(40)
+    }
+    wait(20)
+    repeat 18 {
+      $1 -= @rnd(0.01, 0.02)
+      spd($1)
+      wait(4)
+    }
+    wait(60)
   }
-  wait(20)
-  repeat 18 {
-    $1 -= @rnd(0.01, 0.02)
-    spd($1)
-    wait(4)
-  }
-  wait(60)
 }
 
+emitter way4 {
+  init {
+    spd(0)
+    $0 = @aim
+    $1 = $0
+  }
+  run {
+    $1 -= 30
+    repeat 4 {
+      $2 = @rnd(0.1,0.3)
+      fire(tailshot, ENG05R, $1, $2)
+      $1 += 20
+    }
+  }
+}
 
 emitter round12 {
-  $0 = @angle
-  $1 = 30
-  repeat 12 {
-    fire(simple, ENG01B, $0, @speed)
-    $0 += 30
+  init {
+    $0 = @angle
+    $1 = 30
+  }
+
+  run {
+    repeat 12 {
+      fire(simple, A_UD01, $0, @speed)
+      $0 += 30
+    }
   }
 }
 
-
 emitter round {
-  $0 = @angle
-  $1 = 15
-  repeat 24 {
-    fire(simple, ENG01B, $0, @speed)
-    $0 += 15
+  init {
+    $0 = @angle
+    $1 = 15
+  }
+
+  run {
+    repeat 24 {
+      fire(simple, ENG03R, $0, @speed)
+      $0 += 15
+    }
   }
 }
 
 emitter a {
 
-
-
-  $1 = 0
-  repeat 30 {
-    $0 = $1
-    $0 += @rnd(0, 90)
-    repeat 24 {
-      fire(accelshot, ENG01D, $0, 0)
-      $0 += 15.0
+  run {
+    $1 = 0
+    repeat 30 {
+      $0 = $1
+      $0 += @rnd(0, 90)
+      repeat 24 {
+        fire(accelshot, ENG01D, $0, 0)
+        $0 += 15.0
+      }
+      $1 += 5
+      se(test)
+      wait(10)
     }
-    $1 += 5
-    se(test)
-    wait(10)
-  }
 
-  wait(30)
+    wait(30)
 
-  repeat 6 {
-    $1 = -30
-    $1 += @rnd(0,60)
-    $0 = 0.23
-    repeat 7 {
-      $0 -= 0.03
-      fire(delayaim, ENG01B, $1, $0)
-      $1 += 180
-      fire(delayaim, ENG01B, $1, $0)
-      $1 -= 180
+    repeat 6 {
+      $1 = -30
+      $1 += @rnd(0,60)
+      $0 = 0.23
+      repeat 7 {
+        $0 -= 0.03
+        fire(delayaim, ENG01B, $1, $0)
+        $1 += 180
+        fire(delayaim, ENG01B, $1, $0)
+        $1 -= 180
+      }
+      wait(45)
     }
+
     wait(45)
-  }
 
-  wait(45)
+    repeat 6 {
+      $0 = 60
+      $0 += @rnd(0,7)
+      repeat 6 {
+        fire(simple, ENG01D, $0, 0.3)
+        $0 += 6
+        se(test2)
+        wait(3)
+      }
+      $0 = 110
+      $0 -= @rnd(0,7)
+      repeat 6 {
+        fire(simple, ENG01D, $0, 0.3)
+        $0 -= 6
+        wait(3)
+      }
+      wait(20)
+    }
 
-  repeat 6 {
-    $0 = 60
-    $0 += @rnd(0,7)
-    repeat 6 {
-      fire(simple, ENG01D, $0, 0.3)
-      $0 += 6
-      se(test2)
-      wait(3)
-    }
-    $0 = 110
-    $0 -= @rnd(0,7)
-    repeat 6 {
-      fire(simple, ENG01D, $0, 0.3)
-      $0 -= 6
-      wait(3)
-    }
-    wait(20)
   }
 
 }
