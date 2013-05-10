@@ -4,6 +4,9 @@ object Resource {
   
   final val path = "./"
   final val imgpath = path + "img/"
+  final val soundpath = path + "sound/"
+  final val musicpath = path + "music/"
+
   final val basicExtension = ".png"
   final val scriptPath = path + "script/"
   

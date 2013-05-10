@@ -75,6 +75,7 @@ class Game(_width: Int, _height: Int) {
     GLUtil.setup()
     SceneController.init(new TestScene)
     SoundSystem.init()
+    BGM.init()
 
     getDelta()
     lastFPS = getTime()

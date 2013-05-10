@@ -14,7 +14,7 @@ sealed trait Op
 * 
 */
 case class Repeat(time: Int, subseq: Array[Op]) extends Op {
-  override def toString() = "Repeat(%d, %s)" format (time, subseq.deep.toString)
+  override def toString = "Repeat(%d, %s)" format (time, subseq.deep.toString())
 } 
 
 /** 
@@ -117,3 +117,13 @@ case class SetScale(value: Container) extends Op
  * @param value 変更するalpha値
  */
 case class SetAlpha(value: Container) extends Op
+
+// 曲データロード
+case class MusicLoad(id: Symbol) extends Op
+// 曲データ開放
+case class MusicRelease(id: Symbol) extends Op
+// 曲再生
+case class MusicPlay(id: Symbol) extends Op
+// 曲停止
+case object MusicStop extends Op
+

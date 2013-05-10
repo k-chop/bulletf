@@ -168,6 +168,22 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
             }
           }; incPC(); recur(nestLevel, seq)
 
+          case MusicLoad(id) =>
+            BGM.load(id)
+            incPC(); recur(nestLevel, seq)
+
+          case MusicRelease(id) =>
+            BGM.release(id)
+            incPC(); recur(nestLevel, seq)
+
+          case MusicPlay(id) =>
+            BGM.play(id)
+            incPC(); recur(nestLevel, seq)
+
+          case MusicStop =>
+            BGM.stop()
+            incPC(); recur(nestLevel, seq)
+
         }
 
       } else if (nestLevel != 0) {

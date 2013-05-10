@@ -46,12 +46,13 @@ object SoundSystem {
     val mapbuf = mutable.HashMap.empty[Symbol, Int]
 
     val transform = { s: String => s.replace(" ","") } andThen { s: String => s.split(":") }
-    val lines = io.Source.fromFile("sound/mapping.txt")("UTF-8").getLines().map{
+
+    io.Source.fromFile("sound/mapping.txt")("UTF-8").getLines().map{
       transform
     }.zipWithIndex.foreach {
       case (Array(symId, filename, ctime), id) =>
         mapbuf += (Symbol(symId) -> id)
-        arrbuf += new Sound(s"sound/$filename")
+        arrbuf += new Sound(s"${Resource.soundpath}$filename")
         colbuf += Try{ ctime.toInt }.getOrElse(1)
         println(s"SoundSystem: Load Sound (id:$id, symId:$symId, file:$filename, cooltime:$ctime)")
       case s =>

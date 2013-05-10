@@ -121,7 +121,6 @@ class TestScene extends Scene with HasInnerFunc {
   }
   
   def init() {
-    //BGM.play(0)
 
     emitters.clear()
     enemies.clear()

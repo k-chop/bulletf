@@ -100,6 +100,18 @@ object DefinitionFinder {
     case ("alpha", Seq(valueCon: Container)) =>
       SetAlpha(valueCon)
 
+    case ("music_load", Seq(StrVar(id))) =>
+      MusicLoad(id.sym)
+
+    case ("music_release", Seq(StrVar(id))) =>
+      MusicRelease(id.sym)
+
+    case ("music_play", Seq(StrVar(id))) =>
+      MusicPlay(id.sym)
+
+    case ("music_stop", _) =>
+      MusicStop
+
     case _ => Nop
   }
 
