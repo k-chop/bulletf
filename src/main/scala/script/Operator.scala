@@ -123,7 +123,7 @@ case class MusicLoad(id: Symbol) extends Op
 // 曲データ開放
 case class MusicRelease(id: Symbol) extends Op
 // 曲再生
-case class MusicPlay(id: Symbol) extends Op
+case class MusicPlay(id: Symbol, volume: Container) extends Op
 // 曲停止
 case object MusicStop extends Op
 

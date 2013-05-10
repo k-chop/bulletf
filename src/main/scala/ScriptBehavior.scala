@@ -176,8 +176,8 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
             BGM.release(id)
             incPC(); recur(nestLevel, seq)
 
-          case MusicPlay(id) =>
-            BGM.play(id)
+          case MusicPlay(id, volCon) =>
+            BGM.play(id, ex(volCon).toFloat)
             incPC(); recur(nestLevel, seq)
 
           case MusicStop =>

@@ -46,11 +46,15 @@ object BGM {
     }
   }
 
-  def play(id: Symbol) {
+  def play(id: Symbol, volume: Float) {
     music_map.get(id) foreach { m: Music =>
       now_playing = id
-      m.loop(1f, 1.0f)
+      m.loop(1f, volume)
     }
+  }
+
+  def play(id: Symbol) {
+    play(id, 0.8f)
   }
 
   def stop() {

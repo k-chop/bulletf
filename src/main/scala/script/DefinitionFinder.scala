@@ -106,8 +106,8 @@ object DefinitionFinder {
     case ("music_release", Seq(StrVar(id))) =>
       MusicRelease(id.sym)
 
-    case ("music_play", Seq(StrVar(id))) =>
-      MusicPlay(id.sym)
+    case ("music_play", Seq(StrVar(id), vol: Container)) =>
+      MusicPlay(id.sym, vol)
 
     case ("music_stop", _) =>
       MusicStop
