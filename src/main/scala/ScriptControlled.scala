@@ -8,7 +8,7 @@ object ScriptControlled {
   lazy val initialVars: Array[Double] = Array.fill(MAX_NEST){0.0}
 }
 
-trait ScriptControlled extends Movable with CanInit {
+trait ScriptControlled extends Movable with CanInit with ParamCustomizable {
 
   // 残りウェイトのカウンタ
   var waitCount: Int = -1

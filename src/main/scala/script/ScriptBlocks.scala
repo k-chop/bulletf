@@ -10,10 +10,10 @@ case object TypeMove extends ScriptType
 case object TypeStage extends ScriptType
 
 object ScriptBlocks {
-  def empty: ScriptBlocks = new ScriptBlocks('main, TypeStage, null, Map.empty[Symbol, Array[Op]])
+  def empty: ScriptBlocks = new ScriptBlocks('main, TypeStage, Map.empty[Symbol, String], Map.empty[Symbol, Array[Op]])
 }
 
-class ScriptBlocks(val name: Symbol, val types: ScriptType, val dataBlock: Any, otherBlocks: Map[Symbol, Array[Op]]) {
+class ScriptBlocks(val name: Symbol, val types: ScriptType, val dataBlock: Map[Symbol, String], otherBlocks: Map[Symbol, Array[Op]]) {
 
   val initBlock: Array[Op] = otherBlocks.get('init).getOrElse(Array(Nop))
   val runBlock: Array[Op] = otherBlocks.get('run).getOrElse(Array(Nop))

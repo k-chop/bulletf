@@ -20,7 +20,18 @@ trait CanInit {
   def init()
 }
 
-trait BulletLike extends ScriptControlled with Runnable with Drawable
+trait ParamCustomizable {
+  def setParam(params: Map[Symbol, String]) {}
+}
+
+sealed trait DrawType
+case object NormalDraw extends DrawType
+case object AdditiveDraw extends DrawType
+case class RotateDraw(speed: Double) extends DrawType
+
+trait BulletLike extends ScriptControlled with Runnable with Drawable {
+  var drawType: DrawType = NormalDraw
+}
 
 trait HasInnerFunc {
 

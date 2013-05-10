@@ -127,3 +127,4 @@ case class MusicPlay(id: Symbol, volume: Container) extends Op
 // 曲停止
 case object MusicStop extends Op
 
+case class DataSet(name: Symbol, data: String) extends Op

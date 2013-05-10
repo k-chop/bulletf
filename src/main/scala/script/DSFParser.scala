@@ -2,15 +2,17 @@ package com.github.whelmaze.bulletf
 package script
 
 import scala.util.parsing.combinator.syntactical._
+import scala.collection.mutable
 
 object DSFParser extends StandardTokenParsers {
   import DefinitionFinder._
 
-  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@")
+  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":=")
   lexical.reserved += (
     "repeat",
     "move","stage","bullet","enemy","effect","emitter",
-    "data","init","run","die"
+    "data","init","run","die",
+    "nop"
     )
 
   // (type, name, ops)
@@ -48,13 +50,19 @@ object DSFParser extends StandardTokenParsers {
       case bn ~ _ ~ ops => (bn, ops.toArray)
     }
 
-  lazy val blockName = ("data" | "init" | "run" | "die") ^^ { case s => Symbol(s) }
+  lazy val blockName = ("data"| "init" | "run" | "die") ^^ { case s => Symbol(s) }
 
   lazy val syms: Parser[Symbol] = ident ^^ { case s => Symbol(s) }
   
   lazy val opseq: Parser[Seq[Op]] = rep1(op)
 
-  lazy val op: Parser[Op] =  bind | func | repeat | update
+  lazy val op: Parser[Op] =  bind | func | repeat | update | nop | dataset
+
+  lazy val dataset: Parser[Op] = ident ~ ":=" ~ (stringLit | int | double) ^^ {
+    case i ~ _ ~ str => DataSet(Symbol(i), str.toString)
+  }
+
+  lazy val nop: Parser[Op] = "nop" ^^ { case _ => Nop }
 
   lazy val repeat: Parser[Op] = "repeat" ~> numericLit ~ "{" ~ opseq <~ "}" ^^ {
     case time ~ _ ~ opsec => Repeat(time.toInt, opsec.toArray)
@@ -116,7 +124,8 @@ object DSFParser extends StandardTokenParsers {
       case Success(blockSet, _) =>
         blockSet map { case (typeSym, name, blockMap) =>
           // datablockがnullなのは仮
-          val sblocks = new ScriptBlocks(Symbol(name), symToType(typeSym), null, blockMap)
+          val datablock = extractDataBlock(blockMap.get('data).getOrElse(Array(Nop)))
+          val sblocks = new ScriptBlocks(Symbol(name), symToType(typeSym), datablock, blockMap)
           println(sblocks)
           (Symbol(name), sblocks)
         }
@@ -141,6 +150,15 @@ object DSFParser extends StandardTokenParsers {
     case 'emitter => TypeEmitter
     case 'move => TypeMove
     case 'stage => TypeStage
+  }
+
+  def extractDataBlock(ops: Array[Op]): Map[Symbol, String] = {
+    val acc = mutable.HashMap.empty[Symbol, String]
+    ops foreach {
+      case DataSet(sym, str) => acc += (sym -> str)
+      case _ => // 他は無視
+    }
+    acc.toMap
   }
 
   // def main(args: Array[String]) = {    

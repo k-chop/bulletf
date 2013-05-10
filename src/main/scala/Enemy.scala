@@ -10,14 +10,6 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   val sprite = Sprite.get(resource)
   val radius: Double = sprite.rect.w / 4.0
 
-/*  var waitCount: Int = -1
-  var waitingNest: Int = 0
-  val pc = copyPc
-  val lc = copyLc
-  val vars = copyVars
-  var enable: Boolean = true
-  var time: Int = 0*/
-
   var live: Boolean = true
   // 体力
   var health: Int = 10
@@ -27,6 +19,12 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   // initブロックの実行
   override def init() {
     action.init(this)
+  }
+
+  override def setParam(params: Map[Symbol, String]) {
+    this.health = params.get('health) map { s: String =>
+      s.toInt
+    } getOrElse(10)
   }
 
   override def disable() {
