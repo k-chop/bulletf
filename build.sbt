@@ -12,6 +12,8 @@ javaOptions ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
 
 initialCommands in console += "import com.github.whelmaze.bulletf._"
 
+initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
+
 seq(lwjglSettings: _*)
 
 compile in Compile <<= compile in Compile mapR {
