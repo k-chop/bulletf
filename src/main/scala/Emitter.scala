@@ -25,6 +25,7 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
 
   def update(delta: Int) {
     if (enable) {
+      time += 1
       action.run(delta)(this)
       updateFunc.set(delta)
       ownObjects.foreach(updateFunc.func)

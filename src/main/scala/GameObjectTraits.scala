@@ -29,6 +29,7 @@ trait HasInnerFunc {
   protected val updateFunc: InnerUpdateFunc
   protected val enableFunc = (b: BulletLike) => b.enable
   protected val drawFunc = (b: Drawable) => b.draw()
+  protected val initFunc = (b: Enemy) => b.init()
 
 }
 

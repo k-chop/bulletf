@@ -30,8 +30,22 @@ trait ScriptControlled extends Movable {
     enable = false
   }
 
+  def clearLcPc() {
+    var i = 0
+    while(i < MAX_NEST) {
+      pc(i) = 0; i += 1
+    }
+    i = 0
+    while(i < MAX_NEST) {
+      lc(i) = -1; i += 1
+    }
+    i = 0
+  }
+
   // スクリプトの実行が終わった時に呼び出される。
   def onEndScript(delta: Int)
+
+  //----------------------------------------------
 
   protected def copyPc: Array[Int] = {
     val dest = Array.ofDim[Int](MAX_NEST)

@@ -2,45 +2,50 @@ package com.github.whelmaze.bulletf
 package script
 
 import scala.util.parsing.combinator.syntactical._
-import scala.util.parsing.combinator._
 
 object DSFParser extends StandardTokenParsers {
   import DefinitionFinder._
 
   lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@")
-  lexical.reserved += ("repeat","action","bullet","enemy","effect", "emitter","data","init","run","die")
+  lexical.reserved += (
+    "repeat",
+    "move","stage","bullet","enemy","effect","emitter",
+    "data","init","run","die"
+    )
 
   // (type, name, ops)
 //  lazy val top: Parser[Seq[(Symbol, Symbol, Array[Op])]] = rep1(definition)
-  lazy val top: Parser[Seq[(Symbol, Array[Op])]] = rep1(definition)
+  lazy val topLevel: Parser[Seq[(Symbol, String, Map[Symbol, Array[Op]])]] = rep1(definition)
   
   lazy val types: Parser[Symbol] =
-    ("action" | "bullet" | "enemy" | "effect" | "emitter") ^^ {
+    ("stage" | "move" | "bullet" | "enemy" | "effect" | "emitter") ^^ {
       case s => Symbol(s)
     }
   
-  lazy val definition: Parser[(Symbol, Array[Op])] = {
+  lazy val definition: Parser[(Symbol, String, Map[Symbol, Array[Op]])] = {
 /*    types ~> ident ~ "{" ~ blocks <~ "}" ^^ { // 新定義
       case s ~ _ ~ bl => (Symbol(s), bl.find(_._1 == 'run).map(_._2).getOrElse(Seq.empty[Op]).toArray)
     } | types ~> ident ~ "{" ~ opseq <~ "}" ^^ { // 旧定義
       case s ~ _ ~ ops => (Symbol(s), ops.toArray)
     }*/
-    newdef | olddef
+    newdef
   }
 
-  lazy val newdef: Parser[(Symbol, Array[Op])] = types ~> ident ~ "{" ~ blocks <~ "}" ^^ {
-    case s ~ _ ~ bls => (Symbol(s), bls.find(_._1 == 'run).map(_._2).getOrElse(Seq(Nop)).toArray)
+  lazy val newdef: Parser[(Symbol, String, Map[Symbol, Array[Op]])] = types ~ ident ~ "{" ~ blocks <~ "}" ^^ {
+    case ty ~ name ~ _ ~ bls => (ty, name, bls)
   }
 
-  lazy val olddef: Parser[(Symbol, Array[Op])] = types ~> ident ~ "{" ~ opseq <~ "}" ^^ {
+/*  lazy val olddef: Parser[(Symbol, Array[Op])] = types ~> ident ~ "{" ~ opseq <~ "}" ^^ {
     case s ~ _ ~ ops => (Symbol(s), ops.toArray)
+  } */
+
+  lazy val blocks: Parser[Map[Symbol, Array[Op]]] = rep1(block) ^^ {
+    case bls => bls.toMap
   }
 
-  lazy val blocks: Parser[Seq[(Symbol, Seq[Op])]] = rep1(block)
-
-  lazy val block: Parser[(Symbol, Seq[Op])] =
+  lazy val block: Parser[(Symbol, Array[Op])] =
     blockName ~ "{" ~ opseq <~ "}" ^^ {
-      case bn ~ _ ~ ops => (bn, ops)
+      case bn ~ _ ~ ops => (bn, ops.toArray)
     }
 
   lazy val blockName = ("data" | "init" | "run" | "die") ^^ { case s => Symbol(s) }
@@ -101,27 +106,41 @@ object DSFParser extends StandardTokenParsers {
   lazy val variable: Parser[Container] =
     "$" ~> numericLit ^^ { case i => EVar(GetVar(i.toInt)) }
 
-  def parse(_source: String): Seq[(Symbol, Array[Op])] = {
+  def parse(_source: String): Seq[(Symbol, ScriptBlocks)] = {
     val commentReg = """//.*""".r
     val source = commentReg.replaceAllIn(_source, "") // 一行コメントを行末まで削除
 
     //println(source)
-    top(new lexical.Scanner(source)) match {
-      case Success(behaviors, _) =>
-        behaviors foreach { case (n, ops) => println(n+":"+ops.deep.toString) }
-        behaviors
-      case Failure(msg, d) => {
+    topLevel(new lexical.Scanner(source)) match {
+
+      case Success(blockSet, _) =>
+        blockSet map { case (typeSym, name, blockMap) =>
+          // datablockがnullなのは仮
+          val sblocks = new ScriptBlocks(Symbol(name), symToType(typeSym), null, blockMap)
+          println(sblocks)
+          (Symbol(name), sblocks)
+        }
+
+      case Failure(msg, d) =>
         println("parse failure.")
         println(msg)
         println(d.pos.longString)
-        Seq(('main, Array(Nop)))
-      }
-      case Error(msg, _) => {
+        Seq(('main, ScriptBlocks.empty))
+
+      case Error(msg, _) =>
         println("parse error.")
         println(msg)
-        Seq(('main, Array(Nop)))
-      }
+        Seq(('main, ScriptBlocks.empty))
     }
+  }
+
+  def symToType(s: Symbol): ScriptType = s match {
+    case 'effect => TypeEffect
+    case 'enemy => TypeEnemy
+    case 'bullet => TypeBullet
+    case 'emitter => TypeEmitter
+    case 'move => TypeMove
+    case 'stage => TypeStage
   }
 
   // def main(args: Array[String]) = {    

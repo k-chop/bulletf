@@ -6,7 +6,7 @@ import scala.collection.mutable.ListBuffer
 import scala.annotation.tailrec
 import util.Try
 
-class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
+class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
   import implicits.autoWrapAngle
 
   def extract(unit: ScriptControlled)(c: Container): Double = c match {
@@ -36,7 +36,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
       if (_unit != null)
         extract(_unit)(c)
       else {
-        System.err.println(s"call Extractor#apply without ScriptedMove_unit\ncontainer info: ${c.toString}\ntopseq info: ${topseq.deep.toString()}")
+        System.err.println(s"call Extractor#apply without ScriptedMove_unit\ncontainer info: ${c.toString}\ntopseq info: ${blocks.runBlock.deep.toString()}")
         0
       }
     }
@@ -44,35 +44,33 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
 
   val ex = new Extractor(null)
 
-  def run(delta: Int)(implicit unit: ScriptControlled) {
-    // runの度にanonfun$3を生成してヤバイ
-    // 普通なら問題にならないけど、毎フレーム呼び出されるものなのでキツイ
-    //val ex = extract(unit) _
-    ex.set(unit)
+  def step(t_nestLevel: Int, t_seq: Array[Op], unit: ScriptControlled, delta: Int, onInit: Boolean) {
 
-    unit.time += 1
-    
     @tailrec
     def recur(nestLevel: Int, seq: Array[Op]) {
       def incPC() {
         unit.pc(nestLevel) += 1
       }
 
-      //println("w:"+bullet.waitCount+",nest:"+nestLevel+",pc:"+bullet.pc(nestLevel))
-      
       if (0 <= unit.waitCount) { // wait中
-        
+
         unit.waitCount -= 1
         if (unit.waitCount == -1) {
           unit.pc(unit.waitingNest) += 1
-          recur(0, topseq)
+          recur(0, blocks.runBlock)
         } else {
           BasicBehavior.run(delta)(unit)
         }
-        
+
       } else if (unit.pc(nestLevel) < seq.length) { // 次のOpを実行
-        
+
         seq(unit.pc(nestLevel)) match {
+          case Wait(_) if onInit =>
+            recur(nestLevel, seq)
+
+          case VWait(_) if onInit =>
+            recur(nestLevel, seq)
+
           case Wait(time) =>
             unit.waitCount = if (time < 1) 1 else time
             //println("wait:" + bullet.waitCount)
@@ -95,6 +93,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
           // 必要なら定義先で改めて定義すればよい。
           case GenEnemy(action, kind, x, y) => unit match {
             case c: CanProduceToGlobal =>
+              println("genenemy")
               c.genEnemy(BehaviorManager.get(action), kind, Position(ex(x), ex(y)), Angle(unit.angle.dir), unit.speed)
             case _ =>
           }; incPC(); recur(nestLevel, seq)
@@ -114,7 +113,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
           case Repeat(time, childs) =>
             if ( unit.lc(nestLevel+1) == -1) {
               unit.lc(nestLevel+1) = time
-              //println("repeat:" + time +", into NestLevel:"+(nestLevel+1))
+              if (unit.time % 120 == 0) println("repeat:" + time +", into NestLevel:"+(nestLevel+1))
             }
             recur(nestLevel+1, childs) // 1段階ネスト
 
@@ -181,7 +180,7 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
             unit.pc(nestLevel - 1) += 1
             // また頭からたどる．親も保持した方がいいのか……
             //println("[repeat end] NestLevel:"+nestLevel)
-            recur(0, topseq)
+            recur(0, blocks.runBlock)
           case 0 => // 無限ループなのでpcリセットして続行
             unit.pc(nestLevel) = 0
             recur(nestLevel, seq)
@@ -191,13 +190,27 @@ class ScriptBehavior(val topseq: Array[Op]) extends Behavior {
             unit.pc(nestLevel) = 0
             recur(nestLevel, seq)
         }
-      } else { // もう全部終わってるならScriptedMove側に移譲
-        unit.onEndScript(delta)
-        //BasicBehavior.run(delta)(unit)
+      } else { // もう全部終わってるならScriptedMove側に移譲(ただしinitブロック中では単に終了)
+        if (!onInit) unit.onEndScript(delta)
+        else println(s"initblock end $unit")
       }
     }
-    
-    recur(0, topseq) // 頭からたどる
+
+    recur(t_nestLevel, t_seq)
+  }
+
+  // 1度目のupdateの前に実行されるブロックを呼び出す
+  override def init(unit: ScriptControlled) {
+    ex.set(unit)
+    step(0, blocks.initBlock, unit, 0, onInit = true)
+    ex.unset()
+    unit.clearLcPc() // Lc, Pcは共有なのでブロックが変わる時はリセット
+  }
+
+  def run(delta: Int)(unitA: ScriptControlled) {
+    ex.set(unitA)
+
+    step(0, blocks.runBlock, unitA, delta, onInit = false) // 頭からたどる
     ex.unset()
   }
 

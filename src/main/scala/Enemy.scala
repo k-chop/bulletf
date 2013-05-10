@@ -24,6 +24,11 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
+  // initブロックの実行
+  def init() {
+    action.init(this)
+  }
+
   override def disable() {
     super.disable()
     live = false
@@ -42,6 +47,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
     if (enable) {
       if (!inside) live = false
       if (live) {
+        time += 1
         action.run(delta)(this)
       }
       updateFunc.set(delta)

@@ -30,7 +30,9 @@ class TestScene extends Scene with HasInnerFunc {
 
     // fetch from enemy_pool
     if (Global.enemy_pool.nonEmpty) {
-      enemies ++= Global.enemy_pool.fetch()
+      val newEnemies = Global.enemy_pool.fetch()
+      newEnemies foreach initFunc
+      enemies ++= newEnemies
     }
 
     // fetch from effect_pool
@@ -124,8 +126,10 @@ class TestScene extends Scene with HasInnerFunc {
     BehaviorManager.clear()
     score.clear()
     effects.clear()
+    Global.enemy_pool.clear()
+    Global.effect_pool.clear()
 
-    List('loadtest, 'effects).foreach{ s => BehaviorManager.build(s.name) }
+    List('newdef, 'effects).foreach{ s => BehaviorManager.build(s.name) }
     
     emitters += STGObjectFactory.initialEmitter(BehaviorManager.get('main))
     

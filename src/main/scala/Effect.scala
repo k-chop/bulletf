@@ -19,7 +19,10 @@ class Effect(var action: Behavior, resource: Symbol, var pos: Position, var angl
   }
 
   def update(delta: Int) {
-    if (enable) action.run(delta)(this)
+    if (enable) {
+      time += 1
+      action.run(delta)(this)
+    }
   }
 
   /** スクリプトの実行が終わった時に呼び出される。

@@ -30,7 +30,10 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   }
 
   def update(delta: Int) {
-    if (enable) action.run(delta)(this)
+    if (enable) {
+      time += 1
+      action.run(delta)(this)
+    }
     if (!inside) disable()
   }
 
