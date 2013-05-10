@@ -1,3 +1,13 @@
+bullet simple {
+  data {
+    draw_type := "rotate:6"
+  }
+
+  run {
+    nop
+  }
+}
+
 bullet tailshot {
   run {
     repeat 0 {
@@ -128,7 +138,7 @@ emitter main {
   }
 
   run {
-    music_play(s01b)
+    music_play(s01b, 0.6)
 
     wait(5)
 
@@ -192,6 +202,11 @@ emitter main {
 }
 
 enemy forth {
+
+  data {
+    health := 1000
+  }
+
   init {
     dir(90)
     spd(0.21)
@@ -267,6 +282,11 @@ enemy forth {
 }
 
 enemy third {
+
+  data {
+    health := 60
+  }
+
   init {
     dir(90)
     spd(0.21)
@@ -306,6 +326,11 @@ enemy third {
 }
 
 enemy second {
+
+  data {
+    health := 200
+  }
+
   init {
     dir(90)
     spd(0.21)
@@ -345,6 +370,11 @@ enemy second {
 }
 
 enemy first {
+
+  data {
+    health := 30
+  }
+
   init {
     $0 = 90
     dir($0)
