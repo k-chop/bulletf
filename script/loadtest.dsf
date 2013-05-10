@@ -121,7 +121,15 @@ emitter invader5line {
 
 // 今のところこれが起点。
 emitter main {
+
+  init {
+    music_load(s01b)
+    music_load(boss01b)
+  }
+
   run {
+    music_play(s01b)
+
     wait(5)
 
     repeat 7 {
