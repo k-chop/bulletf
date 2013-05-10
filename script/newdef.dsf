@@ -1,0 +1,40 @@
+enemy abc {
+
+  init {
+    spd(0.25)
+    dir(@aim)
+  }
+
+  run {
+  	repeat 20 {
+  	  se(shot03, 0.2)
+  	  fire(simple, BLT02R, @aim, 0.3)
+  	  wait(10)
+  	}
+  }
+
+  die {
+    fx(muzzle, ENG01B)
+  }
+}
+
+bullet ababa {
+  run {
+    repeat 0 {
+      dir(@aim)
+    }
+  }
+}
+
+// entry point
+emitter main {
+
+  run {
+    repeat 0 {
+      //fire(simple, ENG01B, @aim, 0.3)
+      appear(abc, invader01, @x, 5)
+      wait(60)
+    }
+  }
+
+}

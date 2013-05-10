@@ -1,57 +1,84 @@
 
 // 弾打ち出す時のマズルフラッシュ
 effect muzzle {
-  spd(0)
-  $0 = 0.8
-  $1 = 0.8
-  repeat 4 {
-    alpha($0)
-    scale($1)
-    $0 -= 0.2
-    $1 += 0.2
-    wait(4)
+  init {
+    spd(0)
+    $0 = 0.8
+    $1 = 0.8
   }
-  alpha(0)
+  run {
+    repeat 4 {
+      alpha($0)
+      scale($1)
+      $0 -= 0.2
+      $1 += 0.2
+      wait(4)
+    }
+    alpha(0)
+  }
+}
+
+// 追尾弾用
+effect tail {
+  init {
+    spd(0)
+    $0 = 0.5
+    $1 = 0.5
+  }
+  run {
+    repeat 20 {
+      alpha($0)
+      scale($1)
+      $0 -= 0.025
+      $1 -= 0.025
+      wait(2)
+    }
+    alpha(0)
+  }
 }
 
 // プレイヤーが死んだときのエフェクト。仮。
 effect player_death {
-  se(exp01)
-  wait(4)
-  se(exp01)
-  wait(4)
-  se(exp05)
-  $0 = 1.0
-  $1 = 1.0
-  repeat 10 {
-    alpha($0)
-    scale($1)
-    $0 -= 0.1
-    $1 += 0.2
-    wait(1)
-  } 
-  alpha(0)
+  run {
+    se(exp01)
+    wait(4)
+    se(exp01)
+    wait(4)
+    se(exp05)
+    $0 = 1.0
+    $1 = 1.0
+    repeat 10 {
+      alpha($0)
+      scale($1)
+      $0 -= 0.1
+      $1 += 0.1
+      wait(1)
+    } 
+    alpha(0)
+  }
 }
 
 // インベーダー死亡時のエフェクト。仮。
 effect death {
-  se(exp03, 0.2)
-  $0 = 1.0
-  $1 = 1.0
-  repeat 4 {
-    alpha($0)
-    scale($1)
-    $0 -= 0.1
-    $1 -= 0.1
+  run {
+    se(exp03, 0.2)
+    $0 = 1.0
+    $1 = 1.0
+    repeat 4 {
+      alpha($0)
+      scale($1)
+      $0 -= 0.1
+      $1 -= 0.1
+      wait(1)
+    }
     wait(1)
+    repeat 6 {
+      $0 -= 0.1
+      $1 += 0.4
+      alpha($0)
+      scale($1)
+      wait(1)
+    }
+    alpha(0)
   }
-  wait(1)
-  repeat 6 {
-    $0 -= 0.1
-    $1 += 0.4
-    alpha($0)
-    scale($1)
-    wait(1)
-  }
-  alpha(0)
 }
