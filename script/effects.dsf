@@ -58,10 +58,29 @@ effect player_death {
   }
 }
 
+effect boom {
+  init {
+    $0 = 1.0
+    $1 = 0.2
+    alpha($0)
+    scale($1)
+  }
+  run {
+    repeat 20 {
+      alpha($0)
+      scale($1)
+      $0 -= 0.1
+      $1 += @rnd(0.3,0.6)
+      wait(2)
+    }
+    alpha(0)
+  }
+}
+
 // インベーダー死亡時のエフェクト。仮。
 effect death {
   run {
-    se(exp03, 0.2)
+    se(exp03, 0.8)
     $0 = 1.0
     $1 = 1.0
     repeat 4 {
@@ -69,6 +88,7 @@ effect death {
       scale($1)
       $0 -= 0.1
       $1 -= 0.1
+      fx(boom, BOOM01)
       wait(1)
     }
     wait(1)
@@ -77,6 +97,7 @@ effect death {
       $1 += 0.4
       alpha($0)
       scale($1)
+      //fx(boom, BOOM01)
       wait(1)
     }
     alpha(0)

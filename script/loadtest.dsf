@@ -1,6 +1,6 @@
 bullet simple {
   data {
-    draw_type := "rotate:6"
+    draw_type := "rotate:8"
   }
 
   run {
@@ -23,7 +23,7 @@ bullet accelshot {
     $1 = 0.015
   }
   run {
-    se(shot03, 0.2)
+    se(shot03, 0.5)
     repeat 0 {
       spd($1, relative)
       wait(10)
@@ -129,16 +129,36 @@ emitter invader5line {
   }
 }
 
+enemy movetest {
+  init {
+    dir(@aim)
+    spd(0.21)
+  }
+  run {
+    wait(30)
+    brake(30)
+    wait(30)
+    accel(30, 0.4)
+    repeat 0 {
+      fire(accelshot, ENG05R, @aim, 0.21)
+      wait(5)
+    }
+  }
+}
+
 // 今のところこれが起点。
 emitter main {
 
   init {
-    music_load(s01b)
-    music_load(boss01b)
+    //music_load(s01b)
+    //music_load(boss01b)
+    nop
   }
 
   run {
-    music_play(s01b, 0.6)
+    //music_play(s01b, 0.4)
+
+    //appear(movetest, invader01, @x, 15)
 
     wait(5)
 
@@ -204,7 +224,7 @@ emitter main {
 enemy forth {
 
   data {
-    health := 1000
+    health := 900
   }
 
   init {
@@ -214,12 +234,7 @@ enemy forth {
 
   run {
     wait(25)
-    $0 = 0.21
-    repeat 21 {
-      spd($0)
-      $0 -= 0.01
-      wait(1)
-    }
+    brake(21)
     spd(0)
     wait(10)
 
@@ -284,7 +299,7 @@ enemy forth {
 enemy third {
 
   data {
-    health := 60
+    health := 40
   }
 
   init {
@@ -338,12 +353,7 @@ enemy second {
 
   run {
     wait(35)
-    $0 = 0.21
-    repeat 21 {
-      spd($0)
-      $0 -= 0.01
-      wait(1)
-    }
+    brake(21)
     spd(0)
     wait(10)
     $0 = @aim
@@ -361,10 +371,7 @@ enemy second {
     }
     $0 = 0
     dir($1)
-    repeat 10 {
-      spd($0)
-      $0 -= 0.02
-    }
+    accel(20, -0.24)
     wait(30)
   }
 }
@@ -384,24 +391,16 @@ enemy first {
   
   run {
     wait(30)
-    repeat 24 {
-      $1 -= @rnd(0.01, 0.02)
-      spd($1)
-      wait(1)
-    }
+    brake(24, async)
     repeat 1 {
       fx(muzzle, ENG01B)
       se(shot05)
       emit(way4)
-      //fire(exsimple, ENG01B, @aim, 0.05)
+      //fire(simple, A_01Z, @aim, 0.05)
       wait(40)
     }
     wait(20)
-    repeat 18 {
-      $1 -= @rnd(0.01, 0.02)
-      spd($1)
-      wait(4)
-    }
+    accel(72, -0.30)
     wait(60)
   }
 }
@@ -417,6 +416,7 @@ emitter way4 {
     repeat 4 {
       $2 = @rnd(0.1,0.3)
       fire(tailshot, ENG05R, $1, $2)
+      //fire(tailshot, ENG05R, $1, $2)
       $1 += 20
     }
   }
@@ -430,7 +430,7 @@ emitter round12 {
 
   run {
     repeat 12 {
-      fire(simple, A_UD01, $0, @speed)
+      fire(accelshot, BOOM02, $0, @speed)
       $0 += 30
     }
   }
