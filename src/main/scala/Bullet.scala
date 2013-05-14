@@ -55,7 +55,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
         case RotateDraw(rspd) =>
           sprite.draw(pos, (time % 360) * rspd, 1.0, 1.0, time)
         case _ =>
-          sprite.draw(pos, /*(time % 360)*8*/angle.dir-90, 1.0, 1.0, time)
+          sprite.draw(pos, angle.dir-90, 1.0, 1.0, time)
       }
     }
   }

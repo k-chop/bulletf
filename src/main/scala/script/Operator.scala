@@ -128,3 +128,14 @@ case class MusicPlay(id: Symbol, volume: Container) extends Op
 case object MusicStop extends Op
 
 case class DataSet(name: Symbol, data: String) extends Op
+
+/**
+ * 指定座標への移動
+ * @param handling 移動方法
+ * @param x 移動先のX座標
+ * @param y 移動先Y座標
+ * @param time 移動にかける時間(フレーム)
+ * @param async 非同期かどうか
+ * @param option オプション引数(最大10)
+ */
+case class MoveTo(handling: String, x: Container, y: Container, time: Container, async: Boolean, option: Array[Container] = Array.empty[Container]) extends Op

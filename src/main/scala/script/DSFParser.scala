@@ -7,7 +7,7 @@ import scala.collection.mutable
 object DSFParser extends StandardTokenParsers {
   import DefinitionFinder._
 
-  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":=")
+  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":=","|")
   lexical.reserved += (
     "repeat",
     "move","stage","bullet","enemy","effect","emitter",
@@ -68,12 +68,12 @@ object DSFParser extends StandardTokenParsers {
     case time ~ _ ~ opsec => Repeat(time.toInt, opsec.toArray)
   }
 
-  lazy val func: Parser[Op] = ident ~ "(" ~ repsep(args, ",") <~ ")" ^^ {
+  lazy val func: Parser[Op] = ident ~ "(" ~ repsep(args, ("," | "|")) <~ ")" ^^ {
     case name ~ _ ~ as => findFunction(name, as)
   }
 
-  lazy val args: Parser[Container] = value | ident ^^ { s => StrVar(s) }// | calculable
-  
+  lazy val args: Parser[Container] = value | ident ^^ { s => StrVar(s) } | stringLit ^^ { s => StrVar(s) }// | calculable
+
 //  lazy val calculable: Parser[Expr] =
 //    "[" ~> rep1(elem("all", true)) <~ "]" ^^ { case e => CalcParser.calc(e) }
     

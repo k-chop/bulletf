@@ -63,18 +63,26 @@ object Global {
     }
   }
 
-  object aimToShip {
+  object shipReference {
+
     private[this] var ship: Option[Ship] = None
+
     def set(s: Ship) {
       ship = Option(s)
     }
-    def apply(from: Position): Double = {
+
+    def aim(from: Position): Double = {
       import scala.math._
       if (ship.isDefined) {
         val t = ship.get
         toDegrees( atan2(t.pos.y - from.y, t.pos.x - from.x) )
       } else 0
     }
+
+    def x: Double = if (ship.isDefined) ship.get.pos.x else 0
+
+    def y: Double = if (ship.isDefined) ship.get.pos.y else 0
+
     def reset() {
       ship = None
     }

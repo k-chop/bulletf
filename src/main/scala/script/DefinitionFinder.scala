@@ -9,7 +9,7 @@ object DefinitionFinder {
 
   final val spdparams = Set("absolute", "relative")
   final val dirparams = Set("absolute", "aim", "relative")
-  final val stateparams = Set("x", "y", "aim", "speed", "angle")
+  final val stateparams = Set("x", "y", "aim", "speed", "angle", "px", "py")
   
   def findSpecialValue(name: String, args: Seq[Container]): Container = (name, args) match {
     case ("rnd", Seq( DVar(fst), DVar(snd) )) =>
@@ -93,6 +93,23 @@ object DefinitionFinder {
         PlaySound(soundId.sym, pitchCon, volCon)
       case _ => Nop
     }
+
+    case ("brake", s @ Seq(tCon: Container, _*)) =>
+      val isAsync = s.drop(1).take(1).headOption.collect{ case StrVar(str) if str == "async" => true }.getOrElse(false)
+      MoveTo("brake", DVar(0), DVar(0), tCon, async = isAsync, Array.empty[Container])
+
+    case ("accel", s @ Seq(tCon: Container, spd: Container, _*)) =>
+      val isAsync = s.drop(2).take(1).headOption.collect{ case StrVar(str) if str == "async" => true }.getOrElse(false)
+      MoveTo("accel", DVar(0), DVar(0), tCon, async = isAsync, Array(spd))
+
+
+    case ("move_to", s @ Seq(StrVar(handling), xCon: Container, yCon: Container, timeCon: Container, _*)) =>
+      val opt = s.drop(4).take(10).toArray
+      MoveTo(handling, xCon, yCon, timeCon, async = false, opt)
+
+    case ("move_to_async", s @ Seq(StrVar(handling), xCon: Container, yCon: Container, timeCon: Container, _*)) =>
+      val opt = s.drop(4).take(10).toArray
+      MoveTo(handling, xCon, yCon, timeCon, async = true, opt)
 
     case ("scale", Seq(valueCon: Container)) =>
       SetScale(valueCon)

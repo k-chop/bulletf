@@ -13,6 +13,8 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   var live: Boolean = true
   // 体力
   var health: Int = 10
+  // 移動用の状態
+  val status = MoveStrategyStatus.nop
 
   var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
@@ -48,7 +50,14 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
       if (!inside) live = false
       if (live) {
         time += 1
-        action.run(delta)(this)
+        if (0 < status.restFrame) { // 移動が済んでない場合移動、asyncならactionも一緒に実行
+          MoveStrategy.move(delta)(this, status)
+          if (status.async)
+            action.run(delta)(this)
+        } else { // 移動が済んでる場合action実行
+          action.run(delta)(this)
+        }
+        status.updated()
       }
       updateFunc.set(delta)
       ownObjects.foreach(updateFunc.func)

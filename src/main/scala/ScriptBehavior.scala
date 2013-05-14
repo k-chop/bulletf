@@ -13,9 +13,11 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
     case StateVar(p) => p match {
       case 'x => unit.pos.x
       case 'y => unit.pos.y
-      case 'aim => Global.aimToShip(unit.pos)
+      case 'aim => Global.shipReference.aim(unit.pos)
       case 'speed => unit.speed
       case 'angle => unit.angle.dir
+      case 'px => Global.shipReference.x
+      case 'py => Global.shipReference.y
     }
 
     // StrVarは解析時点でSymbolに変換するからこの時点では存在しない
@@ -25,7 +27,7 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
     case Negate(in) => extract(unit)(in) * -1
   }
 
-  // ひっどいクラスだけど高速化の為なので俺は悪くねぇっ！
+  // GC回避用
   private[ScriptBehavior] class Extractor(private[this] var _unit: ScriptControlled) {
 
     def set(unit: ScriptControlled) { _unit = unit }
@@ -65,11 +67,11 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
       } else if (unit.pc(nestLevel) < seq.length) { // 次のOpを実行
 
         seq(unit.pc(nestLevel)) match {
-          case Wait(_) if onInit =>
-            recur(nestLevel, seq)
+          case Wait(_) if onInit => // init中はwaitをスルー
+            incPC(); recur(nestLevel, seq)
 
           case VWait(_) if onInit =>
-            recur(nestLevel, seq)
+            incPC(); recur(nestLevel, seq)
 
           case Wait(time) =>
             unit.waitCount = if (time < 1) 1 else time
@@ -136,7 +138,7 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
             case 'absolute =>
               unit.angle.update(ex(dir))
             case 'aim =>
-              unit.angle.update(Global.aimToShip(unit.pos))
+              unit.angle.update(Global.shipReference.aim(unit.pos))
             case 'relative =>
               unit.angle += ex(dir)
 
@@ -152,6 +154,25 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
           case PlaySound(param, pitch, vol) => {
             SoundSystem.playSymbol(param, ex(pitch).toFloat, ex(vol).toFloat)
           }; incPC(); recur(nestLevel, seq)
+
+          case MoveTo(handling, x, y, time, async, opt) =>
+            unit match {
+              case e: Enemy =>
+                e.status.clearVar() // 変数クリア
+                e.status.handling = handling
+                e.status.target.x = ex(x)
+                e.status.target.y = ex(y)
+                e.status.restFrame = ex(time).toInt
+                e.status.async = async
+                // 変数を解凍して代入
+                var i = opt.length-1
+                while(0 <= i) {
+                  e.status.vars(i) = ex(opt(i))
+                  i -= 1
+                }
+              case _ => // スルー
+            }
+            incPC(); // PCインクリメントしたらwait等がなくてもそこで一旦終了。
 
           // SetScale, SetAlphaはEffectのみに作用するのでここに置くのはちょっと違う気もする
           case SetScale(scaleCon) => {

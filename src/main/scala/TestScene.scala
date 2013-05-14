@@ -17,7 +17,7 @@ class TestScene extends Scene with HasInnerFunc {
   lazy val lives: LifeBoard = new ui.LifeBoard(ship)
   lazy val background: BackGround = new BackGroundBasicStars
   Global.scoreboard.set(score)
-  Global.aimToShip.set(ship)
+  Global.shipReference.set(ship)
 
   private[this] var c: Int = 0
   private[this] var b: Boolean = false
