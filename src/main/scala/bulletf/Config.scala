@@ -1,0 +1,9 @@
+package bulletf
+
+
+
+object Config {
+
+  
+  
+}

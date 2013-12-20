@@ -10,7 +10,7 @@ scalacOptions += "-feature"
 
 javaOptions ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
 
-initialCommands in console += "import com.github.whelmaze.bulletf._"
+initialCommands in console += "._"
 
 initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
 
