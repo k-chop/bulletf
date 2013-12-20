@@ -1,7 +1,6 @@
 package bulletf
 
 
-import ui.{NullScoreBoard, ScoreBoard}
 import scala.collection.mutable
 import ui._
 
