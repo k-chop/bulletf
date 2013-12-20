@@ -25,7 +25,7 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
 
     drawType = params.get('draw_type).map {
       case s if rparamEx(s).head == "rotate" =>
-        RotateDraw((rparamEx(s))(1).toDouble)
+        RotateDraw(rparamEx(s)(1).toDouble)
       case s if s == "additive" =>
         AdditiveDraw
       case _ =>
@@ -62,6 +62,6 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
     }
   }
 
-  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
+  def inside = 0 - (radius * 2) <= pos.x && pos.x <= constants.screenWidth + (radius * 2) && 0 - (radius * 2) <= pos.y && pos.y <= constants.screenHeight + (radius * 2)
 
 }

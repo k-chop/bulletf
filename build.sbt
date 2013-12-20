@@ -14,9 +14,9 @@ initialCommands in console += "._"
 
 initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
 
-seq(lwjglSettings: _*)
+Seq(LWJGLPlugin.lwjglSettings: _*)
 
-compile in Compile <<= compile in Compile mapR {
+compile in Compile <<= (compile in Compile result) map {
   case Inc(inc: Incomplete) =>
     Sound.play("sound/cut01.wav")
     throw inc

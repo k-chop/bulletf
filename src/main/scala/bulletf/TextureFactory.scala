@@ -92,7 +92,7 @@ object TextureFactory {
       new SpriteAnimationInfo(newRect, len, timeTable, loop = true)
     } getOrElse {
       // 見つからない場合は適当なの用意して渡す
-      (new SpriteAnimationInfo(Rect(0,0,1,1), 1, Array((10,0)), loop = false))
+      new SpriteAnimationInfo(Rect(0, 0, 1, 1), 1, Array((10, 0)), loop = false)
     }
 
     (uri, animInfo)
@@ -114,7 +114,7 @@ object TextureFactory {
     (uri, rect)
   }
 
-  private[this] def exists(path: String) = (new File(path)).exists()
+  private[this] def exists(path: String) = new File(path).exists()
 
   // リソースの開放
   def free() {

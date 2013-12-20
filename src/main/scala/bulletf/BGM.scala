@@ -20,7 +20,7 @@ object BGM {
       transform
     } foreach {
       case Array(id, filename) =>
-        uri_map += (Symbol(id) -> (s"${Resource.musicpath}$filename"))
+        uri_map += (Symbol(id) -> s"${Resource.musicpath}$filename")
         println(s"BGM: uri map registered: $id -> $filename")
       case s =>
         println(s"BGM: invalid definition line\n -> ${s.deep}")

@@ -33,7 +33,7 @@ object Global {
     private[this] var self: ScoreBoard = NullScoreBoard
 
     def set(s: ScoreBoard) {
-      self = (if (s == null) NullScoreBoard else s)
+      self = if (s == null) NullScoreBoard else s
     }
 
     def get = self.get

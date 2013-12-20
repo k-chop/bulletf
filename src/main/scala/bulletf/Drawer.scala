@@ -78,8 +78,8 @@ object Drawer {
 
     val halfx = texture.getImageWidth / 2.0
     val halfy = texture.getImageHeight / 2.0
-    val fx = ((pos.x - centerX).toFloat / Game.width)
-    val fy = ((centerY - pos.y).toFloat / Game.height)
+    val fx = (pos.x - centerX).toFloat / Game.width
+    val fy = (centerY - pos.y).toFloat / Game.height
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()

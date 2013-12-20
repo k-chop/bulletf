@@ -28,7 +28,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   override def setParam(params: Map[Symbol, String]) {
     this.health = params.get('health) map { s: String =>
       s.toInt
-    } getOrElse(10)
+    } getOrElse 10
   }
 
   override def disable() {
@@ -90,5 +90,5 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   def size = ownObjects.size
 
-  def inside = (0-(radius*2) <= pos.x  && pos.x <= constants.screenWidth+(radius*2) && 0-(radius*2) <= pos.y && pos.y <= constants.screenHeight+(radius*2))
+  def inside = 0 - (radius * 2) <= pos.x && pos.x <= constants.screenWidth + (radius * 2) && 0 - (radius * 2) <= pos.y && pos.y <= constants.screenHeight + (radius * 2)
 }

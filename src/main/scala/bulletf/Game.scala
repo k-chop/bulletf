@@ -1,12 +1,6 @@
 package bulletf
 
-
-
-import java.io.{ FileInputStream, IOException }
-
-import org.lwjgl.{LWJGLException, Sys}
 import org.lwjgl.opengl.{GLContext, Display, DisplayMode, GL11}
-import org.lwjgl.util.glu.GLU
 import org.lwjgl.input.Controllers
 
 object Game {
@@ -79,15 +73,15 @@ class Game(_width: Int, _height: Int) {
     SoundSystem.init()
     BGM.init()
 
-    getDelta()
-    lastFPS = getTime()
+    calcDelta()
+    lastFPS = getTime
 
     println("vbo: " + GLContext.getCapabilities.GL_ARB_vertex_buffer_object)
     println("drawelement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
 
     while (true) {
-      val be = getTime()
-      val delta = getDelta()
+      val be = getTime
+      val delta = calcDelta()
       //up(delta)
       if (a%60==0) {
         val ta = System.nanoTime()
@@ -139,17 +133,17 @@ class Game(_width: Int, _height: Int) {
   final val WAIT: Int = 16650 // [us]
   // return overtime???
   def sync(before: Long) =  {
-    var now = getTime()
+    var now = getTime
     while(now - before < WAIT) {
       Thread.sleep(0)
-      now = getTime()
+      now = getTime
     }
     //println("wait: " + (now - before))
   }
   
   def up(delta: Int) {
     a += 1
-    rotation += 0.15 * delta / 1000.0;
+    rotation += 0.15 * delta / 1000.0
     y += 0.15f * delta / 1000.0f
     if (y > Game.height) y = 0
   }
@@ -182,17 +176,17 @@ class Game(_width: Int, _height: Int) {
 //    GL11.glMatrixMode(GL11.GL_MODELVIEW)
   }
 
-  def getTime(): Long = System.nanoTime / 1000//(Sys.getTime() * 1000 / Sys.getTimerResolution())
+  def getTime: Long = System.nanoTime / 1000//(Sys.getTime() * 1000 / Sys.getTimerResolution())
 
-  def getDelta(): Int = {
-    val time: Long = getTime()
+  def calcDelta(): Int = {
+    val time: Long = getTime
     val delta: Int = (time - lastFrame).toInt
     lastFrame = time
     delta
   }
 
   def updateFPS() {
-    if (getTime() - lastFPS > 1000000) {
+    if (getTime - lastFPS > 1000000) {
       Display.setTitle("FPS: " + fpscount)
       fpscount = 0
       lastFPS += 1000000

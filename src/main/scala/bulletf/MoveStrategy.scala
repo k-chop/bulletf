@@ -48,7 +48,7 @@ object MoveStrategy {
   private[this] def easing(delta: Int)(unit: Enemy, status: MoveStrategyStatus) {
     import status._
     //safetyVar(0, 0.2)
-    val decel = (1.0 - math.exp(-6.0 * (delta/1000.0)))
+    val decel = 1.0 - math.exp(-6.0 * (delta / 1000.0))
 
     unit.pos.y += (target.y - unit.pos.y) * decel
     unit.pos.x += (target.x - unit.pos.x) * decel

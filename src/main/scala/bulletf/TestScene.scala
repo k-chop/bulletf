@@ -54,7 +54,7 @@ class TestScene extends Scene with HasInnerFunc {
     // collisioncheckerに丸投げで良いのでは
 
     // enemy collision check
-    (enemies.toList) foreach { e =>
+    enemies.toList foreach { e =>
       if (e.live) {
         val cc = new CollisionCheckerEnemy(e)
         cc.check(ship.ownObjects.toList) match {

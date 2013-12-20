@@ -67,7 +67,7 @@ object DSFParser extends StandardTokenParsers {
     case time ~ _ ~ opsec => Repeat(time.toInt, opsec.toArray)
   }
 
-  lazy val func: Parser[Op] = ident ~ "(" ~ repsep(args, ("," | "|")) <~ ")" ^^ {
+  lazy val func: Parser[Op] = ident ~ "(" ~ repsep(args, "," | "|") <~ ")" ^^ {
     case name ~ _ ~ as => findFunction(name, as)
   }
 
@@ -100,12 +100,12 @@ object DSFParser extends StandardTokenParsers {
     }
 
   lazy val int: Parser[Int] =
-    "-" ~> numericLit ^^ { case i => -(i.toInt) } |
+    "-" ~> numericLit ^^ { case i => -i.toInt } |
     numericLit ^^ { case i => i.toInt }
 
   lazy val double: Parser[Double] =
     "-" ~> numericLit ~ "." ~ numericLit ^^ {
-      case bef ~ _ ~ aft => -((bef+"."+aft).toDouble)
+      case bef ~ _ ~ aft => -(bef + "." + aft).toDouble
     } | numericLit ~ "." ~ numericLit ^^ {
     case bef ~ _ ~ aft => (bef+"."+aft).toDouble
   }
