@@ -1,4 +1,92 @@
-bullet simple {
+emitter temp {
+  
+  run {
+    emit(t01aline)
+    wait(110)
+    emit(t01aline)
+    wait(110)
+    emit(t01bline)
+  }
+
+}
+
+enemy t01b {
+  data {
+    health := 42
+  }
+  init {
+    spd(0.35)
+    dir(90)
+  }
+  run {
+    wait(8)
+    brake(30)
+    emit(threeWay)
+    wait(60)
+    accel(72, -0.3)
+  }
+}
+
+emitter threeWay {
+  run {
+    repeat 5 {
+      $0 = @aim
+      $0 -= 10
+      se(shot02)
+      repeat 3 {
+        fire(simple, ENG05R, $0, 0.33)
+        $0 += 10
+      }
+      wait(4)
+    }
+  }
+}
+
+emitter t01bline {
+  run {
+    $0 = @x
+    $0 -= 50
+    repeat 3 {
+      appear(t01b, invader01, $0, 5)
+      $0 += 50
+      wait(50)
+    }
+  }
+}
+
+emitter t01aline {
+  run {
+    
+    repeat 6 {
+      $0 = @x
+      $0 += @rnd(-200,200)
+      appear(t01a, invader01, $0, 5)
+      wait(10)
+    }
+  }
+}
+
+enemy t01a {
+  data {
+    health := 20
+  }
+
+  init {
+    $1 = @rnd(0.25,0.32)
+    spd($1)
+    $0 = @aim
+    $0 += @rnd(-10,10)
+    dir($0)
+  }
+
+  run {
+    se(shot03)
+    fire(simpleX, ENG03R, @aim, @rnd(0.34,0.4))
+  }
+
+}
+
+bullet simpleX {
   data {
     draw_type := "rotate:8"
   }
@@ -162,6 +250,10 @@ emitter main {
 
     wait(5)
 
+    emit(temp)
+
+    wait(500)
+
     repeat 7 {
       appear(first, invader01, @x, 15)
       wait(20)
@@ -257,14 +349,14 @@ enemy forth {
       spd(0)
       wait(8)    
     }
-    repeat 64 {
+    repeat 56 {
       dir($0)
       se(shot04)
       $0 += @rnd(30,80)
       spd(0.3)
       emit(round12)
       spd(0)
-      wait(3)
+      wait(5)
     }
 
     wait(7)
