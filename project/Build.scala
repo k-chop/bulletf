@@ -7,6 +7,8 @@ import javax.sound.sampled._
 import scala.concurrent._
 import scala.concurrent.duration._
 
+import ExecutionContext.Implicits.global
+
 // さんこう
 // http://www.ibm.com/developerworks/jp/java/library/j-5things12/#N101D9
 // http://stackoverflow.com/questions/16057378/executing-a-task-dependency-for-test-failure-in-sbt
@@ -34,7 +36,7 @@ object Sound {
       clip.close()
       stream.close()
     }
-    Await.ready(f, 0 nanos)
+    Await.result(f, 1 seconds)
   }
 }
 
