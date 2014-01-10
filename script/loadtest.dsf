@@ -2,9 +2,9 @@ emitter temp {
   
   run {
     emit(t01aline)
-    wait(110)
+    wait(100)
     emit(t01aline)
-    wait(110)
+    wait(100)
     emit(t01bline)
   }
 
@@ -252,7 +252,7 @@ emitter main {
 
     emit(temp)
 
-    wait(500)
+    wait(440)
 
     repeat 7 {
       appear(first, invader01, @x, 15)
