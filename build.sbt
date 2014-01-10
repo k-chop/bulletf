@@ -8,9 +8,11 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 
 scalacOptions += "-feature"
 
+//incOptions := incOptions.value.withNameHashing(true)
+
 javaOptions ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
 
-initialCommands in console += "._"
+initialCommands in console += "import bulletf._"
 
 initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
 
