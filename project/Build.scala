@@ -4,7 +4,10 @@ import Keys._
 import java.io.File
 import javax.sound.sampled._
 
-import scala.concurrent.ops._
+import scala.concurrent._
+import scala.concurrent.duration._
+
+import ExecutionContext.Implicits.global
 
 // さんこう
 // http://www.ibm.com/developerworks/jp/java/library/j-5things12/#N101D9
@@ -13,7 +16,7 @@ import scala.concurrent.ops._
 object Sound {
 
   def play(file: String) {
-    spawn {
+    val f = future {
       val clip = AudioSystem.getClip
       clip.addLineListener(new LineListener(){
         def update(e: LineEvent) {
@@ -33,6 +36,7 @@ object Sound {
       clip.close()
       stream.close()
     }
+    Await.result(f, 1 seconds)
   }
 }
 

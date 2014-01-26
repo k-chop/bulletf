@@ -2,19 +2,23 @@ name := "bulletf"
 
 version := "0.1.0-SNAPSHOT"
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.3"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 
 scalacOptions += "-feature"
 
+//incOptions := incOptions.value.withNameHashing(true)
+
 javaOptions ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
 
-initialCommands in console += "import com.github.whelmaze.bulletf._"
+initialCommands in console += "import bulletf._"
 
-seq(lwjglSettings: _*)
+initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
 
-compile in Compile <<= compile in Compile mapR {
+Seq(LWJGLPlugin.lwjglSettings: _*)
+
+compile in Compile <<= (compile in Compile result) map {
   case Inc(inc: Incomplete) =>
     Sound.play("sound/cut01.wav")
     throw inc
