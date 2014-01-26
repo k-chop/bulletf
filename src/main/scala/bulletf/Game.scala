@@ -1,6 +1,6 @@
 package bulletf
 
-import org.lwjgl.opengl.{GLContext, Display, DisplayMode, GL11}
+import org.lwjgl.opengl._
 import org.lwjgl.input.Controllers
 
 object Game {
@@ -77,7 +77,9 @@ class Game(_width: Int, _height: Int) {
     lastFPS = getTime
 
     println("vbo: " + GLContext.getCapabilities.GL_ARB_vertex_buffer_object)
-    println("drawelement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
+    println("drawElement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
+    println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION))
+    println("GLSL version: " + GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION))
 
     while (true) {
       val be = getTime

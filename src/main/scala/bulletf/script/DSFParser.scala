@@ -125,7 +125,7 @@ object DSFParser extends StandardTokenParsers {
           // datablockがnullなのは仮
           val datablock = extractDataBlock(blockMap.get('data).getOrElse(Array(Nop)))
           val sblocks = new ScriptBlocks(Symbol(name), symToType(typeSym), datablock, blockMap)
-          println(sblocks)
+          //println(sblocks)
           (Symbol(name), sblocks)
         }
 
