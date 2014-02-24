@@ -9,7 +9,6 @@ class TestScene extends Scene with HasInnerFunc {
 //  this: Scene =>
 
   lazy val ship = new Ship()
-  lazy val col = new CollisionCheckerShip(ship)
   lazy val emitters = mutable.ListBuffer.empty[Emitter]
   lazy val enemies = mutable.ListBuffer.empty[Enemy]
   lazy val effects = mutable.ListBuffer.empty[Effect]
@@ -50,39 +49,21 @@ class TestScene extends Scene with HasInnerFunc {
     enemies foreach updateFunc.func
     effects foreach updateFunc.func
 
-    // ↓これ各シーンでやることじゃなくね……
-    // collisioncheckerに丸投げで良いのでは
-
-    // enemy collision check
-    enemies.toList foreach { e =>
-      if (e.live) {
-        val cc = new CollisionCheckerEnemy(e)
-        cc.check(ship.ownObjects.toList) match {
-          case ShotBy(s: Shot) =>
-            //println(s"hit: ${s.pos}")
-            e.damage(s)
-            s.destroy()
-            Global.scoreboard.add(10)
-            SoundSystem.playSymbol('test2, vol = 0.04f)
-          case _ =>
-        }
-      }
+    val eCallBack = (e: Enemy, s: Shot) => {
+      e.damage(s)
+      s.destroy()
+      Global.scoreboard.add(10)
+      SoundSystem.playSymbol('test2, vol = 0.04f)
     }
 
-    // ship collision check
-    val damaged = col.check(enemies.toList) match {
+    CollisionCheckerEnemy.checkAll(enemies.toList, ship.ownObjects.toList, eCallBack)
+
+    val damaged = CollisionCheckerShip.checkAll(ship, enemies.toSeq, emitters.toSeq) match {
       case ShotBy(x) =>
         println(s"shot by ${x.asInstanceOf[HasCollision].pos}")
         ship.damage(x)
         true
-      case _ =>
-        col.check(emitters.toList) match {
-          case ShotBy(x) =>
-            println(s"shot by ${x.asInstanceOf[HasCollision].pos}")
-            ship.damage(x)
-            true
-          case _ => false
-        }
+      case _ => false
     }
 
     // 自機がダメージ食らった場合

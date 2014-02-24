@@ -4,62 +4,105 @@ package bulletf
 
 import collection.mutable
 
-abstract class CollisionChecker[A, B](val target: A) {
+abstract class CollisionChecker[A, B] {
 
-  def check(pool: List[B]): State
+  def check(target: A, pool: Seq[B]): State
 
 }
 
-class CollisionCheckerShip(target: Ship) extends CollisionChecker[Ship, BulletLike](target) {
+object CollisionCheckerShip extends CollisionChecker[Ship, BulletLike] {
   import MathUtil.sq
 
-  def isHit(s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
+  def checkAll(ship: Ship, enemies: Seq[Enemy], emitters: Seq[Emitter]): State = {
+    CollisionCheckerShip.check(ship, enemies) match {
+      case a @ ShotBy(_) => a
+      case _ =>
+        CollisionCheckerShip.check(ship, emitters) match {
+          case b @ ShotBy(_) => b
+          case _ => Live
+        }
+    }
+  }
+
+  def isHit(target: Ship, s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
 
   // 1つ見つけた時点で探索打ち切り隊
-  def check(pool: List[BulletLike]): State = {
+  def check(target: Ship, pool: Seq[BulletLike]): State = {
 
     // 無敵時間が1以上ならそもそも判定取らない
     if (0 < target.invincibleTime) return Live
 
-    pool foreach {
-      case s: Enemy if s.enable =>
-        val ehit = if (s.live) isHit(s) else false
+    @annotation.tailrec
+    def recur(ps: Seq[BulletLike]): State = ps match {
+
+      case (e: Enemy) +: tail if e.enable =>
+        val ehit = if (e.live) isHit(target, e) else false
         if (!ehit) { // 当たってなければ子もチェック
-          check(s.ownObjects.toList) match {
-            case s: ShotBy[_] => return s
-            case _ =>
+          check(target, e.ownObjects.toList) match {
+            case s: ShotBy[_] => s
+            case _ => recur(tail)
           }
-        } else { // foreachの中でearly returnっていいのかこれ...
-          return ShotBy(s)
+        } else {
+          ShotBy(e)
         }
-      case s: Bullet if s.enable => // 当たってたらそれ返す, 当たってなかったら華麗にスルー
-        if (isHit(s)) {
-          return ShotBy(s)
+
+      case (b: Bullet) +: tail if b.enable =>
+        if (isHit(target, b)) ShotBy(b) else recur(tail)
+
+      case (em: Emitter) +: tail if em.enable => // Emitterに当たり判定はないので子のチェック
+        check(target, em.ownObjects.toList) match {
+          case s: ShotBy[_] => s
+          case _=> recur(tail)
         }
-      case s: Emitter if s.enable => // Emitterに当たり判定はないので子のチェック
-        check(s.ownObjects.toList) match {
-          case s: ShotBy[_] => return s
-          case _ =>
-        }
-      case _ => // ShotBy以外はスルー
+
+      case _ => // empty: 全部のチェックスルーしたので当たってない
+        Live
     }
-    Live // 全部のチェックスルーしたら当たってない
+
+    recur(pool)
   }
 
 }
 
-class CollisionCheckerEnemy(target: Enemy) extends CollisionChecker[Enemy, Shot](target) {
+object  CollisionCheckerEnemy extends CollisionChecker[Enemy, Shot] {
   import MathUtil.sq
 
-  def isHit(s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
+  def checkAll(targets: Seq[Enemy], pool: Seq[Shot], eCallBack: (Enemy, Shot) => Unit): Unit = {
 
-  def check(pool: List[Shot]): State = {
-    pool foreach {
-      case s: Shot if s.enable =>
-        if (isHit(s)) return ShotBy(s)
-      case _ =>
+    @annotation.tailrec
+    def recur(es: Seq[Enemy]): Unit = es match {
+      case (e: Enemy) +: tail =>
+        if (e.live) {
+          check(e, pool) match {
+            case ShotBy(s: Shot) =>
+              eCallBack(e, s)
+              recur(tail)
+            case _ =>
+              recur(tail)
+          }
+        } else recur(tail)
+      case _ => // empty
     }
-    Live
+
+    recur(targets)
+  }
+
+  def isHit(target: Enemy, s: HasCollision) = sq(target.pos.x - s.pos.x) + sq(target.pos.y - s.pos.y) < sq(s.radius + target.radius)
+
+  def check(target: Enemy, pool: Seq[Shot]): State = {
+
+    @annotation.tailrec
+    def recur(ss: Seq[Shot]): State = ss match {
+      case (s: Shot) +: tail =>
+        if (s.enable)
+          if (isHit(target, s)) ShotBy(s) else recur(tail)
+        else
+          recur(tail)
+      case _ => // all check through
+        Live
+    }
+
+    recur(pool)
   }
 
 }

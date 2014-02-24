@@ -7,6 +7,19 @@ import java.io.{ FileInputStream, IOException }
 
 import scala.collection.mutable.ArrayBuffer
 
+object Bullet {
+
+  final private[Bullet] val psdt: String PartialFunction DrawType = {
+    case s if s.split(":").head == "rotate" =>
+      RotateDraw(s.split(":")(1).toDouble)
+    case s if s == "additive" =>
+      AdditiveDraw
+    case _ =>
+      NormalDraw
+  }
+
+}
+
 class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
   extends BulletLike with HasCollision with CanProduceToGlobal
 {
@@ -21,17 +34,8 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   }
 
   override def setParam(params: Map[Symbol, String]) {
-    def rparamEx(s: String) = s.split(":")
-
-    drawType = params.get('draw_type).map {
-      case s if rparamEx(s).head == "rotate" =>
-        RotateDraw(rparamEx(s)(1).toDouble)
-      case s if s == "additive" =>
-        AdditiveDraw
-      case _ =>
-        NormalDraw
-    }.getOrElse(NormalDraw)
-
+    val t = params.get('draw_type).map(Bullet.psdt)
+    drawType = if (t.isEmpty) NormalDraw else t.get
   }
 
   override def disable() {
