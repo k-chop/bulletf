@@ -5,6 +5,11 @@ package bulletf
 import Constants.script._
 import collection.mutable
 
+object Enemy {
+
+  final private[Enemy] val sti = (s: String) => s.toInt
+}
+
 class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
   extends BulletLike with OwnerLike with CanProduceAll with HasCollision with HasInnerFunc
 {
@@ -26,9 +31,8 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   }
 
   override def setParam(params: Map[Symbol, String]) {
-    this.health = params.get('health) map { s: String =>
-      s.toInt
-    } getOrElse 10
+    val t = params.get('health) map Enemy.sti
+    this.health = if (t.isEmpty) 10 else t.get
   }
 
   override def disable() {
