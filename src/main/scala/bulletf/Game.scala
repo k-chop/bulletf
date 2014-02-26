@@ -116,8 +116,8 @@ class Game(_width: Int, _height: Int) {
       // sum += delta//getTime - be
       // if (s == fps) { println((sum / s.toDouble) + " : " + sum); s= 0; sum=0}
 
-      sync(be)
-      //Display.sync(fps) // ←dame (on windows7 64bit)
+      //sync(be)
+      Display.sync(fps) // ←dame (on windows7 64bit)
       a += 1; a %= 360
       if (Display.isCloseRequested) {
         println("free resources...")
