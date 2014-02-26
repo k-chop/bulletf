@@ -26,3 +26,5 @@ compile in Compile <<= (compile in Compile result) map {
     Sound.play("sound/pickup01.wav")
     v
 }
+
+LWJGLPlugin.lwjgl.version := "2.9.1"
