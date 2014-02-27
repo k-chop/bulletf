@@ -1,8 +1,8 @@
 package bulletf
 
 
-
-import org.newdawn.slick.opengl.{ Texture, TextureLoader }
+import mdesl.graphics.Texture
+import mdesl.test.Util
 import java.io.{File, FileInputStream}
 
 import collection.mutable
@@ -41,7 +41,7 @@ object TextureFactory {
 
   def genNewTexture(uriStr: String, key: Symbol): Texture = {
     println("create texture: " + uriStr + ", key: " + key)
-    val texture = TextureLoader.getTexture("PNG", new FileInputStream( uriStr ))
+    val texture = new Texture(Util.getResource(uriStr), Texture.NEAREST)
     texCache.update(uriStr, texture)
     texture
   }
@@ -118,7 +118,7 @@ object TextureFactory {
 
   // リソースの開放
   def free() {
-    texCache.values.foreach(_.release())
+    texCache.values.foreach(_.dispose())
     println("Freeing texture resources complete.")
   }
 

@@ -70,44 +70,4 @@ object Drawer {
     draw(texture, Rect(0, 0, texture.getImageWidth, texture.getImageHeight), pos, 0, 1.0, 1.0)
   }
 
-  def draw3d(texture: Texture, pos: Position, time: Int) {
-    import GL11._
-    import constants._
-
-    Game.view3d()
-
-    val halfx = texture.getImageWidth / 2.0
-    val halfy = texture.getImageHeight / 2.0
-    val fx = (pos.x - centerX).toFloat / Game.width
-    val fy = (centerY - pos.y).toFloat / Game.height
-
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glOrtho(-1, 1, -1, 1, -1, 10)
-
-    val zz = -4f
-    val xx = -10f
-
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-
-    val w = Game.width.toFloat
-    val h = Game.height.toFloat
-
-    val z = 0f
-    glTranslated((pos.x-centerX)/centerX, -(pos.y-centerY)/centerY, -1)
-    glRotatef(time.toFloat*2f, 0f, 0f, 1f)
-    glRotatef(time.toFloat*2f, 1f, 0f, 0f)
-    glRotatef(time.toFloat*2f, 0f, 1f, 0f)
-
-    val t = 10f
-
-    //glScaled(0.1, 0.1, 1)
-    GLUtil.drawBox(0.06f, GL_LINE_LOOP)
-    //GLUtil.drawVBO()
-
-    glLoadIdentity()
-
-
-  }
 }

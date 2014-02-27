@@ -48,27 +48,16 @@ object Game {
 
 class Game(_width: Int, _height: Int) {
   var fps: Int = 60
+  var a: Int = 0
   private[this] var lastFrame: Long = 0
   private[this] var fpscount: Int = 0
   private[this] var lastFPS: Long = 0
-
-  var ax: Float = 0f
-  var ay: Float = 0f
-  var az: Float = 0f
-  var x = 0f
-  var y = 0f
-  var rotation: Double = 0
-  var a: Int = 0
-  var s: Int = 0
-  var sum: Double = 0
-  var error: Long = 0
 
   Game._width = _width
   Game._height = _height
 
   def start() {
     initGL()
-    GLUtil.setup()
     SceneController.init(new TestScene)
     SoundSystem.init()
     BGM.init()
@@ -76,10 +65,7 @@ class Game(_width: Int, _height: Int) {
     calcDelta()
     lastFPS = getTime
 
-    println("vbo: " + GLContext.getCapabilities.GL_ARB_vertex_buffer_object)
-    println("drawElement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
-    println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION))
-    println("GLSL version: " + GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION))
+    GLUtil.printGLSpecs()
 
     while (true) {
       val be = getTime
@@ -98,9 +84,11 @@ class Game(_width: Int, _height: Int) {
       updateFPS()
 
       Game.clearScreen()
-      Game.view3d()
+      //Game.view3d()
 
-      Game.view2d()
+      //Game.view2d()
+      SpriteBatch.self.begin()
+
       if (a%60==0) {
         val ta = System.nanoTime()
         SceneController.draw()
@@ -110,6 +98,8 @@ class Game(_width: Int, _height: Int) {
       } else {
         SceneController.draw()
       }
+      SpriteBatch.self.end()
+
       Display.update()
 
       // s += 1
@@ -142,13 +132,6 @@ class Game(_width: Int, _height: Int) {
     }
     //println("wait: " + (now - before))
   }
-  
-  def up(delta: Int) {
-    a += 1
-    rotation += 0.15 * delta / 1000.0
-    y += 0.15f * delta / 1000.0f
-    if (y > Game.height) y = 0
-  }
 
   private def initGL() {
     Display.setDisplayMode(new DisplayMode(Game.width,Game.height))
@@ -168,14 +151,7 @@ class Game(_width: Int, _height: Int) {
     
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    
-    GL11.glViewport(0,0,Game.width,Game.height)
-//    GL11.glMatrixMode(GL11.GL_MODELVIEW)
 
-//    GL11.glMatrixMode(GL11.GL_PROJECTION)
-//   GL11.glLoadIdentity()
-//    GL11.glOrtho(0, width, height, 0, 1, -1)
-//    GL11.glMatrixMode(GL11.GL_MODELVIEW)
   }
 
   def getTime: Long = System.nanoTime / 1000//(Sys.getTime() * 1000 / Sys.getTimerResolution())

@@ -12,7 +12,7 @@ class AnimationSprite(resourceId: Symbol) extends Sprite {
   def draw(custom_rect: Rect, pos: Position, angle: Double) {}
 
   def draw(pos: Position, angle: Double, scale: Double, alpha: Double, time: Int) {
-    Drawer.draw(texture, animInfo.next(time), pos, angle, scale, alpha)
+    //Drawer.draw(texture, animInfo.next(time), pos, angle, scale, alpha)
   }
 }
 
