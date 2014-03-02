@@ -8,6 +8,7 @@ import de.matthiasmann.twl.utils.PNGDecoder.Format
 import org.lwjgl.{BufferUtils, LWJGLException}
 import org.lwjgl.util.glu.GLU
 import org.lwjgl.util.vector.{Matrix4f, Vector3f}
+import scala.collection.mutable
 
 
 class Moving(var x: Float, var y: Float, width: Int, height: Int, val angle: Float, speed: Float) {
@@ -47,8 +48,6 @@ object DrawerPlus {
   private[this] var temp: ByteBuffer = _
   private[this] var idxsbuf: ByteBuffer = _
   private[this] var iboTemp: ByteBuffer = _
-  private[this] var angleDelta = 1f
-  private[this] val rotateVec = new Vector3f()
   private[this] val mat44buf = BufferUtils.createFloatBuffer(16)
   private[this] val projbuf = {
     val t4 = GLUtil.ortho2dMatrix(width, height)
@@ -57,6 +56,7 @@ object DrawerPlus {
     bu.flip()
     bu
   }
+
   val QUAD_MAX_NUM = 20000
   private[this] val movings = Array.tabulate(QUAD_MAX_NUM){ i => new Moving(width/2f, height/2f, 10, 10, (math.random*360f).toFloat, (math.random*0.6f).toFloat) }
   var timeidx = 0
@@ -150,18 +150,22 @@ object DrawerPlus {
     e.rewind() // not flip!!!
 
     vao = VAO.gen()
-    vao.bindWith { _ =>
+    vao.bindWith { implicit a =>
       vbo = VBO.gen(GL15.GL_ARRAY_BUFFER)
       vbo.bindWith { v =>
-        v.set(vf, GL15.GL_STREAM_DRAW)
+        v.setData(vf, GL15.GL_STREAM_DRAW)
+        val ms = MappedString("xxcccctt", Map().withDefaultValue(GL11.GL_FLOAT))
+        v.setAttributes(ms)
+        /*
         v.attribute(0, 2, GL11.GL_FLOAT, normalized = false, 8*4, 0)
         v.attribute(1, 4, GL11.GL_FLOAT, normalized = false, 8*4, 2*4)
         v.attribute(2, 2, GL11.GL_FLOAT, normalized = false, 8*4, 6*4)
+        */
       }
     }
     ibo = VBO.gen(GL15.GL_ELEMENT_ARRAY_BUFFER)
     ibo.bindWith {
-      _.set(idxsbuf, GL15.GL_STREAM_DRAW)
+      _.setData(idxsbuf, GL15.GL_STREAM_DRAW)
     }
   }
 
@@ -254,12 +258,12 @@ object DrawerPlus {
       GL13.glActiveTexture(GL13.GL_TEXTURE0)
       GL11.glBindTexture(GL11.GL_TEXTURE_2D, texIds(0))
 
-      vao.bindWith { _ =>
-        vbo.enableAttributes()
+      vao.bindWith { implicit a =>
+        vbo.enableAttributes(a)
         ibo.bindWith { _ =>
           GL11.glDrawElements(GL11.GL_TRIANGLES, 6*movings.length, GL11.GL_UNSIGNED_INT, 0)
         }
-        vbo.disableAttributes()
+        vbo.disableAttributes(a)
       }
     }
 
@@ -267,13 +271,52 @@ object DrawerPlus {
 
   def destroyAll() = {
     shader.delete()
-    vao.bindWith { _ =>
-      vbo.disableAttributes()
+    vao.bindWith { implicit a =>
+      vbo.disableAttributes(a)
       vbo.delete()
     }
     vao.delete()
     ibo.delete()
   }
+}
+
+case class MappedString(mapping: String, mapper: Map[Char, Int]) {
+
+  private[this] def iterator() = {
+    require(mapping != "", "Attribute mapping string must be nonEmpty.")
+
+    val sizeMap: Map[Char, Int] = mapping groupBy identity map { case (c, s) => c -> s.length }
+    val compacted = mapping.foldLeft(""+mapping.head){ case (acc,c) => if (c==acc.last) acc else acc + c }
+
+    new Iterator[(Int, Int)] {
+      private[this] val str = compacted
+      private[this] var idx = 0
+      def hasNext = idx < str.length
+      def next() = {
+        val c = str(idx)
+        idx += 1
+        (sizeMap(c), mapper(c))
+      }
+    }
+  }
+
+  def makeRegisterList(): Array[(Int, Int, Int, Int, Long)] = {
+    val l = iterator().toList
+
+    var offset = 0L
+    var idx = 0
+    val stride = l.foldLeft(0){ case (c, (size, typ)) => c + size * GLUtil.byteSize(typ) }
+
+    val builder = mutable.ArrayBuilder.make[(Int, Int, Int, Int, Long)]()
+    l foreach { case (size, data_type) =>
+      builder += ((idx, size, data_type, stride, offset))
+
+      idx += 1
+      offset += size * GLUtil.byteSize(data_type)
+    }
+    builder.result()
+  }
+
 }
 
 class Shader(vertex: String, fragment: String) {
@@ -320,10 +363,9 @@ class Shader(vertex: String, fragment: String) {
   }
 
   def load(filename: String, shaderType: Int): Int = {
-    var id = 0
     val source = io.Source.fromFile(filename).mkString
 
-    id = GL20.glCreateShader(shaderType)
+    val id = GL20.glCreateShader(shaderType)
     GL20.glShaderSource(id, source)
     GL20.glCompileShader(id)
 
@@ -360,32 +402,55 @@ object VBO {
 
 class VBO(id: Int, typ: Int) {
 
-  def bind() = GL15.glBindBuffer(typ, id)
+  private[this] val usedAttrib = mutable.BitSet.empty
 
-  def unbind() = GL15.glBindBuffer(typ, 0)
+  private[this] var bound = false
+
+  def isBound = bound
+
+  def bind() = {
+    GL15.glBindBuffer(typ, id)
+    bound = true
+  }
+
+  def unbind() = {
+    GL15.glBindBuffer(typ, 0)
+    bound = false
+  }
 
   def bindWith[T](f: VBO => T) = {
     bind(); f(this); unbind()
   }
 
-  def set(data: FloatBuffer, drawType: Int) = GL15.glBufferData(typ, data, drawType)
-  def set(data: ByteBuffer, drawType: Int) = GL15.glBufferData(typ, data, drawType)
-  def set(data: IntBuffer, drawType: Int) = GL15.glBufferData(typ, data, drawType)
+  def setData(data: FloatBuffer, drawType: Int) = GL15.glBufferData(typ, data, drawType)
+  def setData(data: ByteBuffer, drawType: Int) = GL15.glBufferData(typ, data, drawType)
+  def setData(data: IntBuffer, drawType: Int) = GL15.glBufferData(typ, data, drawType)
 
-  def attribute(listIdx: Int, size: Int, dataType: Int, normalized: Boolean, stride: Int, offset: Long) = GL20.glVertexAttribPointer(listIdx, size, dataType, normalized, stride, offset)
-
-  def disableAttributes() = {
-    // TODO: atode naosu!!!!!!!!!!! kore VAO no hou ni ugokasu beki zyane?
-    GL20.glDisableVertexAttribArray(0)
-    GL20.glDisableVertexAttribArray(1)
-    GL20.glDisableVertexAttribArray(2)
+  def attribute(listIdx: Int, size: Int, dataType: Int, normalized: Boolean, stride: Int, offset: Long)(implicit vao: VAO) = {
+    GL20.glVertexAttribPointer(listIdx, size, dataType, normalized, stride, offset)
   }
 
-  def enableAttributes() = {
-    // TODO: atode naosu!!!!!!!!!!! kore VAO no hou ni ugokasu beki zyane?
-    GL20.glEnableVertexAttribArray(0)
-    GL20.glEnableVertexAttribArray(1)
-    GL20.glEnableVertexAttribArray(2)
+  def setAttributes(ms: MappedString)(implicit vao: VAO) = {
+    require(vao.isBound, "setAttributes: cannot set to attribute list with no VAO bound.")
+
+    ms.makeRegisterList() foreach { case (idx, size, data_type, stride, offset) =>
+      println(s"set attribute: idx($idx), size($size), type(${GLUtil.name(data_type)}), stride($stride), offset($offset)")
+      usedAttrib += idx
+      GL20.glVertexAttribPointer(idx, size, data_type, false, stride, offset)
+    }
+
+  }
+
+  def disableAttributes(implicit vao: VAO) = {
+    require(vao.isBound, "disableAttributes: This operation is need to VAO bound.")
+
+    usedAttrib.foreach( GL20.glDisableVertexAttribArray )
+  }
+
+  def enableAttributes(implicit vao: VAO) = {
+    require(vao.isBound, "enableAttributes: This operation is need to VAO bound.")
+
+    usedAttrib.foreach( GL20.glEnableVertexAttribArray )
   }
 
   def delete() = {
@@ -404,9 +469,19 @@ object VAO {
 
 class VAO(id: Int) {
 
-  def bind() = GL30.glBindVertexArray(id)
+  private[this] var bound: Boolean = false
 
-  def unbind() = GL30.glBindVertexArray(0)
+  def isBound = bound
+
+  def bind() = {
+    GL30.glBindVertexArray(id)
+    bound = true
+  }
+
+  def unbind() = {
+    GL30.glBindVertexArray(0)
+    bound = false
+  }
 
   @inline def bindWith[T](f: VAO => T) = {
     this.bind()

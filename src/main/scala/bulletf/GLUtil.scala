@@ -31,4 +31,28 @@ object GLUtil {
     println("GLSL version: " + GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION))
   }
 
+  @inline final def byteSize(data_type: Int): Int = {
+    import GL11._
+    data_type match {
+      case GL_UNSIGNED_BYTE | GL_BYTE => 1
+      case GL_SHORT | GL_UNSIGNED_SHORT => 2
+      case GL_FLOAT | GL_INT | GL_UNSIGNED_INT => 4
+    }
+  }
+
+  @inline final def name(typ: Int): String = {
+    import GL11._
+    typ match {
+      case GL_FLOAT => "GL_FLOAT"
+      case GL_UNSIGNED_BYTE => "GL_UNSIGNED_BYTE"
+      case GL_BYTE => "GL_BYTE"
+      case GL_SHORT => "GL_SHORT"
+      case GL_INT => "GL_INT"
+      case GL_UNSIGNED_INT => "GL_UNSIGNED_INT"
+      case GL_UNSIGNED_SHORT => "GL_UNSIGNED_SHORT"
+      case _ => "UNDEFINED"
+    }
+  }
+
+
 }
