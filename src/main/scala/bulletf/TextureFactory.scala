@@ -1,11 +1,13 @@
 package bulletf
 
 
-import mdesl.graphics.Texture
-import mdesl.test.Util
-import java.io.{File, FileInputStream}
+import java.io.{IOException, File, FileInputStream}
 
 import collection.mutable
+import org.lwjgl.opengl.{GL30, GL11, GL13}
+import java.nio.ByteBuffer
+import de.matthiasmann.twl.utils.PNGDecoder
+import de.matthiasmann.twl.utils.PNGDecoder.Format
 
 
 object TextureFactory {
@@ -41,7 +43,7 @@ object TextureFactory {
 
   def genNewTexture(uriStr: String, key: Symbol): Texture = {
     println("create texture: " + uriStr + ", key: " + key)
-    val texture = new Texture(Util.getResource(uriStr), Texture.NEAREST)
+    val texture = TextureLoader.fromPNG(uriStr)
     texCache.update(uriStr, texture)
     texture
   }
@@ -118,8 +120,60 @@ object TextureFactory {
 
   // リソースの開放
   def free() {
-    texCache.values.foreach(_.dispose())
+    texCache.values.foreach(_.delete())
     println("Freeing texture resources complete.")
   }
 
+}
+
+object TextureLoader {
+
+  def fromPNG(filename: String, textureUnit: Int = GL13.GL_TEXTURE0): Texture = {
+    var buf: ByteBuffer = null
+    var tWidth = 0
+    var tHeight = 0
+
+    try {
+      val in = new FileInputStream(filename)
+      val decoder = new PNGDecoder(in)
+
+      tWidth = decoder.getWidth
+      tHeight = decoder.getHeight
+
+      buf = ByteBuffer.allocateDirect(4 * decoder.getWidth * decoder.getHeight)
+      decoder.decode(buf, decoder.getWidth * 4, Format.RGBA)
+
+      buf.flip()
+      in.close()
+
+    } catch {
+      case e: IOException =>
+        e.printStackTrace()
+        sys.exit(-1)
+    }
+
+    val texId = GL11.glGenTextures()
+    GL13.glActiveTexture(textureUnit)
+    GL11.glBindTexture(GL11.GL_TEXTURE_2D, texId)
+
+    GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1)
+
+    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, tWidth, tHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf)
+    GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D)
+
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT)
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT)
+
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR)
+
+    Texture(texId, tWidth, tHeight)
+  }
+}
+
+case class Texture(id: Int, width: Int, height: Int) {
+
+  def bind() = GL11.glBindTexture(GL11.GL_TEXTURE_2D, id)
+
+  def delete() = GL11.glDeleteTextures(id)
 }

@@ -58,6 +58,9 @@ class Game(_width: Int, _height: Int) {
 
   def start() {
     initGL()
+    //DrawerPlus.setupOpenGL()
+    DrawerPlus.setupShader()
+    DrawerPlus.setupObjects()
     SceneController.init(new TestScene)
     SoundSystem.init()
     BGM.init()
@@ -87,18 +90,22 @@ class Game(_width: Int, _height: Int) {
       //Game.view3d()
 
       //Game.view2d()
-      SpriteBatch.self.begin()
+
+      DrawerPlus.begin()
 
       if (a%60==0) {
         val ta = System.nanoTime()
         SceneController.draw()
+        DrawerPlus.flush()
         val elasp = (System.nanoTime() - ta) / 1000.0 / 1000.0
         println(f"draw takes time: $elasp%e ms")
         println(s"sprite count: ${Sprite.count}")
+        println(s"drawCalls: ${DrawerPlus.drawCalls}")
       } else {
         SceneController.draw()
       }
-      SpriteBatch.self.end()
+
+      DrawerPlus.end()
 
       Display.update()
 
@@ -111,6 +118,7 @@ class Game(_width: Int, _height: Int) {
       a += 1; a %= 360
       if (Display.isCloseRequested) {
         println("free resources...")
+        DrawerPlus.destroyAll()
         BGM.free()
         SoundSystem.free()
         TextureFactory.free()

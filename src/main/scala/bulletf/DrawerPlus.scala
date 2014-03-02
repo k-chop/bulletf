@@ -38,16 +38,16 @@ object DrawerPlus {
   private[this] var vbo: VBO = _
   private[this] var ibo: VBO = _
   private[this] var shader: Shader = _
-  private[this] val texIds: Array[Int] = Array(0, 0)
+  private[this] val texIds: Array[Texture] = Array.ofDim[Texture](2)
 
   val width = 640
   val height = 480
 
   //-- test --------------
-  private[this] var a: ByteBuffer = _
-  private[this] var temp: ByteBuffer = _
-  private[this] var idxsbuf: ByteBuffer = _
-  private[this] var iboTemp: ByteBuffer = _
+  private[this] var verticesBuffer: ByteBuffer = _
+  private[this] var verticesBufferTemp: ByteBuffer = _
+  private[this] var indexBuffer: ByteBuffer = _
+  private[this] var indexBufferTemp: ByteBuffer = _
   private[this] val mat44buf = BufferUtils.createFloatBuffer(16)
   private[this] val projbuf = {
     val t4 = GLUtil.ortho2dMatrix(width, height)
@@ -58,21 +58,14 @@ object DrawerPlus {
   }
 
   val QUAD_MAX_NUM = 20000
-  private[this] val movings = Array.tabulate(QUAD_MAX_NUM){ i => new Moving(width/2f, height/2f, 10, 10, (math.random*360f).toFloat, (math.random*0.6f).toFloat) }
+  val MAX_VERTICES = QUAD_MAX_NUM*4
+  private[this] val movings = Array.tabulate(QUAD_MAX_NUM){ i => new Moving(width/2f, height/2f, 10, 10, (math.random*360f).toFloat, (math.random*0.6f).toFloat+0.2f) }
+
+  // time
   var timeidx = 0
   val updateTimes = Array.ofDim[Long](60)
   val drawTimes = Array.ofDim[Long](60)
   //--------------------
-
-  def setup() = {
-    vao = VAO.gen()
-    vao.bindWith { _ =>
-      vbo = VBO.gen(GL15.GL_ARRAY_BUFFER)
-      ibo = VBO.gen(GL15.GL_ELEMENT_ARRAY_BUFFER)
-    }
-  }
-
-  // ------------------------------------
 
   def main(args: Array[String]) = {
 
@@ -80,7 +73,7 @@ object DrawerPlus {
 
     setupOpenGL()
     setupShader()
-    setupQuads()
+    setupObjects()
     setupTextures()
 
     while (!Display.isCloseRequested) {
@@ -126,46 +119,27 @@ object DrawerPlus {
     shader = new Shader("shader/subd.vert", "shader/subd.frag")
   }
 
-  val MAX_VERTICES = QUAD_MAX_NUM*4
-  def setupQuads() = {
-    val p: Array[Array[Float]] = Array(
-      // x,y,r,g,b,a,s,t
-      Array(-0.5f, 0.5f, 1f, 0f, 0f, 1f, 0f, 0f),
-      Array(-0.5f,-0.5f, 0f, 1f, 0f, 1f, 0f, 1f),
-      Array( 0.5f,-0.5f, 0f, 0f, 1f, 1f, 1f, 1f),
-      Array( 0.5f, 0.5f, 1f, 1f, 1f, 1f, 1f, 0f)
-    )
+  def setupObjects() = {
+    // x,y,r,g,b,a,s,t -> (x,y): position, (r,g,b,a): color, (s,t): texture coordinate
+    val ms = VerticesLayout("xxcccctt", Map().withDefaultValue(GL11.GL_FLOAT))
 
-    temp = BufferUtils.createByteBuffer(8 * 4 *4)
-    a = BufferUtils.createByteBuffer(8 * 4 *4 *MAX_VERTICES)
-    val vf = a.asFloatBuffer()
-    p.foreach(vf.put)
-    vf.rewind() // not flip!!!
+    verticesBufferTemp = BufferUtils.createByteBuffer(ms.stride * 4) // vertices per quad
+    verticesBuffer = BufferUtils.createByteBuffer(ms.stride * 4 * QUAD_MAX_NUM) // vertices are Float
 
-    iboTemp = BufferUtils.createByteBuffer(6*4)
-    val idxs: Array[Int] = Array(0,1,2,2,3,0)
-    idxsbuf = BufferUtils.createByteBuffer(MAX_VERTICES*4) // Int
-    val e = idxsbuf.asIntBuffer()
-    e.put(idxs)
-    e.rewind() // not flip!!!
+    indexBufferTemp = BufferUtils.createByteBuffer(6*4)  // indices per quad
+    indexBuffer = BufferUtils.createByteBuffer(MAX_VERTICES * 4) // indices are Int
 
     vao = VAO.gen()
-    vao.bindWith { implicit a =>
+    vao.bindWith { implicit vaoi => // for vbo operation which vao bind required.
       vbo = VBO.gen(GL15.GL_ARRAY_BUFFER)
       vbo.bindWith { v =>
-        v.setData(vf, GL15.GL_STREAM_DRAW)
-        val ms = MappedString("xxcccctt", Map().withDefaultValue(GL11.GL_FLOAT))
+        v.setData(verticesBuffer, GL15.GL_STREAM_DRAW)
         v.setAttributes(ms)
-        /*
-        v.attribute(0, 2, GL11.GL_FLOAT, normalized = false, 8*4, 0)
-        v.attribute(1, 4, GL11.GL_FLOAT, normalized = false, 8*4, 2*4)
-        v.attribute(2, 2, GL11.GL_FLOAT, normalized = false, 8*4, 6*4)
-        */
       }
     }
     ibo = VBO.gen(GL15.GL_ELEMENT_ARRAY_BUFFER)
     ibo.bindWith {
-      _.setData(idxsbuf, GL15.GL_STREAM_DRAW)
+      _.setData(indexBuffer, GL15.GL_STREAM_DRAW)
     }
   }
 
@@ -174,10 +148,103 @@ object DrawerPlus {
     texIds(1) = TextureLoader.fromPNG("img/ash_uvgrid07.png")
   }
 
+  //--------------------
+  var idx = 0
+  var nowTextureId = 0
+  var drawCalls = 0
+
+  def begin() = {
+    idx = 0
+    drawCalls = 0
+  }
+
+  def end() = {
+    if (idx > 0) flush()
+  }
+
+  def storeVertices(fbuf: FloatBuffer, texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double, alpha: Double) = {
+    fbuf.rewind()
+
+    import Game.{width => w, height => h}
+    val x1 = (pos.x.toFloat / w)*2f-1f
+    val y1 = -((pos.y.toFloat / h)*2f-1f)
+    val y2 = -(((pos.y.toFloat+rect.h) / h)*2f-1f)
+    val x2 = ((pos.x.toFloat+rect.w) / w)*2f-1f
+
+    val fAlpha = alpha.toFloat
+    val s1 = rect.x / texture.width.toFloat
+    val s2 = (rect.x + rect.w) / texture.width.toFloat
+    val t1 = rect.y / texture.height.toFloat
+    val t2 = (rect.y + rect.h) / texture.height.toFloat
+
+    fbuf.put(x1).put(y1).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t1)
+    fbuf.put(x1).put(y2).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t2)
+    fbuf.put(x2).put(y2).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t2)
+    fbuf.put(x2).put(y1).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t1)
+
+    fbuf.flip()
+  }
+
+  def draw(texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double, alpha: Double) = {
+
+    if (nowTextureId == -1) {
+      texture.bind()
+      nowTextureId = texture.id
+    } else if (texture.id != nowTextureId) {
+      flush()
+      texture.bind()
+      nowTextureId = texture.id
+    }
+
+    val fbuf = verticesBufferTemp.asFloatBuffer()
+    storeVertices(fbuf, texture, rect, pos, rotate, scale, alpha)
+
+    vbo.bindWith { _ =>
+      GL11.glGetError()
+      GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 4L*8*4*idx, verticesBufferTemp)
+      if (GL11.glGetError() != GL11.GL_NO_ERROR) {
+        println("error: " + GLU.gluErrorString(GL11.glGetError()))
+      }
+    }
+
+    ibo.bindWith { _ =>
+      indexBufferTemp.rewind()
+      val ibuf = indexBufferTemp.asIntBuffer()
+      val ofs = 4 * idx // quad = 4 vertices
+      ibuf.put(0+ofs).put(1+ofs).put(2+ofs).put(2+ofs).put(3+ofs).put(0+ofs)
+      ibuf.flip()
+      GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 6L * 4 * idx, indexBufferTemp) // 6 index per quad
+    }
+
+    idx += 1
+  }
+
+  def flush() = {
+    shader.useWith { s =>
+      val modelmat = new Matrix4f()
+
+      modelmat.store(mat44buf)
+      mat44buf.flip()
+      s.setUniformMat4("modelMatrix", transpose = false, mat44buf)
+      s.setUniformMat4("projMatrix", transpose = false, projbuf)
+
+
+      vao.bindWith { implicit a =>
+        vbo.enableAttributes(a)
+        ibo.bindWith { _ =>
+          GL11.glDrawElements(GL11.GL_TRIANGLES, 6*idx, GL11.GL_UNSIGNED_INT, 0)
+        }
+        vbo.disableAttributes(a)
+      }
+    }
+    drawCalls += 1
+    idx = 0
+  }
+
   def step() = {
 
     //p("first")
-    val fbuf = temp.asFloatBuffer()
+    val fbuf = verticesBufferTemp.asFloatBuffer()
     movings.foreach(_.update())
 
     //p("vbo bind before")
@@ -192,7 +259,7 @@ object DrawerPlus {
       //p(s"sub bef (${temp.limit()}})")
       val q = 4L*8*4*i
       GL11.glGetError() // suteru
-      GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, q, temp)
+      GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, q, verticesBufferTemp)
       if (bb && GL11.glGetError() == GL11.GL_INVALID_VALUE) {
         println("idx:"+i +" (invalid value found)")
         bb = false
@@ -207,11 +274,11 @@ object DrawerPlus {
     var j = 0
     while(j < movings.length) {
       val ofs = j*4
-      iboTemp.rewind()
-      val ib = iboTemp.asIntBuffer()
+      indexBufferTemp.rewind()
+      val ib = indexBufferTemp.asIntBuffer()
       ib.put(0+ofs).put(1+ofs).put(2+ofs).put(2+ofs).put(3+ofs).put(0+ofs)
       ib.flip()
-      GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 6L*4*j, iboTemp)
+      GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 6L*4*j, indexBufferTemp)
       j+=1
     }
     ibo.unbind()
@@ -227,22 +294,11 @@ object DrawerPlus {
       s.setUniformMat4("modelMatrix", transpose = false, mat44buf)
       s.setUniformMat4("projMatrix", transpose = false, projbuf)
     }
-
-    /*vbo.bindWith { b =>
-      temp.clear()
-      GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, temp)
-      println("0: " + inp(temp.asFloatBuffer()))
-      temp.clear()
-      GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 8*4*4, temp)
-      println("1: " + inp(temp.asFloatBuffer()))
-      temp.clear()
-      GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 8L*4*4*2, temp)
-      println("2: " + inp(temp.asFloatBuffer()))
-    }*/
   }
-  def p(s: String) = println(s + ": " +GLU.gluErrorString(GL11.glGetError()))
 
-  def inp(f: FloatBuffer) = {
+  private[this] def p(s: String) = println(s + ": " +GLU.gluErrorString(GL11.glGetError()))
+
+  private[this] def inp(f: FloatBuffer) = {
     f.rewind()
     val a = collection.mutable.ArrayBuilder.make[Float]()
     val lim = f.limit()
@@ -251,12 +307,13 @@ object DrawerPlus {
     }
     a.result().deep.toString()
   }
+
   def render() = {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT)
 
     shader.useWith { _ =>
       GL13.glActiveTexture(GL13.GL_TEXTURE0)
-      GL11.glBindTexture(GL11.GL_TEXTURE_2D, texIds(0))
+      texIds(0).bind()
 
       vao.bindWith { implicit a =>
         vbo.enableAttributes(a)
@@ -280,9 +337,9 @@ object DrawerPlus {
   }
 }
 
-case class MappedString(mapping: String, mapper: Map[Char, Int]) {
+case class VerticesLayout(mapping: String, mapper: Map[Char, Int]) {
 
-  private[this] def iterator() = {
+  private[this] def iterator(): Iterator[(Int, Int)] = {
     require(mapping != "", "Attribute mapping string must be nonEmpty.")
 
     val sizeMap: Map[Char, Int] = mapping groupBy identity map { case (c, s) => c -> s.length }
@@ -300,12 +357,14 @@ case class MappedString(mapping: String, mapper: Map[Char, Int]) {
     }
   }
 
+  private[this] val l = iterator().toList
+
+  val stride = l.foldLeft(0){ case (c, (size, typ)) => c + size * GLUtil.byteSize(typ) }
+
   def makeRegisterList(): Array[(Int, Int, Int, Int, Long)] = {
-    val l = iterator().toList
 
     var offset = 0L
     var idx = 0
-    val stride = l.foldLeft(0){ case (c, (size, typ)) => c + size * GLUtil.byteSize(typ) }
 
     val builder = mutable.ArrayBuilder.make[(Int, Int, Int, Int, Long)]()
     l foreach { case (size, data_type) =>
@@ -430,7 +489,7 @@ class VBO(id: Int, typ: Int) {
     GL20.glVertexAttribPointer(listIdx, size, dataType, normalized, stride, offset)
   }
 
-  def setAttributes(ms: MappedString)(implicit vao: VAO) = {
+  def setAttributes(ms: VerticesLayout)(implicit vao: VAO) = {
     require(vao.isBound, "setAttributes: cannot set to attribute list with no VAO bound.")
 
     ms.makeRegisterList() foreach { case (idx, size, data_type, stride, offset) =>
@@ -483,7 +542,7 @@ class VAO(id: Int) {
     bound = false
   }
 
-  @inline def bindWith[T](f: VAO => T) = {
+  @inline final def bindWith[T](f: VAO => T) = {
     this.bind()
     f(this)
     this.unbind()
@@ -496,47 +555,3 @@ class VAO(id: Int) {
 
 }
 
-object TextureLoader {
-
-  def fromPNG(filename: String, textureUnit: Int = GL13.GL_TEXTURE0): Int = {
-    var buf: ByteBuffer = null
-    var tWidth = 0
-    var tHeight = 0
-
-    try {
-      val in = new FileInputStream(filename)
-      val decoder = new PNGDecoder(in)
-
-      tWidth = decoder.getWidth
-      tHeight = decoder.getHeight
-
-      buf = ByteBuffer.allocateDirect(4 * decoder.getWidth * decoder.getHeight)
-      decoder.decode(buf, decoder.getWidth * 4, Format.RGBA)
-
-      buf.flip()
-      in.close()
-
-    } catch {
-      case e: IOException =>
-        e.printStackTrace()
-        sys.exit(-1)
-    }
-
-    val texId = GL11.glGenTextures()
-    GL13.glActiveTexture(textureUnit)
-    GL11.glBindTexture(GL11.GL_TEXTURE_2D, texId)
-
-    GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1)
-
-    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, tWidth, tHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf)
-    GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D)
-
-    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT)
-    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT)
-
-    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
-    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR)
-
-    texId
-  }
-}
