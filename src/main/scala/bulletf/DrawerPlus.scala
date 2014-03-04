@@ -166,16 +166,16 @@ object DrawerPlus {
     fbuf.rewind()
 
     import Game.{width => w, height => h}
-    val x1 = (pos.x.toFloat / w)*2f-1f
-    val y1 = -((pos.y.toFloat / h)*2f-1f)
-    val y2 = -(((pos.y.toFloat+rect.h) / h)*2f-1f)
-    val x2 = ((pos.x.toFloat+rect.w) / w)*2f-1f
+    val x1 = (pos.x / w * 2.0 - 1.0).toFloat
+    val y1 = -(pos.y / h * 2.0 - 1.0).toFloat
+    val y2 = -((pos.y + rect.h) / h * 2.0 - 1.0).toFloat
+    val x2 = ((pos.x + rect.w) / w * 2.0 - 1.0).toFloat
 
     val fAlpha = alpha.toFloat
-    val s1 = rect.x / texture.width.toFloat
-    val s2 = (rect.x + rect.w) / texture.width.toFloat
-    val t1 = rect.y / texture.height.toFloat
-    val t2 = (rect.y + rect.h) / texture.height.toFloat
+    val s1 = (rect.x / texture.width.toDouble).toFloat
+    val s2 = ((rect.x + rect.w) / texture.width.toDouble).toFloat
+    val t1 = (rect.y / texture.height.toDouble).toFloat
+    val t2 = ((rect.y + rect.h) / texture.height.toDouble).toFloat
 
     fbuf.put(x1).put(y1).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t1)
     fbuf.put(x1).put(y2).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t2)
