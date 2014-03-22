@@ -1,4 +1,4 @@
-package bulletf
+package bulletf.example
 
 import org.lwjgl.opengl._
 import java.nio.{ByteBuffer, FloatBuffer}
@@ -19,7 +19,7 @@ object TestVBOInterleaved {
   private val width = 640
   private val height = 480
 
-  def main(args: Array[String]) {
+  /*def main(args: Array[String]) {
     setupOpenGL()
     setupQuad()
     setupShaders()
@@ -32,7 +32,7 @@ object TestVBOInterleaved {
     }
 
     destroyOpenGL()
-  }
+  }*/
 
   def setupOpenGL() {
     try {

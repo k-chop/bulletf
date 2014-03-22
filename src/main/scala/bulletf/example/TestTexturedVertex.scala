@@ -1,4 +1,4 @@
-package bulletf
+package bulletf.example
 
 import scala.language.implicitConversions
 

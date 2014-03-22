@@ -1,7 +1,7 @@
-package bulletf
+package bulletf.example
 
 import org.lwjgl.opengl._
-import java.nio.{ByteBuffer, FloatBuffer}
+import java.nio.ByteBuffer
 import org.lwjgl.{LWJGLException, BufferUtils}
 import org.lwjgl.util.glu.GLU
 import java.io.{FileInputStream, IOException}
@@ -30,7 +30,7 @@ object TestVBOWithBufferSubData {
   private var vertexByteBuffer: ByteBuffer = null
   private var verticesByteBuffer: ByteBuffer = null
 
-  def main(args: Array[String]) {
+  /*def main(args: Array[String]) {
     setupOpenGL()
     setupQuad()
     setupShaders()
@@ -44,7 +44,7 @@ object TestVBOWithBufferSubData {
     }
 
     destroyOpenGL()
-  }
+  }*/
 
   def setupTextures() {
     texIds(0) = loadPNGTexture("img/ash_uvgrid01.png", GL13.GL_TEXTURE0)
