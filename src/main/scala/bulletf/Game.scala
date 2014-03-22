@@ -1,6 +1,6 @@
 package bulletf
 
-import org.lwjgl.opengl.{GLContext, Display, DisplayMode, GL11}
+import org.lwjgl.opengl._
 import org.lwjgl.input.Controllers
 
 object Game {
@@ -48,27 +48,19 @@ object Game {
 
 class Game(_width: Int, _height: Int) {
   var fps: Int = 60
+  var a: Int = 0
   private[this] var lastFrame: Long = 0
   private[this] var fpscount: Int = 0
   private[this] var lastFPS: Long = 0
-
-  var ax: Float = 0f
-  var ay: Float = 0f
-  var az: Float = 0f
-  var x = 0f
-  var y = 0f
-  var rotation: Double = 0
-  var a: Int = 0
-  var s: Int = 0
-  var sum: Double = 0
-  var error: Long = 0
 
   Game._width = _width
   Game._height = _height
 
   def start() {
     initGL()
-    GLUtil.setup()
+    //DrawerPlus.setupOpenGL()
+    DrawerPlus.setupShader()
+    DrawerPlus.setupObjects()
     SceneController.init(new TestScene)
     SoundSystem.init()
     BGM.init()
@@ -76,8 +68,7 @@ class Game(_width: Int, _height: Int) {
     calcDelta()
     lastFPS = getTime
 
-    println("vbo: " + GLContext.getCapabilities.GL_ARB_vertex_buffer_object)
-    println("drawelement: " + GLContext.getCapabilities.GL_ARB_draw_elements_base_vertex)
+    GLUtil.printGLSpecs()
 
     while (true) {
       val be = getTime
@@ -96,29 +87,38 @@ class Game(_width: Int, _height: Int) {
       updateFPS()
 
       Game.clearScreen()
-      Game.view3d()
+      //Game.view3d()
 
-      Game.view2d()
+      //Game.view2d()
+
+      DrawerPlus.begin()
+
       if (a%60==0) {
         val ta = System.nanoTime()
         SceneController.draw()
+        DrawerPlus.flush()
         val elasp = (System.nanoTime() - ta) / 1000.0 / 1000.0
         println(f"draw takes time: $elasp%e ms")
         println(s"sprite count: ${Sprite.count}")
+        println(s"drawCalls: ${DrawerPlus.drawCalls}")
       } else {
         SceneController.draw()
       }
+
+      DrawerPlus.end()
+
       Display.update()
 
       // s += 1
       // sum += delta//getTime - be
       // if (s == fps) { println((sum / s.toDouble) + " : " + sum); s= 0; sum=0}
 
-      sync(be)
-      //Display.sync(fps) // ←dame (on windows7 64bit)
+      //sync(be)
+      Display.sync(fps) // ←dame (on windows7 64bit)
       a += 1; a %= 360
       if (Display.isCloseRequested) {
         println("free resources...")
+        DrawerPlus.destroyAll()
         BGM.free()
         SoundSystem.free()
         TextureFactory.free()
@@ -140,13 +140,6 @@ class Game(_width: Int, _height: Int) {
     }
     //println("wait: " + (now - before))
   }
-  
-  def up(delta: Int) {
-    a += 1
-    rotation += 0.15 * delta / 1000.0
-    y += 0.15f * delta / 1000.0f
-    if (y > Game.height) y = 0
-  }
 
   private def initGL() {
     Display.setDisplayMode(new DisplayMode(Game.width,Game.height))
@@ -166,14 +159,7 @@ class Game(_width: Int, _height: Int) {
     
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    
-    GL11.glViewport(0,0,Game.width,Game.height)
-//    GL11.glMatrixMode(GL11.GL_MODELVIEW)
 
-//    GL11.glMatrixMode(GL11.GL_PROJECTION)
-//   GL11.glLoadIdentity()
-//    GL11.glOrtho(0, width, height, 0, 1, -1)
-//    GL11.glMatrixMode(GL11.GL_MODELVIEW)
   }
 
   def getTime: Long = System.nanoTime / 1000//(Sys.getTime() * 1000 / Sys.getTimerResolution())

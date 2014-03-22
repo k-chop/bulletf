@@ -1,14 +1,6 @@
 package bulletf
 
 
-
-import java.io.{ FileInputStream, IOException }
-
-import org.lwjgl.LWJGLException
-import org.lwjgl.opengl.{ Display, DisplayMode, GL11 }
-import org.newdawn.slick.Color
-import org.newdawn.slick.opengl.{ Texture, TextureLoader }
-
 import collection.mutable
 
 object SceneController {

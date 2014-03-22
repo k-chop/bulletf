@@ -3,7 +3,10 @@ package bulletf
 
 
 import scala.collection.mutable
-import org.newdawn.slick.opengl.Texture
+
+object SpriteBatch {
+  final val self = new mdesl.graphics.SpriteBatch()
+}
 
 object Sprite {
 
@@ -52,11 +55,11 @@ class SpriteImpl(resourceId: Symbol) extends Sprite {
 
   // 普通のSpriteはtime無視
   def draw(pos: Position, angle: Double, scale: Double, alpha: Double, time: Int) {
-    Drawer.draw(texture, rect, pos, angle, scale, alpha)
+    DrawerPlus.draw(texture, rect, pos, angle, scale, alpha)
   }
 
   def draw(custom_rect: Rect, pos: Position, angle: Double) {
-    Drawer.draw(texture, custom_rect, pos, angle)
+    //Drawer.draw(texture, custom_rect, pos, angle)
   }
 
 }
