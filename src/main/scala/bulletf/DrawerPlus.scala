@@ -67,7 +67,7 @@ object DrawerPlus {
   val drawTimes = Array.ofDim[Long](60)
   //--------------------
 
-  def main(args: Array[String]) = {
+  /*def main(args: Array[String]) = {
 
     def time = System.nanoTime()
 
@@ -96,7 +96,7 @@ object DrawerPlus {
     }
 
     destroyAll()
-  }
+  }*/
 
   def setupOpenGL() = {
     try {
