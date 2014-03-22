@@ -7,41 +7,18 @@ import de.matthiasmann.twl.utils.PNGDecoder
 import de.matthiasmann.twl.utils.PNGDecoder.Format
 import org.lwjgl.{BufferUtils, LWJGLException}
 import org.lwjgl.util.glu.GLU
-import org.lwjgl.util.vector.{Matrix4f, Vector3f}
+import org.lwjgl.util.vector.{Vector2f, Vector4f, Matrix4f, Vector3f}
 import scala.collection.mutable
 
-
-class Moving(var x: Float, var y: Float, width: Int, height: Int, val angle: Float, speed: Float) {
-  import scala.math._
-
-  def store(buf: FloatBuffer) = {
-    import DrawerPlus.{width => w, height => h}
-    val x1 = (x / w)*2f-1f
-    val y1 = (y / h)*2f-1f
-    val y2 = ((y+height) / h)*2f-1f
-    val x2 = ((x+width) / w)*2f-1f
-
-    buf.put(x1).put(y1).put(1f).put(1f).put(1f).put(1f).put(0f).put(0f)
-    buf.put(x1).put(y2).put(1f).put(1f).put(1f).put(1f).put(0f).put(1f)
-    buf.put(x2).put(y2).put(1f).put(1f).put(1f).put(1f).put(1f).put(1f)
-    buf.put(x2).put(y1).put(1f).put(1f).put(1f).put(1f).put(1f).put(0f)
-  }
-
-  def update() = {
-    x += (cos(angle * Pi / 180.0f) * speed).toFloat
-    y += (sin(angle * Pi / 180.0f) * speed).toFloat
-  }
-}
-
 object DrawerPlus {
+
   private[this] var vao: VAO = _
   private[this] var vbo: VBO = _
   private[this] var ibo: VBO = _
   private[this] var shader: Shader = _
-  private[this] val texIds: Array[Texture] = Array.ofDim[Texture](2)
 
-  val width = 640
-  val height = 480
+  lazy val width = Game.width
+  lazy val height = Game.height
 
   //-- test --------------
   private[this] var verticesBuffer: ByteBuffer = _
@@ -59,44 +36,12 @@ object DrawerPlus {
 
   val QUAD_MAX_NUM = 20000
   val MAX_VERTICES = QUAD_MAX_NUM*4
-  private[this] val movings = Array.tabulate(QUAD_MAX_NUM){ i => new Moving(width/2f, height/2f, 10, 10, (math.random*360f).toFloat, (math.random*0.6f).toFloat+0.2f) }
 
   // time
   var timeidx = 0
   val updateTimes = Array.ofDim[Long](60)
   val drawTimes = Array.ofDim[Long](60)
   //--------------------
-
-  /*def main(args: Array[String]) = {
-
-    def time = System.nanoTime()
-
-    setupOpenGL()
-    setupShader()
-    setupObjects()
-    setupTextures()
-
-    while (!Display.isCloseRequested) {
-      val be = time
-      step()
-      updateTimes(timeidx) = time - be
-      val be2 = time
-      render()
-      drawTimes(timeidx) = time - be2
-
-      timeidx+=1
-      timeidx%=60
-      if (timeidx == 0) {
-        println("update average: " + updateTimes.sum/60.0/1000/1000) //msec
-        println("draw average: " + drawTimes.sum/60.0/1000/1000)  //msec
-      }
-
-      Display.sync(60)
-      Display.update()
-    }
-
-    destroyAll()
-  }*/
 
   def setupOpenGL() = {
     try {
@@ -143,11 +88,6 @@ object DrawerPlus {
     }
   }
 
-  def setupTextures() = {
-    texIds(0) = TextureLoader.fromPNG("img/ash_uvgrid01.png")
-    texIds(1) = TextureLoader.fromPNG("img/ash_uvgrid07.png")
-  }
-
   //--------------------
   var idx = 0
   var nowTextureId = 0
@@ -162,14 +102,25 @@ object DrawerPlus {
     if (idx > 0) flush()
   }
 
+  // temp matrices (to avoid allocation)
+  val rotSrc = new Matrix4f()
+  val rotVec = new Vector3f(0.0f, 0.0f, 1.0f) // Z-axis
+  val srcVec = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f)
+  val posVec = new Vector3f(0.0f, 0.0f, 1.0f)
+  val scaleVec = new Vector3f()
+
   def storeVertices(fbuf: FloatBuffer, texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double, alpha: Double) = {
     fbuf.rewind()
 
     import Game.{width => w, height => h}
-    val x1 = (pos.x / w * 2.0 - 1.0).toFloat
-    val y1 = -(pos.y / h * 2.0 - 1.0).toFloat
-    val y2 = -((pos.y + rect.h) / h * 2.0 - 1.0).toFloat
-    val x2 = ((pos.x + rect.w) / w * 2.0 - 1.0).toFloat
+
+    val ww = rect.w / 2.0
+    val hh = rect.h / 2.0
+
+    val x1 = ((pos.x-ww) / w * 2.0 - 1.0).toFloat
+    val y1 = -((pos.y-hh) / h * 2.0 - 1.0).toFloat
+    val y2 = -((pos.y-hh + rect.h) / h * 2.0 - 1.0).toFloat
+    val x2 = ((pos.x-ww + rect.w) / w * 2.0 - 1.0).toFloat
 
     val fAlpha = alpha.toFloat
     val s1 = (rect.x / texture.width.toDouble).toFloat
@@ -177,10 +128,29 @@ object DrawerPlus {
     val t1 = (rect.y / texture.height.toDouble).toFloat
     val t2 = ((rect.y + rect.h) / texture.height.toDouble).toFloat
 
-    fbuf.put(x1).put(y1).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t1)
-    fbuf.put(x1).put(y2).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t2)
-    fbuf.put(x2).put(y2).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t2)
-    fbuf.put(x2).put(y1).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t1)
+    rotSrc.setIdentity()
+
+    val ddx = (pos.x/w*2.0-1.0).toFloat
+    val ddy = -(pos.y/h*2.0-1.0).toFloat
+    posVec.set(ddx, ddy)
+    rotSrc.translate(posVec)
+    rotSrc.rotate(-rotate.toRadians.toFloat, rotVec)
+    scaleVec.set(scale.toFloat, scale.toFloat, 1f)
+    rotSrc.scale(scaleVec)
+    posVec.set(-ddx, -ddy)
+    rotSrc.translate(posVec)
+
+    srcVec.set(x1, y1, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t1)
+
+    srcVec.set(x1, y2, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t2)
+
+    srcVec.set(x2, y2, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t2)
+
+    srcVec.set(x2, y1, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t1)
 
     fbuf.flip()
   }
@@ -239,91 +209,6 @@ object DrawerPlus {
     }
     drawCalls += 1
     idx = 0
-  }
-
-  def step() = {
-
-    //p("first")
-    val fbuf = verticesBufferTemp.asFloatBuffer()
-    movings.foreach(_.update())
-
-    //p("vbo bind before")
-    vbo.bind()
-    var i = 0
-    var bb = true
-    while(i < movings.length) {
-      fbuf.rewind()
-      movings(i).store(fbuf)
-      fbuf.flip()
-      //println(i +"__: " + inp(fbuf))
-      //p(s"sub bef (${temp.limit()}})")
-      val q = 4L*8*4*i
-      GL11.glGetError() // suteru
-      GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, q, verticesBufferTemp)
-      if (bb && GL11.glGetError() == GL11.GL_INVALID_VALUE) {
-        println("idx:"+i +" (invalid value found)")
-        bb = false
-      }
-      //p("sub aft")
-      i+=1
-    }
-    vbo.unbind()
-    //p("vbo bind after, ibo bind before")
-
-    ibo.bind()
-    var j = 0
-    while(j < movings.length) {
-      val ofs = j*4
-      indexBufferTemp.rewind()
-      val ib = indexBufferTemp.asIntBuffer()
-      ib.put(0+ofs).put(1+ofs).put(2+ofs).put(2+ofs).put(3+ofs).put(0+ofs)
-      ib.flip()
-      GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 6L*4*j, indexBufferTemp)
-      j+=1
-    }
-    ibo.unbind()
-    //p("ibo bind after")
-
-    val modelmat = new Matrix4f()
-    //rotateVec.z += angleDelta
-    //Matrix4f.rotate(rotateVec.getZ.toDouble.toRadians.toFloat, new Vector3f(0, 0, 1), modelmat, modelmat)
-
-    shader.useWith { s =>
-      modelmat.store(mat44buf)
-      mat44buf.flip()
-      s.setUniformMat4("modelMatrix", transpose = false, mat44buf)
-      s.setUniformMat4("projMatrix", transpose = false, projbuf)
-    }
-  }
-
-  private[this] def p(s: String) = println(s + ": " +GLU.gluErrorString(GL11.glGetError()))
-
-  private[this] def inp(f: FloatBuffer) = {
-    f.rewind()
-    val a = collection.mutable.ArrayBuilder.make[Float]()
-    val lim = f.limit()
-    (0 until lim) foreach { i =>
-      a += f.get(i)
-    }
-    a.result().deep.toString()
-  }
-
-  def render() = {
-    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT)
-
-    shader.useWith { _ =>
-      GL13.glActiveTexture(GL13.GL_TEXTURE0)
-      texIds(0).bind()
-
-      vao.bindWith { implicit a =>
-        vbo.enableAttributes(a)
-        ibo.bindWith { _ =>
-          GL11.glDrawElements(GL11.GL_TRIANGLES, 6*movings.length, GL11.GL_UNSIGNED_INT, 0)
-        }
-        vbo.disableAttributes(a)
-      }
-    }
-
   }
 
   def destroyAll() = {
@@ -477,7 +362,7 @@ class VBO(id: Int, typ: Int) {
     bound = false
   }
 
-  def bindWith[T](f: VBO => T) = {
+  @inline final def bindWith[T](f: VBO => T) = {
     bind(); f(this); unbind()
   }
 
