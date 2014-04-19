@@ -198,7 +198,9 @@ object DrawerPlus {
       s.setUniformMat4("modelMatrix", transpose = false, mat44buf)
       s.setUniformMat4("projMatrix", transpose = false, projbuf)
 
-
+      GL11.glEnable(GL11.GL_BLEND)
+      //GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE) // additive blending
+      GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
       vao.bindWith { implicit a =>
         vbo.enableAttributes(a)
         ibo.bindWith { _ =>
@@ -206,6 +208,7 @@ object DrawerPlus {
         }
         vbo.disableAttributes(a)
       }
+      GL11.glDisable(GL11.GL_BLEND)
     }
     drawCalls += 1
     idx = 0
