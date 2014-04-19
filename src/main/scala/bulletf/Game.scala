@@ -15,35 +15,6 @@ object Game {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT)
   }
 
-  def view3d() {
-    import GL11._
-
-    if (!on3d) {
-      glMatrixMode(GL_PROJECTION)
-      glPopMatrix()
-      glMatrixMode(GL_MODELVIEW)
-      glPopMatrix()
-      glLoadIdentity()
-      on3d = true
-    }
-  }
-
-  def view2d() {
-    import GL11._
-
-    if (on3d) {
-      glMatrixMode(GL_PROJECTION)
-      glPushMatrix()
-      glLoadIdentity()
-      glOrtho(0, width, height, 0, 1, -1)
-      glMatrixMode(GL_MODELVIEW)
-      glPushMatrix()
-      glLoadIdentity()
-      glColor4f(1.0f, 1.0f, 1.0f, 1.0f)
-      on3d = false
-    }
-  }
-
 }
 
 class Game(_width: Int, _height: Int) {
@@ -87,9 +58,6 @@ class Game(_width: Int, _height: Int) {
       updateFPS()
 
       Game.clearScreen()
-      //Game.view3d()
-
-      //Game.view2d()
 
       DrawerPlus.begin()
 
