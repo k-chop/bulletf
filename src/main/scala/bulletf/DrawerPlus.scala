@@ -105,8 +105,8 @@ object DrawerPlus {
   // temp matrices (to avoid allocation)
   val rotSrc = new Matrix4f()
   val rotVec = new Vector3f(0.0f, 0.0f, 1.0f) // Z-axis
-  val srcVec = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f)
-  val posVec = new Vector3f(0.0f, 0.0f, 1.0f)
+  val srcVec = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f)
+  val posVec = new Vector3f(0.0f, 0.0f, 0.0f)
   val scaleVec = new Vector3f()
 
   def storeVertices(fbuf: FloatBuffer, texture: Texture, rect: Rect, pos: Position, rotate: Double, scale: Double, alpha: Double) = {
@@ -117,10 +117,10 @@ object DrawerPlus {
     val ww = rect.w / 2.0
     val hh = rect.h / 2.0
 
-    val x1 = ((pos.x-ww) / w * 2.0 - 1.0).toFloat
-    val y1 = -((pos.y-hh) / h * 2.0 - 1.0).toFloat
-    val y2 = -((pos.y-hh + rect.h) / h * 2.0 - 1.0).toFloat
-    val x2 = ((pos.x-ww + rect.w) / w * 2.0 - 1.0).toFloat
+    val x1b = (pos.x-ww).toFloat /*  / w * 2.0 - 1.0).toFloat */
+    val y1b = (pos.y-hh).toFloat /* / h * 2.0 - 1.0).toFloat */
+    val y2b = (pos.y+hh).toFloat /* / h * 2.0 - 1.0).toFloat */
+    val x2b = (pos.x+ww).toFloat /* / w * 2.0 - 1.0).toFloat */
 
     val fAlpha = alpha.toFloat
     val s1 = (rect.x / texture.width.toDouble).toFloat
@@ -130,27 +130,34 @@ object DrawerPlus {
 
     rotSrc.setIdentity()
 
-    val ddx = (pos.x/w*2.0-1.0).toFloat
-    val ddy = -(pos.y/h*2.0-1.0).toFloat
-    posVec.set(ddx, ddy)
+    val ddx = pos.x.toFloat
+    val ddy = pos.y.toFloat
+    // point_translation
+    posVec.set(ddx, ddy, 0f)
     rotSrc.translate(posVec)
-    rotSrc.rotate(-rotate.toRadians.toFloat, rotVec)
+    // scale
     scaleVec.set(scale.toFloat, scale.toFloat, 1f)
     rotSrc.scale(scaleVec)
-    posVec.set(-ddx, -ddy)
+    // rotate
+    rotSrc.rotate(rotate.toRadians.toFloat, rotVec)
+    // object_translation
+    posVec.set(-ddx, -ddy, 0f)
     rotSrc.translate(posVec)
 
-    srcVec.set(x1, y1, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
-    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t1)
+    @inline def nw(n: Float) = n / w * 2.0f - 1.0f
+    @inline def nh(n: Float) = -(n / h * 2.0f - 1.0f)
 
-    srcVec.set(x1, y2, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
-    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t2)
+    srcVec.set(x1b, y1b, 0f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(nw(srcVec.getX)).put(nh(srcVec.getY)).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t1)
 
-    srcVec.set(x2, y2, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
-    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t2)
+    srcVec.set(x1b, y2b, 0f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(nw(srcVec.getX)).put(nh(srcVec.getY)).put(1f).put(1f).put(1f).put(fAlpha).put(s1).put(t2)
 
-    srcVec.set(x2, y1, 1f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
-    fbuf.put(srcVec.getX).put(srcVec.getY).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t1)
+    srcVec.set(x2b, y2b, 0f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(nw(srcVec.getX)).put(nh(srcVec.getY)).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t2)
+
+    srcVec.set(x2b, y1b, 0f, 1f); Matrix4f.transform(rotSrc, srcVec, srcVec)
+    fbuf.put(nw(srcVec.getX)).put(nh(srcVec.getY)).put(1f).put(1f).put(1f).put(fAlpha).put(s2).put(t1)
 
     fbuf.flip()
   }
