@@ -53,7 +53,7 @@ class ScoreBoardImpl(private[this] var score: Int) extends ClearableScoreBoard {
   def draw() {
     def drawIn(i: Int, x: Int, y: Int, digit: Int) {
       if (i == 0 && digit != 0) {
-        return
+
       } else {
         val k = i % 10
         tp.x = x; tp.y = y

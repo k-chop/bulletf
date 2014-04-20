@@ -59,7 +59,7 @@ class SpriteImpl(resourceId: Symbol) extends Sprite {
   }
 
   def draw(custom_rect: Rect, pos: Position, angle: Double) {
-    //Drawer.draw(texture, custom_rect, pos, angle)
+    DrawerPlus.draw(texture, custom_rect, pos, angle, scale = 1f, alpha = 1f)
   }
 
 }
