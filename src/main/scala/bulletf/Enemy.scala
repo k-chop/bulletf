@@ -42,12 +42,12 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
 
   // スクリプトの実行が終わっていてまだ弾が残っているなら等速直線運動
   // 弾も消え、自身も画面外に行ったら死亡
-  def onEndScript(delta: Int) {
+  def onEndScript() {
     if (ownObjects.isEmpty && !live) disable()
-    if (live) BasicBehavior.run(delta)(this)
+    if (live) BasicBehavior.run(this)
   }
 
-  def update(delta: Int) {
+  def update() {
     if (enable) {
       if (nextAddPool.nonEmpty) {
         ownObjects ++= nextAddPool // この時点でinitが済んでる
@@ -57,16 +57,15 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
       if (live) {
         time += 1
         if (0 < status.restFrame) { // 移動が済んでない場合移動、asyncならactionも一緒に実行
-          MoveStrategy.move(delta)(this, status)
+          MoveStrategy.move(this, status)
           if (status.async)
-            action.run(delta)(this)
+            action.run(this)
         } else { // 移動が済んでる場合action実行
-          action.run(delta)(this)
+          action.run(this)
         }
         status.updated()
       }
-      updateFunc.set(delta)
-      ownObjects.foreach(updateFunc.func)
+      ownObjects foreach updateFunc
       if (time % 120 == 0) // per 2sec
         ownObjects = ownObjects.filter(enableFunc)
     }

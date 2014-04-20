@@ -50,12 +50,11 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
     }
   }
 
-  def update(delta: Int) {
+  def update() {
     if (0 < invincibleTime) invincibleTime -= 1 // 無敵時間減らす
-    ShipBehavior.move(this, delta)
-    updateFunc.set(delta)
-    ownObjects.foreach(updateFunc.func)
-    ShipBehavior.shot(this, delta)
+    ShipBehavior.move(this)
+    ownObjects foreach updateFunc
+    ShipBehavior.shot(this)
     time += 1
     if (time % 120 == 0) ownObjects = ownObjects.filter(enableFunc)
   }

@@ -13,7 +13,7 @@ trait Drawable {
 }
 
 trait Runnable {
-  def update(delta: Int)
+  def update()
 }
 
 trait CanInit {
@@ -35,13 +35,7 @@ trait BulletLike extends ScriptControlled with Runnable with Drawable {
 
 trait HasInnerFunc {
 
-  protected class InnerUpdateFunc  {
-    private[this] var delta: Int = 0
-    def set(d: Int) { delta = d }
-    val func: Runnable => Unit = b => b.update(delta)
-  }
-
-  protected lazy val updateFunc: InnerUpdateFunc = new InnerUpdateFunc
+  protected val updateFunc = (b: Runnable) => b.update()
   protected val enableFunc = (b: BulletLike) => b.enable
   protected val drawFunc = (b: Drawable) => b.draw()
   protected val initFunc = (b: CanInit) => b.init()

@@ -23,20 +23,19 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
   }
 
   // スクリプトの実行が終わっていたら、持ち弾が0になるまで待ってから死ぬ
-  def onEndScript(delta: Int) {
+  def onEndScript() {
     if (ownObjects.isEmpty && nextAddPool.isEmpty) disable()
   }
 
-  def update(delta: Int) {
+  def update() {
     if (enable) {
       if (nextAddPool.nonEmpty) {
         ownObjects ++= nextAddPool
         nextAddPool.clear()
       }
       time += 1
-      action.run(delta)(this)
-      updateFunc.set(delta)
-      ownObjects.foreach(updateFunc.func)
+      action.run(this)
+      ownObjects foreach updateFunc
       if (time % 120 == 0) // per 2sec
         ownObjects = ownObjects filter enableFunc
     }

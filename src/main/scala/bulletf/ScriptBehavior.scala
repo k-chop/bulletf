@@ -44,7 +44,7 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
 
   val ex = new Extractor(null)
 
-  def step(t_nestLevel: Int, t_seq: Array[Op], unit: ScriptControlled, delta: Int, onInit: Boolean) {
+  def step(t_nestLevel: Int, t_seq: Array[Op], unit: ScriptControlled, onInit: Boolean) {
 
     @tailrec
     def recur(nestLevel: Int, seq: Array[Op]) {
@@ -59,7 +59,7 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
           unit.pc(unit.waitingNest) += 1
           recur(0, blocks.runBlock)
         } else {
-          BasicBehavior.run(delta)(unit)
+          BasicBehavior.run(unit)
         }
 
       } else if (unit.pc(nestLevel) < seq.length) { // 次のOpを実行
@@ -225,7 +225,7 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
             recur(nestLevel, seq)
         }
       } else { // もう全部終わってるならScriptedMove側に移譲(ただしinitブロック中では単に終了)
-        if (!onInit) unit.onEndScript(delta)
+        if (!onInit) unit.onEndScript()
         //else println(s"initblock end $unit")
       }
     }
@@ -236,15 +236,15 @@ class ScriptBehavior(val blocks: ScriptBlocks) extends Behavior {
   // 1度目のupdateの前に実行されるブロックを呼び出す
   override def init(unit: ScriptControlled) {
     ex.set(unit)
-    step(0, blocks.initBlock, unit, 0, onInit = true)
+    step(0, blocks.initBlock, unit, onInit = true)
     ex.unset()
     unit.clearLcPc() // Lc, Pcは共有なのでブロックが変わる時はリセット
   }
 
-  def run(delta: Int)(unitA: ScriptControlled) {
+  def run(unitA: ScriptControlled) {
     ex.set(unitA)
 
-    step(0, blocks.runBlock, unitA, delta, onInit = false) // 頭からたどる
+    step(0, blocks.runBlock, unitA, onInit = false) // 頭からたどる
     ex.unset()
   }
 

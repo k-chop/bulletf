@@ -8,10 +8,10 @@ import collection.mutable
 object ShipBehavior {
   private val sqrt2 = 1.414213
 
-  def move(ship: Ship, delta: Int) {
+  def move(ship: Ship) {
     import Input.keys._
     
-    val plus = 0.25 * delta
+    val plus = 4.0
     val ix = Input.x * plus
     val iy = Input.y * plus
 
@@ -27,7 +27,7 @@ object ShipBehavior {
     ship.pos.y += (if (ix*iy != 0) iy/sqrt2/slow else iy/slow)
   }
 
-  def shot(ship: Ship, delta: Int) {
+  def shot(ship: Ship) {
     import Input.keys._
 
     if (ship.time % 3 == 0) {

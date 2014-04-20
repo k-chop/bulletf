@@ -9,7 +9,7 @@ class GameOverScene extends Scene {
 
   def name() = "GameOver"
   
-  def update(delta: Int): Scene = {
+  def update(): Scene = {
     import Input.keys._
 
     if ( Input(SHOT) )

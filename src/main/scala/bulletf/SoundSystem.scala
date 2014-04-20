@@ -14,7 +14,7 @@ object SoundSystem {
   private[this] var symmap = Map.empty[Symbol, Int]
   private[this] var cooltime = Array.empty[Int]
 
-  def update(delta: Int) {
+  def update() {
     var i = arr.length - 1
     while(0 <= i) {
       if (0 < cooltime(i)) cooltime(i) -= 1

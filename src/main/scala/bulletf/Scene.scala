@@ -10,7 +10,7 @@ trait Scene {
   /**
     * delta is milliseconds.
    */
-  def update(delta: Int): Scene
+  def update(): Scene
   
   def run()
   

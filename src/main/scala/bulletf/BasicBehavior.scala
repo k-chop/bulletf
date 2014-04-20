@@ -10,13 +10,13 @@ object BasicBehavior extends Behavior {
     case _ => false
   }
 
-  def run(delta: Int)(unit: ScriptControlled) {
+  def run(unit: ScriptControlled) {
     import scala.math._
     import implicits.angle2double
 
     if (!isUpdated(unit)) {
-      val vx = cos(unit.angle * Pi / 180.0f) * unit.speed * delta
-      val vy = sin(unit.angle * Pi / 180.0f) * unit.speed * delta
+      val vx = cos(unit.angle * Pi / 180.0f) * unit.speed * 16 // 16 = old_delta
+      val vy = sin(unit.angle * Pi / 180.0f) * unit.speed * 16
       unit.pos.x += vx
       unit.pos.y += vy
 

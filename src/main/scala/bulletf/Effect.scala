@@ -24,17 +24,17 @@ class Effect(var action: Behavior, resource: Symbol, var pos: Position, var angl
     action.init(this)
   }
 
-  def update(delta: Int) {
+  def update() {
     if (enable) {
       time += 1
-      action.run(delta)(this)
+      action.run(this)
     }
   }
 
   /** スクリプトの実行が終わった時に呼び出される。
     * 子供はいないので即殺
     */
-  def onEndScript(delta: Int) {
+  def onEndScript() {
     disable()
   }
 

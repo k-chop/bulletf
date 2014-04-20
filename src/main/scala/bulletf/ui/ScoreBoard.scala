@@ -17,7 +17,7 @@ trait ScoreBoard extends Runnable with Drawable {
 object NullScoreBoard extends ScoreBoard {
   def get: Int = 0
   def add(i: Int) {}
-  def update(delta: Int) {}
+  def update() {}
   def draw() {}
 }
 
@@ -44,7 +44,7 @@ class ScoreBoardImpl(private[this] var score: Int) extends ClearableScoreBoard {
     score = 0
   }
 
-  def update(delta: Int) {
+  def update() {
 
   }
 

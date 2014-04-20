@@ -45,7 +45,7 @@ trait ScriptControlled extends Movable with CanInit with ParamCustomizable {
   }
 
   // スクリプトの実行が終わった時に呼び出される。
-  def onEndScript(delta: Int)
+  def onEndScript()
 
   //----------------------------------------------
 

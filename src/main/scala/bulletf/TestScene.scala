@@ -23,7 +23,7 @@ class TestScene extends Scene with HasInnerFunc {
   
   def name() = "fps test"
 
-  def update(delta: Int): Scene = {
+  def update(): Scene = {
 
     // fetch from enemy_pool
     if (Global.enemy_pool.nonEmpty) {
@@ -41,13 +41,12 @@ class TestScene extends Scene with HasInnerFunc {
     }
 
 
-    background.update(delta)
-    ship.update(delta)
+    background.update()
+    ship.update()
 
-    updateFunc.set(delta)
-    emitters foreach updateFunc.func
-    enemies foreach updateFunc.func
-    effects foreach updateFunc.func
+    emitters foreach updateFunc
+    enemies foreach updateFunc
+    effects foreach updateFunc
 
     val eCallBack = (e: Enemy, s: Shot) => {
       e.damage(s)

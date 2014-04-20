@@ -11,8 +11,8 @@ object SceneController {
     scenes.push( initScene )
   }
   
-  def update(delta: Int) = {
-    val next = scenes.top.update(delta)
+  def update() = {
+    val next = scenes.top.update()
     if (next != scenes.top) {
       scenes.top.dispose()
       scenes.pop()

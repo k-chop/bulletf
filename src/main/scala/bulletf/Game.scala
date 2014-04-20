@@ -42,18 +42,15 @@ class Game(_width: Int, _height: Int) {
     GLUtil.printGLSpecs()
 
     while (true) {
-      val be = getTime
-      val delta = calcDelta()
-      //up(delta)
       if (a%60==0) {
         val ta = System.nanoTime()
-        SceneController.update(delta/1000)
-        val elasp = (System.nanoTime() - ta) / 1000.0 / 1000.0
-        println(f"update takes time: $elasp%e ms")
+        SceneController.update()
+        val elapse = (System.nanoTime() - ta) / 1000.0 / 1000.0
+        println(f"update takes time: $elapse%e ms")
       } else {
-        SceneController.update(delta/1000)
+        SceneController.update()
       }
-      SoundSystem.update(delta/1000)
+      SoundSystem.update()
       
       updateFPS()
 
@@ -77,12 +74,8 @@ class Game(_width: Int, _height: Int) {
 
       Display.update()
 
-      // s += 1
-      // sum += delta//getTime - be
-      // if (s == fps) { println((sum / s.toDouble) + " : " + sum); s= 0; sum=0}
-
       //sync(be)
-      Display.sync(fps) // ←dame (on windows7 64bit)
+      Display.sync(fps)
       a += 1; a %= 360
       if (Display.isCloseRequested) {
         println("free resources...")
@@ -116,9 +109,9 @@ class Game(_width: Int, _height: Int) {
     Display.create()
 
     Controllers.create()
-    val padcount = Controllers.getControllerCount
-    println("padcount : " + padcount)
-    (0 until padcount).foreach{ i =>
+    val padCount = Controllers.getControllerCount
+    println("padCount : " + padCount)
+    (0 until padCount).foreach{ i =>
       val co = Controllers.getController(i)
       println("[%d] \"%s\" (%d)" format (i, co.getName, co.getButtonCount))
     }

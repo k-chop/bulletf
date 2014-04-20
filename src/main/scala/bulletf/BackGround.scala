@@ -17,7 +17,7 @@ class BackGroundBasicStars extends BackGround with HasInnerFunc {
     extends Runnable with Drawable
   {
 
-    def update(delta: Int) {
+    def update() {
       pos.y += speed
       if (pos.y > Game.height) {
         pos.y = 0
@@ -40,9 +40,8 @@ class BackGroundBasicStars extends BackGround with HasInnerFunc {
     new Star(Position(Random.nextDouble * Game.width, 0), initSpeed, initSize)
   }
 
-  def update(delta: Int) {
-    updateFunc.set(delta)
-    stars.foreach(updateFunc.func)
+  def update() {
+    stars foreach updateFunc
   }
 
   def draw() {

@@ -41,12 +41,12 @@ class Shot(val action: Behavior, val resource: Symbol, var pos: Position, var an
   val radius = sprite.rect.w / 4.0
 
   // スクリプトの実行が終わったら等速直線運動へシフト
-  def onEndScript(delta: Int) {
-    BasicBehavior.run(delta)(this)
+  def onEndScript() {
+    BasicBehavior.run(this)
   }
 
-  def update(delta: Int) {
-    if (enable) action.run(delta)(this)
+  def update() {
+    if (enable) action.run(this)
     if (!inside) disable()
   }
 

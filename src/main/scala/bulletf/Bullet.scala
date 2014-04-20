@@ -43,14 +43,14 @@ class Bullet(val action: Behavior, val resource: Symbol, var pos: Position, var 
   }
 
   // スクリプトの実行が終わったら等速直線運動へシフト
-  def onEndScript(delta: Int) {
-    BasicBehavior.run(delta)(this)
+  def onEndScript() {
+    BasicBehavior.run(this)
   }
 
-  def update(delta: Int) {
+  def update() {
     if (enable) {
       time += 1
-      action.run(delta)(this)
+      action.run(this)
     }
     if (!inside) disable()
   }

@@ -13,7 +13,7 @@ class TitleScene extends Scene {
 
   def name() = "Title"
   
-  def update(delta: Int): Scene = {
+  def update(): Scene = {
     import Input.keys._
 
     if ( Input(SHOT) )
