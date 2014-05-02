@@ -10,7 +10,7 @@ scalacOptions += "-feature"
 
 //incOptions := incOptions.value.withNameHashing(true)
 
-javaOptions ++= Seq("-verbose:gc", "-Dfile.encoding=UTF-8")
+javaOptions ++= Seq("-verbose:gc", "-Xloggc:./gc.log", "-XX:+PrintGCDetails", "-XX:+PrintTenuringDistribution", "-Dfile.encoding=UTF-8")
 
 initialCommands in console += "import bulletf._"
 
