@@ -1,12 +1,10 @@
 emitter temp {
   
-  run {
-    emit(t01aline)
-    wait(100)
-    emit(t01aline)
-    wait(100)
-    emit(t01bline)
-  }
+  emit(t01aline)
+  wait(100)
+  emit(t01aline)
+  wait(100)
+  emit(t01bline)
 
 }
 
@@ -18,55 +16,52 @@ enemy t01b {
     spd(0.35)
     dir(90)
   }
-  run {
-    wait(8)
-    brake(30)
-    emit(threeWay)
-    wait(60)
-    accel(72, -0.3)
-  }
+
+  wait(8)
+  brake(30)
+  emit(threeWay)
+  wait(60)
+  accel(72, -0.3)
+
 }
 
 emitter threeWay {
-  run {
-    repeat 5 {
-      $0 = @aim
-      $0 -= 10
-      se(shot02)
-      repeat 3 {
-        fire(simple, ENG05R, $0, 0.33)
-        $0 += 10
-      }
-      wait(4)
+
+  repeat 5 {
+    $0 = @aim
+    $0 -= 10
+    se(shot02)
+    repeat 3 {
+      fire(simple, ENG05R, $0, 0.33)
+      $0 += 10
     }
+    wait(4)
   }
 }
 
 emitter t01bline {
-  run {
-    $0 = @x
-    $0 -= 50
-    repeat 3 {
-      appear(t01b, invader01, $0, 5)
-      $0 += 50
-      wait(50)
-    }
+
+  $0 = @x
+  $0 -= 50
+  repeat 3 {
+    appear(t01b, invader01, $0, 5)
+    $0 += 50
+    wait(50)
   }
 }
 
 emitter t01aline {
-  run {
-    
-    repeat 6 {
-      $0 = @x
-      $0 += @rnd(-200,200)
-      appear(t01a, invader01, $0, 5)
-      wait(10)
-    }
+
+  repeat 6 {
+    $0 = @x
+    $0 += @rnd(-200,200)
+    appear(t01a, invader01, $0, 5)
+    wait(10)
   }
 }
 
 enemy t01a {
+
   data {
     health := 20
   }
@@ -79,10 +74,8 @@ enemy t01a {
     dir($0)
   }
 
-  run {
-    se(shot03)
-    fire(simpleX, ENG03R, @aim, @rnd(0.34,0.4))
-  }
+  se(shot03)
+  fire(simpleX, ENG03R, @aim, @rnd(0.34,0.4))
 
 }
 
@@ -90,130 +83,121 @@ bullet simpleX {
   data {
     draw_type := "rotate:8"
   }
-
-  run {
-    nop
-  }
 }
 
 bullet tailshot {
-  run {
-    repeat 0 {
-      fx(tail, ENG01B)
-      wait(4)
-    }
+
+  repeat 0 {
+    fx(tail, ENG01B)
+    wait(4)
   }
 }
 
 bullet accelshot {
+
   init {
     $0 = @spd
     $1 = 0.015
   }
-  run {
-    se(shot03, 0.5)
-    repeat 0 {
-      spd($1, relative)
-      wait(10)
-    }
+
+  se(shot03, 0.5)
+  repeat 0 {
+    spd($1, relative)
+    wait(10)
   }
 }
 
 bullet exsimple {
-  run {
-    se(shot03, 0.2)
-  }
+
+  se(shot03, 0.2)
 }
 
 bullet delayaim {
-  run {
-    wait(60)
-    spd(0.3, absolute)
-    dir(@aim)
-  }
+
+  wait(60)
+  spd(0.3, absolute)
+  dir(@aim)
 }
 
 enemy t01 {
+
   init {
     dir(90)
     spd(0.25)
   }
-  run {
-    wait(15)
-    $0 = 3
-    repeat 30 {
-      dir($0, relative)
-      wait(1)
-    }
-    wait(10)
-    se(shot03, 1.0, 0.2)
-    fire(simple, ENG01B)
-    wait(3)
-    repeat 7 {
-      fx(muzzle, ENG01B)
-      fire(exsimple, ENG01D)
-      wait(3)
-    }
-    wait(10)
-    repeat 30 {
-      dir($0, relative)
-      wait(1)
-    }
-    wait(60)
+
+  wait(15)
+  $0 = 3
+  repeat 30 {
+    dir($0, relative)
+    wait(1)
   }
+  wait(10)
+  se(shot03, 1.0, 0.2)
+  fire(simple, ENG01B)
+  wait(3)
+  repeat 7 {
+    fx(muzzle, ENG01B)
+    fire(exsimple, ENG01D)
+    wait(3)
+  }
+  wait(10)
+  repeat 30 {
+    dir($0, relative)
+    wait(1)
+  }
+  wait(60)
 }
 
 enemy invader {
+
   init {
     $0 = 90
     dir($0)
     $1 = 0.21
     spd($1)
   }
-  run {
-    wait(30)
-    repeat 24 {
-      $1 -= @rnd(0.01, 0.02)
-      spd($1)
-      wait(1)
-    }
-    repeat 6 {
-      $2 = @rnd(0.03, 0.06)
-      fx(muzzle, ENG01B)
-      se(shot03, 0.2)
-      fire(simple, ENG01B, @aim, $2)
-      wait(4)
-    }
-    repeat 18 {
-      $1 -= @rnd(0.01, 0.02)
-      spd($1)
-      wait(1)
-    }
-    wait(60)
+
+  wait(30)
+  repeat 24 {
+    $1 -= @rnd(0.01, 0.02)
+    spd($1)
+    wait(1)
   }
+  repeat 6 {
+    $2 = @rnd(0.03, 0.06)
+    fx(muzzle, ENG01B)
+    se(shot03, 0.2)
+    fire(simple, ENG01B, @aim, $2)
+    wait(4)
+  }
+  repeat 18 {
+    $1 -= @rnd(0.01, 0.02)
+    spd($1)
+    wait(1)
+  }
+  wait(60)
 }
 
 emitter invaderline {
   init {
     $0 = 40
   }
-  run {
-    repeat 20 {
-      appear(invader, invader01, $0, 15)
-      $0 += 20
-      $1 = 10
-      $1 += @rnd(0, 8)
-      wait(1)
-    }
+
+  repeat 20 {
+    appear(invader, invader01, $0, 15)
+    $0 += 20
+    $1 = 10
+    $1 += @rnd(0, 8)
+    wait(1)
   }
 }
 
 emitter invader5line {
-  run {
-    repeat 5 {
-      emit(invaderline)
-      wait(60)
-    }
+
+  repeat 5 {
+    emit(invaderline)
+    wait(60)
   }
 }
 
@@ -222,15 +206,14 @@ enemy movetest {
     dir(@aim)
     spd(0.21)
   }
-  run {
-    wait(30)
-    brake(30)
-    wait(30)
-    accel(30, 0.4)
-    repeat 0 {
-      fire(accelshot, ENG05R, @aim, 0.21)
-      wait(5)
-    }
+
+  wait(30)
+  brake(30)
+  wait(30)
+  accel(30, 0.4)
+  repeat 0 {
+    fire(accelshot, ENG05R, @aim, 0.21)
+    wait(5)
   }
 }
 
@@ -252,7 +235,7 @@ emitter main {
 
     emit(temp)
 
-    wait(440)
+    wait(420)
 
     repeat 7 {
       appear(first, invader01, @x, 15)
