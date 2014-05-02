@@ -4,9 +4,6 @@ package bulletf
 import scala.collection.mutable
 import ui._
 
-/**
- *  evil global
- */
 object Global {
 
   private[Global] trait GlobalPool[T] {

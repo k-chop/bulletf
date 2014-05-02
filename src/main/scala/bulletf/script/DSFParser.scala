@@ -44,10 +44,11 @@ object DSFParser extends StandardTokenParsers {
     case bls => bls.toMap
   }
 
+  // blockNameが省略されてたらrunブロックとして認識
   lazy val block: Parser[(Symbol, Array[Op])] =
     blockName ~ "{" ~ opseq <~ "}" ^^ {
       case bn ~ _ ~ ops => (bn, ops.toArray)
-    }
+    } | opseq ^^ { case ops => ('flatrun, ops.toArray) }
 
   lazy val blockName = ("data"| "init" | "run" | "die") ^^ { case s => Symbol(s) }
 
@@ -124,7 +125,7 @@ object DSFParser extends StandardTokenParsers {
         blockSet map { case (typeSym, name, blockMap) =>
           // datablockがnullなのは仮
           val datablock = extractDataBlock(blockMap.get('data).getOrElse(Array(Nop)))
-          val sblocks = new ScriptBlocks(Symbol(name), symToType(typeSym), datablock, blockMap)
+          val sblocks = new ScriptBlocks(Symbol(name), symToType(typeSym), datablock, validatedBlockMap(name, blockMap))
           //println(sblocks)
           (Symbol(name), sblocks)
         }
@@ -140,6 +141,26 @@ object DSFParser extends StandardTokenParsers {
         println(msg)
         Seq(('main, ScriptBlocks.empty))
     }
+  }
+
+  type BlockMap = Map[Symbol, Array[Op]]
+
+  /*
+   * runとflatrunが両方あったらflatrun優先
+   * 両方なかったらnopのみのを補完
+   * flatrunあるならrunにリネーム
+   */
+  private def validatedBlockMap(actName: String, bap: BlockMap): BlockMap = {
+    if (!bap.contains('run) && !bap.contains('flatrun)) {
+      println(s"$actName has no <run block>")
+      bap + ('run -> Array(Nop))
+    } else if (bap.contains('run) && bap.contains('flatrun)) {
+      println(s"$actName has double run definition: disable <run block>")
+      bap - 'run + ('run -> bap('flatrun)) - 'flatrun
+    } else if (bap.contains('flatrun)) {
+      val swap = bap('flatrun)
+      bap - 'flatrun + ('run -> swap)
+    } else bap
   }
 
   def symToType(s: Symbol): ScriptType = s match {
