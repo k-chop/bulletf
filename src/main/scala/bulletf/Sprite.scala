@@ -4,10 +4,6 @@ package bulletf
 
 import scala.collection.mutable
 
-object SpriteBatch {
-  final val self = new mdesl.graphics.SpriteBatch()
-}
-
 object Sprite {
 
   private[this] val cache = mutable.HashMap.empty[Symbol, Sprite]

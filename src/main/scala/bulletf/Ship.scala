@@ -1,8 +1,9 @@
 package bulletf
 
 
-
+import scala.math.{sin, cos}
 import scala.collection.mutable
+import scala.language.postfixOps
 
 object Ship {
 
@@ -14,6 +15,20 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
 
   // 自機のショット、そのうちキャッシュするようにする
   var ownObjects = mutable.ListBuffer.empty[Shot]
+
+  // オプション: 最大10(仮)
+  lazy val options: mutable.ListBuffer[ShipOption] = {
+    def n(q: Double) = {
+      val r = q.toRadians
+      val len = 30
+      Position(cos(r)*len*1.3 + pos.x, sin(r)*len + pos.y)
+    }
+    val a = mutable.ListBuffer.empty[ShipOption]
+    (0 to 359 by 90 zipWithIndex) foreach { case (i, j) =>
+      a += new ShipOption(this, n(i), i)
+    }
+    a
+  }
 
   val sprite: Sprite = Sprite.get(Resource.shipGraphic)
   // 初期位置
@@ -53,6 +68,7 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
   def update() {
     if (0 < invincibleTime) invincibleTime -= 1 // 無敵時間減らす
     ShipBehavior.move(this)
+    options foreach updateFunc
     ownObjects foreach updateFunc
     ShipBehavior.shot(this)
     time += 1
@@ -64,6 +80,7 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
     if ( (invincibleTime <= 0) || (invincibleTime % 3 == 0) ) {
       sprite.draw(pos)
     }
+    options foreach drawFunc
     ownObjects.foreach(drawFunc)
   }
 
@@ -73,7 +90,37 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
 
 }
 
-
 trait LifeAccess {
   def life: Int
+}
+
+class ShipOption(parent: HasCollision, initPos: Position, var degree: Double) extends HasCollision with Runnable with Drawable {
+
+  val sprite = Sprite.get('a_box01)
+  var speed = 4
+
+  var time = 0
+
+  override var pos: Position = initPos
+  override val radius: Double = 0
+
+  override def draw(): Unit = {
+    sprite.draw(pos, 0f, 1f, 0.5f, time)
+  }
+
+  def update(): Unit = {
+    degree += speed
+    val r = degree.toRadians
+    val len = 30
+    pos.x = cos(r) * len*1.3 + parent.pos.x
+    pos.y = sin(r) * len + parent.pos.y
+
+    time += 1
+    time %= 60
+  }
+
+  def posStep(): Unit = {
+
+  }
+
 }
