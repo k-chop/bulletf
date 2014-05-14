@@ -109,14 +109,29 @@ class ShipOption(parent: HasCollision, initPos: Position, var degree: Double) ex
   }
 
   def update(): Unit = {
+    if (Input(Input.keys.SHOT) && Input(Input.keys.LASER))
+      updateInLaser()
+    else
+      updateOrdinary()
+
+    time += 1
+    time %= 60
+  }
+  
+  def updateOrdinary(): Unit = {
     degree += speed
     val r = degree.toRadians
     val len = 30
     pos.x = cos(r) * len*1.3 + parent.pos.x
     pos.y = sin(r) * len + parent.pos.y
-
-    time += 1
-    time %= 60
+  }
+  
+  def updateInLaser(): Unit = {
+    degree += speed * 2
+    val r = degree.toRadians
+    val len = 15
+    pos.x = cos(r) * len + parent.pos.x
+    pos.y = sin(r) * (len/3) + parent.pos.y - 25
   }
 
   def posStep(): Unit = {

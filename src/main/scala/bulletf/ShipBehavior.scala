@@ -15,7 +15,7 @@ object ShipBehavior {
     val ix = Input.x * plus
     val iy = Input.y * plus
 
-    val slow = if (Input(LAZER)) 2 else 1
+    val slow = if (Input(LASER)) 2 else 1
     
     // if ( key(KEY_RIGHT) ) vx += plus
     // if ( key(KEY_LEFT) ) vx -= plus
@@ -31,31 +31,18 @@ object ShipBehavior {
     import Input.keys._
 
     if (ship.time % 3 == 0) {
-      if (Input(SHOT) && !Input(LAZER)) {
+      if (Input(SHOT) && !Input(LASER)) {
         SoundSystem.playSymbol('shot01a, vol = 0.1f)
         ship.options.foreach { op =>
           ship.ownObjects +=
             STGObjectFactory.newShot(BasicBehavior, 'shot01, op.pos.cloneBy(0, -5), Angle(-90), 1.2)
         }
-/*        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-6, -5), Angle(-90), 1.2)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+6, -5), Angle(-90), 1.2)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-10, -3), Angle(-100), 1.2)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+10, -3), Angle(-80), 1.2)
-*/
-      } else if (Input(SHOT) && Input(LAZER)) {
+      } else if (Input(SHOT) && Input(LASER)) {
         SoundSystem.playSymbol('shot01a, vol = 0.1f)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-15, 3), Angle(-90), 1.25)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(-6, -3), Angle(-90), 1.25)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+6, -3), Angle(-90), 1.25)
-        ship.ownObjects +=
-          STGObjectFactory.newShot(BasicBehavior, 'shot01, ship.pos.cloneBy(+15, 3), Angle(-90), 1.25)
+        ship.options.foreach { op =>
+          ship.ownObjects +=
+            STGObjectFactory.newShot(BasicBehavior, 'shot02, op.pos.cloneBy(0, -5), Angle(-90), 1.3)
+        }
       }
     }
   }

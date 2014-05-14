@@ -10,14 +10,14 @@ object Input {
 
   object keys {
     val SHOT = 1
-    val LAZER = 2
+    val LASER = 2
     val BOMB = 4
     val ACT = 8
   }
   
   var usePad = false
-  val padmap = Map(SHOT -> 3, LAZER -> 5, BOMB -> 2, ACT -> 1)
-  val keymap = Map(SHOT -> KEY_Z, LAZER -> KEY_X, BOMB -> KEY_C, ACT -> KEY_S)
+  val padmap = Map(SHOT -> 3, LASER -> 5, BOMB -> 2, ACT -> 1)
+  val keymap = Map(SHOT -> KEY_Z, LASER -> KEY_X, BOMB -> KEY_C, ACT -> KEY_S)
   
   def apply(i: Int) = if (usePad) pad(i) else key(i)
   def x = if (usePad) pad.x else key.x
