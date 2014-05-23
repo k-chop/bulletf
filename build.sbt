@@ -2,9 +2,14 @@ name := "bulletf"
 
 version := "0.1.0-SNAPSHOT"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.11.1"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
+libraryDependencies <++= scalaVersion { v => Seq(
+  "org.scalatest" %% "scalatest" % "2.1.6" % "test",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1",
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.1"
+)}
+
 
 scalacOptions += "-feature"
 
