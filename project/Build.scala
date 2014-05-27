@@ -36,7 +36,7 @@ object Sound {
       clip.close()
       stream.close()
     }
-    Await.result(f, 1 seconds)
+    Await.result(f, 5 seconds)
   }
 }
 
