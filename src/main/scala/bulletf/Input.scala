@@ -14,7 +14,7 @@ object Input {
     val BOMB = 4
     val ACT = 8
   }
-  
+
   var usePad = false
   val padmap = Map(SHOT -> 3, LASER -> 5, BOMB -> 2, ACT -> 1)
   val keymap = Map(SHOT -> KEY_Z, LASER -> KEY_X, BOMB -> KEY_C, ACT -> KEY_S)
