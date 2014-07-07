@@ -28,4 +28,6 @@ object `package` {
   val ri = { i: Int => util.Random.nextInt(i) }
   val rd = { i: Int => util.Random.nextDouble()*i }
 
+  final val sqrt2 = 1.414213
+
 }

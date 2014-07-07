@@ -11,7 +11,7 @@ object Enemy {
 }
 
 class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike with CanProduceAll with HasCollision with HasInnerFunc
+  extends BulletLike with OwnerLike[BulletLike] with CanProduceAll with HasCollision with HasInnerFunc
 {
 
   val sprite = Sprite.get(resource)
@@ -23,7 +23,7 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
   // 移動用の状態
   val status = MoveStrategyStatus.nop
 
-  var ownObjects = mutable.ListBuffer.empty[BulletLike]
+  protected var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
   // initブロックの実行
   override def init() {

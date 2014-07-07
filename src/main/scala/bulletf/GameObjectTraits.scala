@@ -42,8 +42,9 @@ trait HasInnerFunc {
 
 }
 
-trait OwnerLike {
-  var ownObjects: mutable.ListBuffer[BulletLike]
+trait OwnerLike[T] {
+  protected var ownObjects: mutable.ListBuffer[T]
+  def childs: Seq[T] = ownObjects.toList
 }
 
 trait CanProduceToGlobal {
@@ -57,7 +58,7 @@ trait CanProduceToGlobal {
 }
 
 trait CanProduceAll extends CanProduceToGlobal {
-  self: OwnerLike =>
+  self: OwnerLike[BulletLike] =>
 
   protected[this] lazy val nextAddPool = mutable.ListBuffer.empty[BulletLike]
 

@@ -11,10 +11,10 @@ object Ship {
 
 }
 
-class Ship extends HasCollision with HasInnerFunc with LifeAccess {
+class Ship extends HasCollision with OwnerLike[Shot] with HasInnerFunc with LifeAccess {
 
   // 自機のショット、そのうちキャッシュするようにする
-  var ownObjects = mutable.ListBuffer.empty[Shot]
+  protected var ownObjects = mutable.ListBuffer.empty[Shot]
 
   // オプション: 最大10(仮)
   lazy val options: mutable.ListBuffer[ShipOption] = {
@@ -67,10 +67,10 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
 
   def update() {
     if (0 < invincibleTime) invincibleTime -= 1 // 無敵時間減らす
-    ShipBehavior.move(this)
+    move()
     options foreach updateFunc
     ownObjects foreach updateFunc
-    ShipBehavior.shot(this)
+    shot()
     time += 1
     if (time % 120 == 0) ownObjects = ownObjects.filter(enableFunc)
   }
@@ -84,9 +84,39 @@ class Ship extends HasCollision with HasInnerFunc with LifeAccess {
     ownObjects.foreach(drawFunc)
   }
 
-  // 外部で利用する際mutableだと困るので
-  // でも現状普通にownObjectに外からアクセスできてしまうので意味が無い
-  def shots: List[Shot] = ownObjects.toList
+  def move() {
+    import Input.keys._
+
+    val plus = 4.0
+    val ix = Input.x * plus
+    val iy = Input.y * plus
+
+    val slow = if (Input(LASER)) 2 else 1
+
+    pos.x += (if (ix*iy != 0) ix/sqrt2/slow else ix/slow)
+    pos.y += (if (ix*iy != 0) iy/sqrt2/slow else iy/slow)
+  }
+
+  def shot() {
+    import Input.keys._
+
+    @inline val shotF = (op: ShipOption) =>
+      ownObjects += STGObjectFactory.newShot(BasicBehavior, 'shot01, op.pos.cloneBy(0, -5), Angle(-90), 1.2)
+
+    @inline val laserF = (op: ShipOption) =>
+      ownObjects += STGObjectFactory.newShot(BasicBehavior, 'shot02, op.pos.cloneBy(0, -5), Angle(-90), 1.3)
+
+    if (time % 3 == 0) {
+      if (Input(SHOT) && !Input(LASER)) {
+        SoundSystem.playSymbol('shot01a, vol = 0.1f)
+        options foreach shotF
+      } else if (Input(SHOT) && Input(LASER)) {
+        SoundSystem.playSymbol('shot01a, vol = 0.1f)
+        options foreach laserF
+      }
+    }
+  }
+
 
 }
 

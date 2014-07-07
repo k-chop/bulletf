@@ -38,7 +38,7 @@ object CollisionCheckerShip extends CollisionChecker[Ship, BulletLike] {
       case (e: Enemy) +: tail if e.enable =>
         val ehit = if (e.live) isHit(target, e) else false
         if (!ehit) { // 当たってなければ子もチェック
-          check(target, e.ownObjects.toList) match {
+          check(target, e.childs) match {
             case s: ShotBy[_] => s
             case _ => recur(tail)
           }
@@ -50,7 +50,7 @@ object CollisionCheckerShip extends CollisionChecker[Ship, BulletLike] {
         if (isHit(target, b)) ShotBy(b) else recur(tail)
 
       case (em: Emitter) +: tail if em.enable => // Emitterに当たり判定はないので子のチェック
-        check(target, em.ownObjects.toList) match {
+        check(target, em.childs) match {
           case s: ShotBy[_] => s
           case _=> recur(tail)
         }

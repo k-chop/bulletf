@@ -55,7 +55,7 @@ class TestScene extends Scene with HasInnerFunc {
       SoundSystem.playSymbol('test2, vol = 0.04f)
     }
 
-    CollisionCheckerEnemy.checkAll(enemies.toList, ship.ownObjects.toList, eCallBack)
+    CollisionCheckerEnemy.checkAll(enemies.toList, ship.childs, eCallBack)
 
     val damaged = CollisionCheckerShip.checkAll(ship, enemies.toSeq, emitters.toSeq) match {
       case ShotBy(x) =>

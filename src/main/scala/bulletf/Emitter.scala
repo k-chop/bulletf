@@ -5,7 +5,7 @@ package bulletf
 import collection.mutable
 
 class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike with CanProduceAll with HasInnerFunc
+  extends BulletLike with OwnerLike[BulletLike] with CanProduceAll with HasInnerFunc
 {
 
 /*  var waitCount: Int = -1
@@ -16,7 +16,7 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
   var enable = true
   var time = 0*/
 
-  var ownObjects = mutable.ListBuffer.empty[BulletLike]
+  protected var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
   override def init() {
     action.init(this)
