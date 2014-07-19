@@ -5,7 +5,7 @@ package bulletf
 import collection.mutable
 
 class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike[BulletLike] with CanProduceAll with HasInnerFunc
+  extends BulletLike with OwnerLike[BulletLike] with CanProduceAll
 {
 
 /*  var waitCount: Int = -1
@@ -35,14 +35,14 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
       }
       time += 1
       action.run(this)
-      ownObjects foreach updateFunc
+      ownObjects foreach CommonFunction.updateFunc
       if (time % 120 == 0) // per 2sec
-        ownObjects = ownObjects filter enableFunc
+        ownObjects = ownObjects filter CommonFunction.enableFunc
     }
   }
 
   def draw() {
-    if (enable) ownObjects foreach drawFunc
+    if (enable) ownObjects foreach CommonFunction.drawFunc
   }
 
   def size = ownObjects.size

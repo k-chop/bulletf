@@ -11,7 +11,7 @@ object Ship {
 
 }
 
-class Ship extends HasCollision with OwnerLike[Shot] with HasInnerFunc with LifeAccess {
+class Ship extends HasCollision with OwnerLike[Shot] with LifeAccess {
 
   // 自機のショット、そのうちキャッシュするようにする
   protected var ownObjects = mutable.ListBuffer.empty[Shot]
@@ -68,11 +68,11 @@ class Ship extends HasCollision with OwnerLike[Shot] with HasInnerFunc with Life
   def update() {
     if (0 < invincibleTime) invincibleTime -= 1 // 無敵時間減らす
     move()
-    options foreach updateFunc
-    ownObjects foreach updateFunc
+    options foreach CommonFunction.updateFunc
+    ownObjects foreach CommonFunction.updateFunc
     shot()
     time += 1
-    if (time % 120 == 0) ownObjects = ownObjects.filter(enableFunc)
+    if (time % 120 == 0) ownObjects = ownObjects filter CommonFunction.enableFunc
   }
 
   def draw() {
@@ -80,8 +80,8 @@ class Ship extends HasCollision with OwnerLike[Shot] with HasInnerFunc with Life
     if ( (invincibleTime <= 0) || (invincibleTime % 3 == 0) ) {
       sprite.draw(pos)
     }
-    options foreach drawFunc
-    ownObjects.foreach(drawFunc)
+    options foreach CommonFunction.drawFunc
+    ownObjects foreach CommonFunction.drawFunc
   }
 
   def move() {

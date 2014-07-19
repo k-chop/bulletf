@@ -5,7 +5,7 @@ import collection.mutable
 import org.lwjgl.input.Keyboard._
 import ui._
 
-class TestScene extends Scene with HasInnerFunc {
+class TestScene extends Scene {
 //  this: Scene =>
 
   lazy val ship = new Ship()
@@ -44,9 +44,9 @@ class TestScene extends Scene with HasInnerFunc {
     background.update()
     ship.update()
 
-    emitters foreach updateFunc
-    enemies foreach updateFunc
-    effects foreach updateFunc
+    emitters foreach CommonFunction.updateFunc
+    enemies foreach CommonFunction.updateFunc
+    effects foreach CommonFunction.updateFunc
 
     val eCallBack = (e: Enemy, s: Shot) => {
       e.damage(s)
@@ -93,9 +93,9 @@ class TestScene extends Scene with HasInnerFunc {
 
     background.draw()
     ship.draw()
-    emitters foreach drawFunc
-    enemies foreach drawFunc
-    effects foreach drawFunc
+    emitters foreach CommonFunction.drawFunc
+    enemies foreach CommonFunction.drawFunc
+    effects foreach CommonFunction.drawFunc
     score.draw()
     lives.draw()
   }

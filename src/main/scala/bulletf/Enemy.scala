@@ -11,7 +11,7 @@ object Enemy {
 }
 
 class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: Angle, var speed: Double)
-  extends BulletLike with OwnerLike[BulletLike] with CanProduceAll with HasCollision with HasInnerFunc
+  extends BulletLike with OwnerLike[BulletLike] with CanProduceAll with HasCollision
 {
 
   val sprite = Sprite.get(resource)
@@ -65,16 +65,16 @@ class Enemy(action: Behavior, resource: Symbol, var pos: Position, var angle: An
         }
         status.updated()
       }
-      ownObjects foreach updateFunc
+      ownObjects foreach CommonFunction.updateFunc
       if (time % 120 == 0) // per 2sec
-        ownObjects = ownObjects.filter(enableFunc)
+        ownObjects = ownObjects.filter(CommonFunction.enableFunc)
     }
   }
 
   def draw() {
     if (enable) {
       if (live) sprite.draw(pos, 0, 1.0, 1.0)
-      ownObjects.foreach(drawFunc)
+      ownObjects.foreach(CommonFunction.drawFunc)
     }
   }
 

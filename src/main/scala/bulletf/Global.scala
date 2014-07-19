@@ -52,10 +52,10 @@ object Global {
     protected[this] var self = mutable.ListBuffer.empty[Enemy]
   }
 
-  object needInit_pool extends GlobalPool[CanInit] with HasInnerFunc {
+  object needInit_pool extends GlobalPool[CanInit] {
     protected[this] var self = mutable.ListBuffer.empty[CanInit]
     def allInit() {
-      self.foreach(initFunc)
+      self foreach CommonFunction.initFunc
       self.clear()
     }
   }

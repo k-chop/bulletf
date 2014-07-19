@@ -5,7 +5,7 @@ import scala.util.Random
 
 trait BackGround extends Runnable with Drawable
 
-class BackGroundBasicStars extends BackGround with HasInnerFunc {
+class BackGroundBasicStars extends BackGround {
 
   private def initSpeed = 1 + Random.nextDouble * 10
   private def initSize = Random.nextBoolean() //1 + Random.nextFloat * 3
@@ -41,11 +41,11 @@ class BackGroundBasicStars extends BackGround with HasInnerFunc {
   }
 
   def update() {
-    stars foreach updateFunc
+    stars foreach CommonFunction.updateFunc
   }
 
   def draw() {
-    stars.foreach(drawFunc)
+    stars foreach CommonFunction.drawFunc
   }
 
 }

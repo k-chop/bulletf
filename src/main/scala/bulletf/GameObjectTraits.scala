@@ -33,12 +33,12 @@ trait BulletLike extends ScriptControlled with Runnable with Drawable {
   var drawType: DrawType = NormalDraw
 }
 
-trait HasInnerFunc {
+object CommonFunction {
 
-  protected val updateFunc = (b: Runnable) => b.update()
-  protected val enableFunc = (b: BulletLike) => b.enable
-  protected val drawFunc = (b: Drawable) => b.draw()
-  protected val initFunc = (b: CanInit) => b.init()
+  final val updateFunc = (b: Runnable) => b.update()
+  final val enableFunc = (b: BulletLike) => b.enable
+  final val drawFunc = (b: Drawable) => b.draw()
+  final val initFunc = (b: CanInit) => b.init()
 
 }
 
