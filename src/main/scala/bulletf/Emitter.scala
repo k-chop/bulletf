@@ -8,14 +8,6 @@ class Emitter(action: Behavior, var pos: Position, var angle: Angle, var speed: 
   extends BulletLike with OwnerLike[BulletLike] with CanProduceAll
 {
 
-/*  var waitCount: Int = -1
-  var waitingNest: Int = 0
-  val pc = copyPc
-  val lc = copyLc
-  val vars = copyVars
-  var enable = true
-  var time = 0*/
-
   protected var ownObjects = mutable.ListBuffer.empty[BulletLike]
 
   override def init() {

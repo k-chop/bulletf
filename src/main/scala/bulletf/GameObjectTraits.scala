@@ -49,7 +49,6 @@ trait OwnerLike[T] {
 
 trait CanProduceToGlobal {
   def genEnemy(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
-    //ownObjects += STGObjectFactory.newEnemy(action, kind, pos, angle, speed)
     Global.enemy_pool.set(STGObjectFactory.newEnemy(action, kind, pos, angle, speed))
   }
   def effect(action: Behavior, kind: Symbol, pos: Position, angle: Angle, speed: Double) {
